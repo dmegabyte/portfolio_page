@@ -90,7 +90,7 @@ test.describe('Portfolio E2E Health Check', () => {
     { name: 'AboutPage', path: '/#/about' },
     { name: 'ContactPage', path: '/#/contact' },
     ...projects.map(p => ({ name: `Project: ${p.title}`, path: `/#/project/${p.slug}` })),
-    ...projects.filter(p => p.docPage).map(p => ({ name: `Doc: ${p.title}`, path: `/#${p.docPage}` })),
+    ...projects.filter(p => p.documentationPage).map(p => ({ name: `Documentation: ${p.title}`, path: `/#${p.documentationPage}` })),
   ];
 
   for (const pageInfo of pagesToTest) {

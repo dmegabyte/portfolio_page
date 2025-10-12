@@ -1,7 +1,9 @@
 
+
+
 import React from 'react';
 import DocPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CodeBlockWithCopy } from '../components/DocUIComponents';
+import { SectionHeader, InfoCard, CodeBlockWithCopy } from '../components/DocumentationUIComponents';
 import { CubeTransparentIcon, CodeBracketIcon, BoltIcon,CommandLineIcon, QuestionMarkCircleIcon, TableCellsIcon, DocumentTextIcon, ArchiveBoxIcon, ExclamationTriangleIcon, PlayIcon } from '@heroicons/react/24/outline';
 
 const InterfaceGenDocPage: React.FC = () => {

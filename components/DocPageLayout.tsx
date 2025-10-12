@@ -10,6 +10,7 @@ const DocPageLayout: React.FC<DocPageLayoutProps> = ({ children, title }) => {
     const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
     const [activeId, setActiveId] = useState<string>('');
     const contentRef = useRef<HTMLDivElement>(null);
+    const observerRef = useRef<IntersectionObserver | null>(null);
 
     // Custom click handler to manage scrolling without causing router conflicts.
     const handleTocLinkClick = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -31,7 +32,13 @@ const DocPageLayout: React.FC<DocPageLayoutProps> = ({ children, title }) => {
     // Effect to build table of contents and set up scroll spy
     useEffect(() => {
         if (!contentRef.current) return;
-        
+
+        // Disconnect any existing observer before setting up a new one
+        if (observerRef.current) {
+            observerRef.current.disconnect();
+        }
+
+        // 1. Scan for headings and populate the TOC state
         const headingElements = Array.from(contentRef.current.querySelectorAll('section[id]')) as HTMLElement[];
         const mappedHeadings = headingElements.map(h => {
             const h2 = h.querySelector('h2');
@@ -46,30 +53,64 @@ const DocPageLayout: React.FC<DocPageLayoutProps> = ({ children, title }) => {
         });
         setHeadings(mappedHeadings);
 
-        const observer = new IntersectionObserver(
-            (entries) => {
-                 // Find the topmost visible section
-                let topEntry: IntersectionObserverEntry | null = null;
-                for (const entry of entries) {
-                    if (entry.isIntersecting) {
-                        if (!topEntry || entry.boundingClientRect.top < topEntry.boundingClientRect.top) {
-                            topEntry = entry;
-                        }
-                    }
-                }
-                if (topEntry) {
-                    setActiveId(topEntry.target.id);
-                }
-            },
-            { rootMargin: '-20% 0px -75% 0px', threshold: 0.1 }
-        );
+        // If no headings are found, there's nothing to observe.
+        if (headingElements.length === 0) return;
 
-        headingElements.forEach(h => observer.observe(h));
+        // 2. Set up a robust scroll spy observer.
+        // This ref holds the IDs of all sections currently within the observer's rootMargin.
+        const visibleSections = new Set<string>();
 
-        return () => {
-            headingElements.forEach(h => observer.unobserve(h));
+        const observerCallback = (entries: IntersectionObserverEntry[]) => {
+            // Update the set of sections currently inside the active viewport margin
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    visibleSections.add(entry.target.id);
+                } else {
+                    visibleSections.delete(entry.target.id);
+                }
+            });
+
+            let newActiveId = '';
+            
+            // Find the first visible section by iterating through headings in their document order.
+            // This ensures the topmost visible section is always chosen as active.
+            for (const heading of mappedHeadings) {
+                if (visibleSections.has(heading.id)) {
+                    newActiveId = heading.id;
+                    break;
+                }
+            }
+
+            // Fallback: If no section is in the active margin (e.g., in the space between sections or at the page bottom),
+            // check if the user has scrolled to the very bottom of the document.
+            if (!newActiveId) {
+                const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50; // 50px buffer
+                if (isAtBottom && mappedHeadings.length > 0) {
+                    newActiveId = mappedHeadings[mappedHeadings.length - 1].id;
+                }
+            }
+            
+            // Only update state if the active ID has actually changed to prevent unnecessary re-renders.
+            if (newActiveId) {
+                setActiveId(newActiveId);
+            }
         };
-    }, [children]);
+        
+        observerRef.current = new IntersectionObserver(observerCallback, {
+            // The "active" area is a horizontal band between 20% from the top and 25% from the bottom of the viewport.
+            rootMargin: '-20% 0px -75% 0px',
+            threshold: 0, // Fire as soon as a single pixel enters/leaves the margin.
+        });
+
+        headingElements.forEach(h => observerRef.current.observe(h));
+
+        // Cleanup function to disconnect the observer when the component unmounts or content changes
+        return () => {
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+            }
+        };
+    }, [children]); // Re-run the entire setup if the page content changes.
 
 
     return (
@@ -77,37 +118,41 @@ const DocPageLayout: React.FC<DocPageLayoutProps> = ({ children, title }) => {
             <div className="lg:flex">
                  {/* Sidebar */}
                 <aside className="hidden lg:block w-72 flex-shrink-0 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
-                    <nav aria-labelledby="document-navigation">
-                        <h2 id="document-navigation" className="font-bold text-gray-800 dark:text-slate-200 mb-4 text-lg">Оглавление</h2>
-                        <ul className="space-y-1">
-                            {headings.map((heading) => {
-                                const isActive = activeId === heading.id;
-                                const isSubheading = heading.level > 2;
-                                
-                                const linkClasses = `
-                                    block w-full text-left transition-colors text-sm rounded-md px-3 py-1.5
-                                    ${isSubheading ? 'pl-7' : 'font-semibold'}
-                                    ${isActive
-                                        ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-slate-700'
-                                        : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-700/50'
-                                    }
-                                `;
+                    <div className="flex flex-col h-full">
+                        <nav aria-labelledby="document-navigation" className="flex-grow">
+                            <h2 id="document-navigation" className="font-bold text-gray-800 dark:text-slate-200 mb-4 text-lg">Оглавление</h2>
+                            <ul className="space-y-1">
+                                {headings.map((heading) => {
+                                    const isActive = activeId === heading.id;
+                                    const isSubheading = heading.level > 2;
+                                    
+                                    const linkClasses = `
+                                        block w-full text-left transition-colors duration-200
+                                        border-l-2 py-1.5 pr-3
+                                        ${isSubheading ? 'pl-7' : 'pl-3 font-semibold'}
+                                        ${isActive
+                                            ? 'text-slate-900 dark:text-slate-50 font-bold border-indigo-500 dark:border-indigo-400'
+                                            : 'text-gray-600 dark:text-slate-400 border-transparent hover:text-gray-900 dark:hover:text-slate-100 hover:border-gray-300 dark:hover:border-slate-600'
+                                        }
+                                    `;
 
-                                return (
-                                    <li key={heading.id}>
-                                        <a
-                                            href={`#${heading.id}`}
-                                            onClick={(e) => handleTocLinkClick(e, heading.id)}
-                                            className={linkClasses.trim().replace(/\s+/g, ' ')}
-                                            aria-current={isActive ? 'page' : undefined}
-                                        >
-                                            {heading.text}
-                                        </a>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    </nav>
+                                    return (
+                                        <li key={heading.id}>
+                                            <a
+                                                href={`#${heading.id}`}
+                                                onClick={(e) => handleTocLinkClick(e, heading.id)}
+                                                className={linkClasses.trim().replace(/\s+/g, ' ')}
+                                                aria-current={isActive ? 'page' : undefined}
+                                            >
+                                                {heading.text}
+                                            </a>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </nav>
+                        <ScrollToTopButton />
+                    </div>
                 </aside>
 
                  {/* Main Content */}
@@ -120,7 +165,6 @@ const DocPageLayout: React.FC<DocPageLayoutProps> = ({ children, title }) => {
                     <article ref={contentRef} className="prose prose-lg max-w-none text-gray-700 dark:text-slate-300 dark:prose-headings:text-slate-100 dark:prose-strong:text-slate-100 dark:prose-a:text-indigo-600 dark:prose-a:hover:text-indigo-500 dark:prose-invert">
                         {children}
                     </article>
-                    <ScrollToTopButton />
                 </div>
             </div>
         </div>

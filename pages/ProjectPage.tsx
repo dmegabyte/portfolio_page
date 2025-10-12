@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { projects } from '../data/projects';
@@ -44,9 +45,9 @@ const ProjectPage: React.FC = () => {
         </div>
 
         <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-700 flex flex-wrap gap-4">
-            {project.docPage && (
+            {project.documentationPage && (
             <Link
-                to={project.docPage}
+                to={project.documentationPage}
                 className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors no-underline shadow-sm"
             >
                 Читать документацию

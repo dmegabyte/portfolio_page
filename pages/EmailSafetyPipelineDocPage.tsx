@@ -1,7 +1,9 @@
 
+
+
 import React from 'react';
 import DocPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CodeBlockWithCopy } from '../components/DocUIComponents';
+import { SectionHeader, InfoCard, CodeBlockWithCopy } from '../components/DocumentationUIComponents';
 import { ShieldCheckIcon, EnvelopeOpenIcon, CodeBracketIcon, CogIcon, CheckBadgeIcon } from '@heroicons/react/24/outline';
 
 const EmailSafetyPipelineDocPage: React.FC = () => {

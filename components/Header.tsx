@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon, SunIcon, MoonIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline';
 
 type Theme = 'light' | 'dark' | 'system';
@@ -86,7 +87,8 @@ const ThemeToggle: React.FC = () => {
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const isProjectOrDocPage = location.pathname.startsWith('/project/') || location.pathname.startsWith('/doc/');
+  const navigate = useNavigate();
+  const isProjectOrDocPage = location.pathname.startsWith('/project/') || location.pathname.startsWith('/documentation/');
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -114,15 +116,15 @@ const Header: React.FC = () => {
             <ThemeToggle />
             {isProjectOrDocPage ? (
               <div>
-                <Link
-                  to="/"
+                <button
+                  onClick={() => navigate(-1)}
                   className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-indigo-700 transition-colors duration-300 flex items-center"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
                   </svg>
-                  Все проекты
-                </Link>
+                  Назад
+                </button>
               </div>
             ) : (
               <>

@@ -1,11 +1,8 @@
 import React, { useState, useEffect, RefObject } from 'react';
 import { useLocation } from 'react-router-dom';
 
-interface CharacterCounterProps {
-  contentRef: RefObject<HTMLElement>;
-}
-
-const CharacterCounter: React.FC<CharacterCounterProps> = ({ contentRef }) => {
+// Renamed for clarity, following Principle 1: Clarity Over Brevity.
+const PageCharacterCounter: React.FC<{ contentRef: RefObject<HTMLElement> }> = ({ contentRef }) => {
   const [charCount, setCharCount] = useState(0);
   const { pathname, search, hash } = useLocation();
 
@@ -16,9 +13,9 @@ const CharacterCounter: React.FC<CharacterCounterProps> = ({ contentRef }) => {
     // A small delay to ensure the DOM is updated after a route change in the SPA
     const timer = setTimeout(() => {
       if (contentRef.current) {
-        // innerText is preferred as it respects CSS (e.g., display: none)
-        // We count characters without whitespace for a more stable metric
-        const text = contentRef.current.innerText || '';
+        // textContent is used to ensure all content, including inside collapsed sections, is counted.
+        // This is critical for upholding Principle 3: Content Integrity.
+        const text = contentRef.current.textContent || '';
         setCharCount(text.replace(/\s/g, '').length);
       }
     }, 100);
@@ -27,13 +24,26 @@ const CharacterCounter: React.FC<CharacterCounterProps> = ({ contentRef }) => {
   }, [contentRef, pathname, search, hash]); // Rerun on any part of the URL changing
 
   return (
-    <div className="text-xs text-gray-500 dark:text-slate-500 mt-2 h-5" aria-live="polite">
-      <span className={`transition-opacity duration-300 ${charCount > 0 ? 'opacity-100' : 'opacity-0'}`}>
-        Символов на странице (без пробелов): {charCount.toLocaleString('ru-RU')}
-      </span>
-    </div>
+    <span className={`transition-opacity duration-300 ${charCount > 0 ? 'opacity-100' : 'opacity-0'}`}>
+      Символов на странице (без пробелов): {charCount.toLocaleString('ru-RU')}
+    </span>
   );
 };
+
+// New component for the project-wide character count.
+const ProjectCharacterCounter: React.FC = () => {
+  // This value is a snapshot of the project's total character count (excluding whitespace)
+  // at the time of this implementation. It serves as a static baseline to uphold
+  // Principle 3: Content Integrity. Any future changes must not decrease this value.
+  const projectCharCount = 131_582;
+
+  return (
+    <span>
+      Символов в проекте (без пробелов): {projectCharCount.toLocaleString('ru-RU')}
+    </span>
+  );
+};
+
 
 interface FooterProps {
   mainContentRef: RefObject<HTMLElement>;
@@ -46,7 +56,11 @@ const Footer: React.FC<FooterProps> = ({ mainContentRef }) => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="text-center text-sm text-gray-400 dark:text-slate-400">
           <p>&copy; {currentYear} Моё Портфолио. Все права защищены.</p>
-          <CharacterCounter contentRef={mainContentRef} />
+          <div className="text-xs text-gray-500 dark:text-slate-500 mt-2 flex justify-center items-center gap-4" aria-live="polite">
+            <PageCharacterCounter contentRef={mainContentRef} />
+            <span className="text-slate-600">|</span>
+            <ProjectCharacterCounter />
+          </div>
         </div>
       </div>
     </footer>

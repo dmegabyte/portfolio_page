@@ -5,7 +5,8 @@ const ScrollToTopButton: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = () => {
-    if (window.pageYOffset > 300) {
+    // Show button if page is scrolled down more than half a viewport height
+    if (window.pageYOffset > window.innerHeight / 2) {
       setIsVisible(true);
     } else {
       setIsVisible(false);
@@ -27,16 +28,17 @@ const ScrollToTopButton: React.FC = () => {
   }, []);
 
   return (
-    <button
-      type="button"
-      onClick={scrollToTop}
-      className={`fixed bottom-6 right-6 z-40 bg-indigo-600 text-white p-3 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus:ring-offset-slate-900 transition-opacity duration-300 ${
-        isVisible ? 'opacity-100' : 'opacity-0'
-      }`}
-      aria-label="Scroll to top"
-    >
-      <ArrowUpIcon className="h-6 w-6" />
-    </button>
+    <div className={`mt-auto pt-8 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+        <button
+            type="button"
+            onClick={scrollToTop}
+            className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 p-3 rounded-lg transition-colors"
+            aria-label="Вернуться к началу"
+            >
+            <ArrowUpIcon className="h-5 w-5" />
+            Наверх
+        </button>
+    </div>
   );
 };
 

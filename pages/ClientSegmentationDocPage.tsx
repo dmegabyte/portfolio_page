@@ -1,6 +1,9 @@
+
+
+
 import React, { useState } from 'react';
 import DocPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, TooltipTerm, Modal } from '../components/DocUIComponents';
+import { SectionHeader, InfoCard, TooltipTerm, Modal, CollapsibleSection } from '../components/DocumentationUIComponents';
 // FIX: Import the missing LifebuoyIcon.
 import { 
     RocketLaunchIcon, CircleStackIcon, Cog6ToothIcon, TagIcon, TableCellsIcon, 
@@ -10,9 +13,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 const InteractiveWorkflowDiagram: React.FC = () => {
-    const [isSegmentationModalOpen, setSegmentationModalOpen] = useState(false);
-    const [isSendTimeModalOpen, setSendTimeModalOpen] = useState(false);
-
+    // The modal logic is removed from here to improve UX.
+    // Details are now shown in a CollapsibleSection within the relevant document section.
     return (
         <div className="my-8 not-prose">
             <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
@@ -35,17 +37,29 @@ const InteractiveWorkflowDiagram: React.FC = () => {
                     <div className="flex-grow bg-white dark:bg-slate-800 rounded-lg p-4 border border-gray-200 dark:border-slate-700 shadow-inner w-full md:w-auto">
                         <h4 className="font-semibold text-center text-gray-800 dark:text-slate-200 mb-3">Ядро AI-маркетолога</h4>
                         <div className="flex flex-col sm:flex-row justify-around gap-2">
-                             <button onClick={() => setSegmentationModalOpen(true)} className="flex-1 text-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors">
-                                <UserGroupIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
-                                <span className="text-xs font-semibold">1. Сегментация</span>
-                            </button>
-                             <button onClick={() => setSendTimeModalOpen(true)} className="flex-1 text-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors">
-                                <CalendarDaysIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
-                                <span className="text-xs font-semibold">2. Расчет даты</span>
-                            </button>
-                            <div className="flex-1 text-center p-2">
-                                <TagIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
-                                <span className="text-xs font-semibold">3. Сборка сообщения</span>
+                             <div className="flex-1 text-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors">
+                                <TooltipTerm definition="Система анализирует клиентов по 7+ параметрам (тип, лояльность, активность, потребление и др.), присваивая каждому уникальный сегмент для подбора наиболее релевантного предложения.">
+                                    <div className="flex flex-col items-center justify-center cursor-help">
+                                        <UserGroupIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
+                                        <span className="text-xs font-semibold">1. Сегментация</span>
+                                    </div>
+                                </TooltipTerm>
+                            </div>
+                             <div className="flex-1 text-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors w-full">
+                                <TooltipTerm definition="Система прогнозирует оптимальную дату отправки, используя историю визитов клиента. Детальная логика раскрыта в соответствующем разделе документации.">
+                                    <div className="flex flex-col items-center justify-center cursor-help">
+                                        <CalendarDaysIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
+                                        <span className="text-xs font-semibold">2. Расчет даты</span>
+                                    </div>
+                                </TooltipTerm>
+                            </div>
+                            <div className="flex-1 text-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors">
+                                <TooltipTerm definition="Система автоматически подбирает релевантный шаблон текста и промо-акцию, а затем подставляет персональные данные клиента.">
+                                    <div className="flex flex-col items-center justify-center cursor-help">
+                                        <TagIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
+                                        <span className="text-xs font-semibold">3. Сборка сообщения</span>
+                                    </div>
+                                </TooltipTerm>
                             </div>
                         </div>
                     </div>
@@ -75,77 +89,6 @@ const InteractiveWorkflowDiagram: React.FC = () => {
                     </div>
                 </div>
             </div>
-            
-            <Modal isOpen={isSegmentationModalOpen} onClose={() => setSegmentationModalOpen(false)} title="Полный свод правил сегментации">
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <h4>БЛОК A: АРХИТЕКТУРНЫЕ ПРИНЦИПЫ</h4>
-                    <p><strong>Принцип "idFirst"</strong>: Все ключевые сегменты (тип клиента, тип потребления) в системе представляются не строками ("Посетитель"), а уникальными числовыми идентификаторами (ID = 1). Это делает код более быстрым, надежным и менее зависимым от текстовых названий.</p>
-
-                    <h4>БЛОК B: ГЛОБАЛЬНЫЕ ПРИНЦИПЫ ФИЛЬТРАЦИИ ДАННЫХ</h4>
-                    <ol>
-                        <li><strong>История визитов</strong>: Все расчеты учитывают ВСЕ доступные данные за весь период. Ограничение в 1.5 года снято.</li>
-                        <li><strong>Надежность сравнения статусов</strong>: При сравнении статусов визитов (например, "пришел") используется нормализация текста (регистр, "е"/"ё").</li>
-                        <li><strong>Валидация текстовых полей</strong>: Текстовые поля (шаблоны, промо) считаются валидными, только если их длина после удаления пробелов больше 10 символов.</li>
-                    </ol>
-
-                    <h4>БЛОК 1: СЕГМЕНТАЦИЯ КЛИЕНТОВ</h4>
-                    <p><strong>1.1: Определение типа клиента (по приоритету):</strong></p>
-                    <ul>
-                        <li><strong>Посетитель</strong>: Есть хотя бы один визит со статусом "пришел".</li>
-                        <li><strong>Покупатель</strong>: Нет визитов, но есть покупка.</li>
-                        <li><strong>Лид</strong>: Нет визитов и покупок, но есть запись со статусом "не пришел".</li>
-                        <li><strong>Неизвестно</strong>: Во всех остальных случаях.</li>
-                    </ul>
-                    <p><strong>1.3: Определение типа потребления:</strong> Анализ услуг. Если доля Массаж/СПА ≥ 80%, присваивается эта категория. Иначе — "Универсал".</p>
-                    <p><strong>1.4: Определение лояльности:</strong> 1 визит ("Разовые"), 2-4 визита ("Повторные 2-4"), ≥ 5 визитов ("Повторные 5+").</p>
-                    <p><strong>1.5: Определение активности:</strong> `(сегодня - дата последнего контакта)`. ≤ 90 дней ("Активный"), 91-270 дней ("Пассивный"), &gt; 270 дней ("Потерянный").</p>
-                </div>
-            </Modal>
-             <Modal isOpen={isSendTimeModalOpen} onClose={() => setSendTimeModalOpen(false)} title="Таблица логики расчета времени отправки">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-slate-400">
-                            <tr>
-                                <th className="px-4 py-2">Тип клиента</th>
-                                <th className="px-4 py-2">Условие</th>
-                                <th className="px-4 py-2">Логика `send_date`</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-gray-700 dark:text-slate-300">
-                            <tr className="border-b dark:border-slate-700 bg-amber-50 dark:bg-amber-900/20"><td colSpan={3} className="px-4 py-1 text-xs font-bold text-amber-800 dark:text-amber-400">Высший приоритет</td></tr>
-                            <tr className="border-b dark:border-slate-700">
-                                <td className="px-4 py-2 font-semibold">Любой</td>
-                                <td className="px-4 py-2">✅ Активный абонемент</td>
-                                <td className="px-4 py-2"><code>Дата посл. визита + 30д</code></td>
-                            </tr>
-                            <tr className="border-b dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50"><td colSpan={3} className="px-4 py-1 text-xs font-bold">Основная логика</td></tr>
-                            <tr className="border-b dark:border-slate-700">
-                                <td className="px-4 py-2 font-semibold" rowSpan={2}>Посетитель</td>
-                                <td className="px-4 py-2">≥ 2 визитов ("Повторный")</td>
-                                <td className="px-4 py-2"><code>Дата посл. визита + (min интервал) - 3д</code></td>
-                            </tr>
-                             <tr className="border-b dark:border-slate-700">
-                                <td className="px-4 py-2">1 визит ("Разовый")</td>
-                                <td className="px-4 py-2"><code>Дата визита + (средний интервал) - 3д</code></td>
-                            </tr>
-                            <tr className="border-b dark:border-slate-700">
-                                <td className="px-4 py-2 font-semibold" rowSpan={2}>Покупатель</td>
-                                <td className="px-4 py-2">Подходит по таймингу из "Шаблонов"</td>
-                                <td className="px-4 py-2"><code>сегодня</code></td>
-                            </tr>
-                            <tr className="border-b dark:border-slate-700">
-                                <td className="px-4 py-2">Последнее сообщение &lt; 14д назад</td>
-                                <td className="px-4 py-2"><code>null</code></td>
-                            </tr>
-                            <tr className="border-b dark:border-slate-700">
-                                <td className="px-4 py-2 font-semibold">Лид / Неизвестно</td>
-                                <td className="px-4 py-2">-</td>
-                                <td className="px-4 py-2"><code>null</code> (не отправлять)</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </Modal>
         </div>
     );
 };
@@ -167,6 +110,9 @@ const ClientSegmentationDocPage: React.FC = () => {
         loyalty: "Показатель, отражающий количество успешных визитов клиента. Делится на 'Разовые', 'Повторные (2-4 раза)' и 'Повторные (5 и более раз)'.",
         activity: "Показатель, отражающий, как давно клиент контактировал с сервисом (визит или покупка). Делится на 'Активный' (до 90 дней), 'Пассивный' (91-270 дней) и 'Потерянный' (более 270 дней).",
         consumption_type: "Определяет предпочтения клиента. Если 80% или более услуг относятся к одной категории (Массаж или СПА), присваивается она. В противном случае — 'Универсал'.",
+        massazhnik: "Тип потребления клиента, у которого 80% или более посещенных услуг относятся к категории 'Массаж'.",
+        spashnik: "Тип потребления клиента, у которого 80% или более посещенных услуг относятся к категории 'СПА'.",
+        universal: "Тип потребления клиента, у которого нет доминирующей категории услуг (менее 80% Массажа или СПА).",
         promo_personalization: "Лист «Персонализация» содержит матрицу условий для выбора уникальных промо-акций, основанных на детальном профиле клиента (например, для 'потерянного спашника' с сертификатом). Имеет высший приоритет при выборе акции.",
         promo_actions: "Лист «Акции» содержит общие, групповые промо-предложения. Используется как резервный вариант, если для клиента не нашлось персонального предложения.",
         templates: "Лист «Шаблоны» содержит базовые тексты сообщений для разных сегментов клиентов. Система фильтрует этот лист по параметрам клиента, чтобы выбрать наиболее подходящий текст.",
@@ -179,11 +125,11 @@ const ClientSegmentationDocPage: React.FC = () => {
             <section id="intro">
                 <SectionHeader 
                     icon={<RocketLaunchIcon className="w-8 h-8" />}
-                    title="Что это и для кого?"
-                    subtitle="«Мозг» для маркетолога, который живет в Google Таблицах. Он сам анализирует клиентов и решает, когда и какое сообщение им отправить, чтобы они вернулись."
+                    title="Концепция и бизнес-задача"
+                    subtitle="Описание автономной системы, которая анализирует клиентскую базу, автоматически сегментирует пользователей и запускает персонализированные маркетинговые кампании. Цель — повысить вовлеченность и LTV, минимизировав ручное управление."
                 />
                 <InteractiveWorkflowDiagram />
-                 <InfoCard icon={<LightBulbIcon className="w-8 h-8" />} title="Ключевые выводы (Key Takeaways)">
+                <InfoCard icon={<LightBulbIcon className="w-8 h-8" />} title="Ключевые выводы (Key Takeaways)">
                     <ul className="list-disc list-inside space-y-2 text-base">
                         <li><b>Автоматическая сегментация:</b> Система анализирует данные клиентов по 7+ параметрам (активность, лояльность, тип потребления и др.).</li>
                         <li><b>Персональные коммуникации:</b> Автоматически подбирает релевантные промо-акции и шаблоны сообщений для каждого сегмента.</li>
@@ -197,48 +143,49 @@ const ClientSegmentationDocPage: React.FC = () => {
                 <SectionHeader 
                     icon={<ScaleIcon className="w-8 h-8" />}
                     title="Ключевые принципы системы"
-                    subtitle="Архитектурные решения и глобальные правила обработки данных."
+                    subtitle="В этом разделе раскрываются фундаментальные архитектурные решения, на которых построена вся система. Описывается принцип «idFirst» для повышения производительности и надежности, а также глобальные правила фильтрации и обработки данных, обеспечивающие их полноту, согласованность и высокое качество."
                 />
-                <div className="space-y-8 mt-8 not-prose">
+                <div className="space-y-8 mt-8">
                     <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                         <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0 mb-4">БЛОК A: Архитектурный принцип «idFirst»</h3>
                         <p className="text-gray-700 dark:text-slate-300 text-base">Все ключевые сегменты (тип клиента, тип потребления) в системе представляются не строками ("Посетитель"), а уникальными числовыми идентификаторами (ID = 1). Этот подход, известный как <TooltipTerm definition={glossary.idFirst}>idFirst</TooltipTerm>, делает код более быстрым, надежным и менее зависимым от текстовых названий. Функции сегментации сначала вычисляют текстовое значение, а затем конвертируют его в ID.</p>
-                        <div className="mt-6 border-t border-gray-200 dark:border-slate-700 pt-6">
-                             <h4 className="font-semibold text-lg text-gray-800 dark:text-slate-200 mb-4">Пример маппинга ID</h4>
-                             <div className="grid md:grid-cols-2 gap-6">
-                                 <div>
-                                     <h5 className="font-bold mb-2 text-gray-700 dark:text-slate-300">Тип клиента</h5>
-                                     <div className="space-y-2 font-mono text-sm">
-                                         <div className="flex items-center gap-4 p-2 bg-white dark:bg-slate-800 rounded-md">
-                                             <span className="text-gray-500 dark:text-slate-400">ID: 1</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"Посетитель"</span>
-                                         </div>
-                                         <div className="flex items-center gap-4 p-2 bg-white dark:bg-slate-800 rounded-md">
-                                             <span className="text-gray-500 dark:text-slate-400">ID: 2</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"Покупатель"</span>
-                                         </div>
-                                         <div className="flex items-center gap-4 p-2 bg-white dark:bg-slate-800 rounded-md">
-                                             <span className="text-gray-500 dark:text-slate-400">ID: 3</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"Лид"</span>
-                                         </div>
-                                          <div className="flex items-center gap-4 p-2 bg-white dark:bg-slate-800 rounded-md">
-                                             <span className="text-gray-500 dark:text-slate-400">ID: 4</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"Неизвестно"</span>
+                        <CollapsibleSection title="Показать пример маппинга ID">
+                             <div className="mt-6 border-t border-gray-200 dark:border-slate-700 pt-6">
+                                 <div className="grid md:grid-cols-2 gap-6">
+                                     <div>
+                                         <h5 className="font-bold mb-2 text-gray-700 dark:text-slate-300">Тип клиента</h5>
+                                         <div className="space-y-3 font-mono text-base">
+                                             <div className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900 rounded-lg">
+                                                 <span className="text-gray-500 dark:text-slate-400">ID: 1</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"<TooltipTerm definition={glossary.visitor}>Посетитель</TooltipTerm>"</span>
+                                             </div>
+                                             <div className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900 rounded-lg">
+                                                 <span className="text-gray-500 dark:text-slate-400">ID: 2</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"<TooltipTerm definition={glossary.buyer}>Покупатель</TooltipTerm>"</span>
+                                             </div>
+                                             <div className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900 rounded-lg">
+                                                 <span className="text-gray-500 dark:text-slate-400">ID: 3</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"<TooltipTerm definition={glossary.lead}>Лид</TooltipTerm>"</span>
+                                             </div>
+                                              <div className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900 rounded-lg">
+                                                 <span className="text-gray-500 dark:text-slate-400">ID: 4</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"Неизвестно"</span>
+                                             </div>
                                          </div>
                                      </div>
-                                 </div>
-                                  <div>
-                                     <h5 className="font-bold mb-2 text-gray-700 dark:text-slate-300">Тип потребления</h5>
-                                     <div className="space-y-2 font-mono text-sm">
-                                         <div className="flex items-center gap-4 p-2 bg-white dark:bg-slate-800 rounded-md">
-                                             <span className="text-gray-500 dark:text-slate-400">ID: 1</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"Массажник"</span>
-                                         </div>
-                                         <div className="flex items-center gap-4 p-2 bg-white dark:bg-slate-800 rounded-md">
-                                             <span className="text-gray-500 dark:text-slate-400">ID: 2</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"Спашник"</span>
-                                         </div>
-                                         <div className="flex items-center gap-4 p-2 bg-white dark:bg-slate-800 rounded-md">
-                                             <span className="text-gray-500 dark:text-slate-400">ID: 3</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"Универсал"</span>
+                                      <div>
+                                         <h5 className="font-bold mb-2 text-gray-700 dark:text-slate-300">Тип потребления</h5>
+                                         <div className="space-y-3 font-mono text-base">
+                                             <div className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900 rounded-lg">
+                                                 <span className="text-gray-500 dark:text-slate-400">ID: 1</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"<TooltipTerm definition={glossary.massazhnik}>Массажник</TooltipTerm>"</span>
+                                             </div>
+                                             <div className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900 rounded-lg">
+                                                 <span className="text-gray-500 dark:text-slate-400">ID: 2</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"<TooltipTerm definition={glossary.spashnik}>Спашник</TooltipTerm>"</span>
+                                             </div>
+                                             <div className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900 rounded-lg">
+                                                 <span className="text-gray-500 dark:text-slate-400">ID: 3</span><span className="text-gray-400 dark:text-slate-500">↔</span><span>"<TooltipTerm definition={glossary.universal}>Универсал</TooltipTerm>"</span>
+                                             </div>
                                          </div>
                                      </div>
                                  </div>
                              </div>
-                         </div>
+                        </CollapsibleSection>
                     </div>
                      <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                         <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0 mb-4">БЛОК B: Глобальные принципы фильтрации данных</h3>
@@ -279,7 +226,7 @@ const ClientSegmentationDocPage: React.FC = () => {
                 <SectionHeader 
                     icon={<UserGroupIcon className="w-8 h-8" />}
                     title="1. Сегментация клиентов"
-                    subtitle="Детальное описание правил и функций для категоризации клиентов в различные сегменты."
+                    subtitle="Этот раздел детально описывает многоуровневый процесс автоматической категоризации клиентов. Здесь представлены все правила и метрики, по которым система определяет тип клиента, его лояльность, активность, потребительские предпочтения и другие ключевые характеристики, формируя полный 360-градусный профиль."
                 />
                 <div className="grid md:grid-cols-2 gap-6 mt-6">
                     {/* 1.1: Client Type */}
@@ -325,6 +272,25 @@ const ClientSegmentationDocPage: React.FC = () => {
                                         <p className="text-sm text-gray-600 dark:text-slate-400">Во всех остальных случаях.</p>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 1.2: Visit Intervals */}
+                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 space-y-4">
+                        <div className="flex items-center gap-3">
+                            <CpuChipIcon className="w-7 h-7 text-indigo-500 dark:text-indigo-400"/>
+                            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-200 mt-0">1.2: Расчет интервалов визитов</h3>
+                        </div>
+                        <p className="text-sm text-gray-500 dark:text-slate-400">Ключевые метрики для прогнозирования следующего визита клиента. Рассчитываются только для <TooltipTerm definition={glossary.visitor}>Посетителей</TooltipTerm>.</p>
+                        <div className="space-y-3 pt-2">
+                            <div className="p-3 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
+                                <h4 className="font-semibold text-gray-900 dark:text-slate-100">Минимальный интервал (<TooltipTerm definition={glossary.minInterval}>minInterval</TooltipTerm>)</h4>
+                                <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">Вычисляется для каждого клиента индивидуально. Это наименьший промежуток (в днях) между двумя его последовательными визитами. Используется для прогноза возвращения <TooltipTerm definition={glossary.loyalty}>"повторных"</TooltipTerm> клиентов.</p>
+                            </div>
+                            <div className="p-3 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
+                                <h4 className="font-semibold text-gray-900 dark:text-slate-100">Средний интервал (<TooltipTerm definition={glossary.avgInterval}>avgInterval</TooltipTerm>)</h4>
+                                <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">Рассчитывается как среднее арифметическое всех интервалов между визитами по всей клиентской базе. Используется для прогноза возвращения <TooltipTerm definition={glossary.loyalty}>"разовых"</TooltipTerm> клиентов, у которых еще нет своей истории визитов.</p>
                             </div>
                         </div>
                     </div>
@@ -433,11 +399,9 @@ const ClientSegmentationDocPage: React.FC = () => {
                 <SectionHeader 
                     icon={<TagIcon className="w-8 h-8" />}
                     title="2. Шаблоны, промо и плейсхолдеры"
-                    subtitle="Пошаговый конвейер сборки персонализированного сообщения."
+                    subtitle="Здесь пошагово разбирается конвейер, который превращает сырые данные и сегменты в готовое к отправке, персонализированное сообщение. Описывается логика выбора наиболее релевантной промо-акции и текстового шаблона, а также механизм подстановки персональных данных клиента (плейсхолдеров)."
                 />
-                
-                <div className="space-y-8 mt-8 not-prose">
-                    
+                <div className="space-y-8 mt-8">
                     {/* Step 1: Promo Selection */}
                     <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                         <div className="flex items-center gap-4 mb-4">
@@ -451,12 +415,12 @@ const ClientSegmentationDocPage: React.FC = () => {
                                 <p className="text-base text-gray-700 dark:text-slate-300">Ищутся персональные предложения в листе <TooltipTerm definition={glossary.promo_personalization}>«Персонализация»</TooltipTerm>.</p>
                             </div>
                             <div className="flex justify-center items-center text-gray-400 dark:text-slate-500">
-                                <ArrowLongDownIcon className="w-6 h-6" />
-                                <span className="ml-2 font-semibold text-sm">Если ничего не найдено</span>
+                                <ArrowLongDownIcon className="w-8 h-8"/>
+                                <span className="text-sm font-semibold ml-2">Если не найдено...</span>
                             </div>
-                            <div className="bg-white dark:bg-slate-800 rounded-lg p-5 border border-gray-200 dark:border-slate-700 shadow-md">
-                                <h4 className="font-bold text-base text-gray-800 dark:text-slate-200 mt-0">Резервный вариант</h4>
-                                <p className="text-base text-gray-700 dark:text-slate-300">Берётся общее групповое промо из листа <TooltipTerm definition={glossary.promo_actions}>«Акции»</TooltipTerm>.</p>
+                            <div className="bg-white dark:bg-slate-800 rounded-lg p-5 border border-gray-200 dark:border-slate-700 shadow-sm">
+                                <h4 className="font-bold text-base text-gray-800 dark:text-slate-200 mt-0">Резервный поиск</h4>
+                                <p className="text-base text-gray-700 dark:text-slate-300">Ищутся общие предложения в листе <TooltipTerm definition={glossary.promo_actions}>«Акции»</TooltipTerm>.</p>
                             </div>
                         </div>
                     </div>
@@ -467,200 +431,155 @@ const ClientSegmentationDocPage: React.FC = () => {
                             <div className="flex-shrink-0 w-10 h-10 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-lg">2</div>
                             <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0">ШАГ 2: Выбор шаблона</h3>
                         </div>
-                        <p className="text-gray-700 dark:text-slate-300 mb-6 pl-14 text-base">На основе <TooltipTerm definition={glossary.segment}>сегмента</TooltipTerm> клиента, определённого в БЛОКЕ 1, система находит наиболее подходящий базовый текст сообщения.</p>
-                        <div className="flex items-center justify-center gap-4 flex-wrap pl-14">
-                            <div className="text-center p-4 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-                                <p className="font-semibold text-gray-800 dark:text-slate-200">Клиентский сегмент</p>
-                                <p className="text-sm text-gray-500 dark:text-slate-400">(из БЛОКА 1)</p>
-                            </div>
-                             <ArrowLongDownIcon className="w-8 h-8 text-gray-400 dark:text-slate-500 rotate-[270deg] md:rotate-0" />
-                            <div className="text-center p-4 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
-                                <p className="font-semibold text-gray-800 dark:text-slate-200">Фильтрация листа <TooltipTerm definition={glossary.templates}>«Шаблоны»</TooltipTerm></p>
-                                <p className="text-sm text-gray-500 dark:text-slate-400">(по сегменту)</p>
-                            </div>
-                            <ArrowLongDownIcon className="w-8 h-8 text-gray-400 dark:text-slate-500 rotate-[270deg] md:rotate-0" />
-                            <div className="text-center p-4 bg-emerald-50 dark:bg-emerald-900/50 rounded-lg shadow-sm border border-emerald-200 dark:border-emerald-800">
-                                <p className="font-semibold text-emerald-800 dark:text-emerald-300">Выбранный шаблон</p>
-                                <p className="text-sm text-emerald-600 dark:text-emerald-400">(базовый текст)</p>
-                            </div>
-                        </div>
+                        <p className="text-gray-700 dark:text-slate-300 pl-14 text-base">Функция <code>selectTemplate</code> ищет наиболее подходящий шаблон в листе <TooltipTerm definition={glossary.templates}>«Шаблоны»</TooltipTerm>, фильтруя по параметрам клиента.</p>
+                         <p className="text-sm text-gray-500 dark:text-slate-400 mt-2 pl-14 flex items-center gap-2"><LightBulbIcon className="w-5 h-5" /> <span>Чем больше параметров совпало, тем выше приоритет шаблона.</span></p>
                     </div>
 
-                    {/* Step 3: Validation */}
+                     {/* Step 3: Placeholder Replacement */}
                     <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                         <div className="flex items-center gap-4 mb-4">
                             <div className="flex-shrink-0 w-10 h-10 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-lg">3</div>
-                            <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0">ШАГ 3: Валидация контента</h3>
+                            <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0">ШАГ 3: Замена плейсхолдеров</h3>
                         </div>
-                         <div className="pl-14">
-                             <InfoCard icon={<ShieldCheckIcon className="w-8 h-8" />} title="Критически важное правило: проверка длины текста">
-                                <p className="text-base">
-                                    Тексты, полученные на Шаге 1 (промо) и Шаге 2 (шаблон), считаются валидными <strong>только</strong> если их длина после удаления пробелов <strong>больше 10 символов</strong>.
+                        <p className="text-gray-700 dark:text-slate-300 mb-6 pl-14 text-base">Функция <code>replacePlaceholders</code> заменяет переменные в тексте на реальные данные, превращая шаблон в интерактивное персонализированное сообщение.</p>
+                        <div className="pl-14">
+                            <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-md max-w-2xl mx-auto">
+                                <p className="text-base text-gray-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
+                                    {"Здравствуйте, "}
+                                    <TooltipTerm definition="Например: Иван">
+                                        {"{{NAME}}"}
+                                    </TooltipTerm>
+                                    {"} 🤗 Это София, администратор "}
+                                    <TooltipTerm definition="Например: вашего салона">
+                                        {"{{COMPANY}}"}
+                                    </TooltipTerm>
+                                    {".\n Рады видеть вас снова с нами!\n\n 🎁 - "}
+                                    <TooltipTerm definition="Например: Скидка 15% на массаж">
+                                        {"{{TEXT_PROMO}}"}
+                                    </TooltipTerm>
+                                    {"\n\n ❗Чтобы получить подарок, покажите это сообщение администратору во время визита.\n\n Подобрать вам удобный день и время для записи? 😊"}
                                 </p>
-                                <p className="mt-2 text-base text-gray-500 dark:text-slate-400">
-                                    Это правило автоматически отсеивает пустые или некорректные значения (например, "null", случайные пробелы), обеспечивая высокое качество исходящих сообщений.
-                                </p>
-                            </InfoCard>
+                            </div>
                         </div>
                     </div>
-                    
-                     {/* Step 4: Personalization */}
+                </div>
+            </section>
+            
+            <section id="send-date-logic">
+                <SectionHeader 
+                    icon={<SparklesIcon className="w-8 h-8" />}
+                    title="3. Расчет даты отправки (`send_date`)"
+                    subtitle="Это ядро предиктивной аналитики системы. В этом разделе раскрывается сложная логика, которая определяет оптимальный день для отправки сообщения каждому клиенту. Описывается иерархия правил, от работы с владельцами абонементов до прогнозирования следующего визита на основе индивидуального поведения."
+                />
+                <div className="space-y-8 mt-8">
                     <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="flex-shrink-0 w-10 h-10 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-lg">4</div>
-                            <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0">ШАГ 4: Персонализация (Сборка сообщения)</h3>
-                        </div>
-                         <p className="text-gray-700 dark:text-slate-300 mb-6 pl-14 text-base">На финальном этапе система объединяет компоненты и заменяет плейсхолдеры на реальные данные клиента.</p>
+                        <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0 mb-4">Принцип работы и приоритеты</h3>
+                        <p className="text-gray-700 dark:text-slate-300 text-base">Система вычисляет поле <TooltipTerm definition={glossary.send_date}>send_date</TooltipTerm> на основе набора правил, применяемых в строгом порядке. Если для клиента срабатывает правило более высокого приоритета, последующие правила для него не рассматриваются. Если ни одно из правил не сработало, <code>send_date</code> остается пустым (<code>null</code>), и сообщение такому клиенту не отправляется.</p>
+                    </div>
 
-                        <div className="grid md:grid-cols-2 gap-8 items-start pl-14">
-                            <div>
-                                <h4 className="font-semibold text-lg mb-4 text-gray-700 dark:text-slate-300">Исходные компоненты</h4>
-                                <div className="space-y-4">
-                                    <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                        <h5 className="font-bold mb-2 text-gray-800 dark:text-slate-200">Шаблон:</h5>
-                                        <p className="text-base text-gray-700 dark:text-slate-300">Здравствуйте, <code className="bg-sky-100 text-sky-800 rounded dark:bg-sky-900 dark:text-sky-300">{`{NAME}`}</code> 🤗 ... Спасибо что вы с нами! 🎁 - <code className="bg-amber-100 text-amber-800 rounded dark:bg-amber-900 dark:text-amber-300">{`{TEXT_PROMO}`}</code></p>
-                                    </div>
-                                    <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                        <h5 className="font-bold mb-2 text-gray-800 dark:text-slate-200">Промо:</h5>
-                                        <p className="text-base text-gray-700 dark:text-slate-300"><code className="bg-amber-100 text-amber-800 rounded dark:bg-amber-900 dark:text-amber-300">дарим вам скидку 20% на следующий массаж</code></p>
-                                    </div>
-                                    <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                        <h5 className="font-bold mb-2 text-gray-800 dark:text-slate-200">Данные клиента:</h5>
-                                        <p className="text-base text-gray-700 dark:text-slate-300">Имя: <code className="bg-sky-100 text-sky-800 rounded dark:bg-sky-900 dark:text-sky-300">Анна</code></p>
-                                    </div>
+                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                        <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0 mb-4">Детальная логика расчета</h3>
+                        <div className="relative border-l-2 border-gray-200 dark:border-slate-700 ml-4">
+                            {/* Timeline Item 1 */}
+                            <div className="mb-8 ml-12">
+                                <div className="absolute -left-[22px] flex items-center justify-center w-10 h-10 bg-amber-100 dark:bg-amber-900 rounded-full ring-8 ring-gray-50 dark:ring-slate-900/50">
+                                    <StarIcon className="w-6 h-6 text-amber-500 dark:text-amber-400" />
+                                </div>
+                                <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 mt-0">Приоритет 1: Клиенты с активным абонементом</h4>
+                                    <p className="mt-1 text-gray-600 dark:text-slate-400 text-base">Это самая ценная группа. Чтобы поддерживать их вовлеченность, система планирует отправку ровно через 30 дней после их последнего визита, мягко напоминая о себе. <br/><strong>Формула:</strong> <code>Дата последнего визита + 30 дней</code></p>
                                 </div>
                             </div>
-                             <div>
-                                <h4 className="font-semibold text-lg mb-4 text-gray-700 dark:text-slate-300 flex items-center gap-2"><SparklesIcon className="w-6 h-6 text-yellow-500"/> Финальное сообщение</h4>
-                                <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border-2 border-green-500 shadow-lg">
-                                    <p className="text-gray-800 dark:text-slate-200 whitespace-pre-wrap leading-relaxed text-base">Здравствуйте, <code className="bg-sky-100 text-sky-800 font-semibold px-1 rounded dark:bg-sky-900 dark:text-sky-300">Анна</code > 🤗 Это София, администратор Wellness Spa. Спасибо что вы с нами!
-                                    <br/><br/>
-                                    🎁 - <code className="bg-amber-100 text-amber-800 font-semibold px-1 rounded dark:bg-amber-900 dark:text-amber-300">дарим вам скидку 20% на следующий массаж</code >
-                                    <br/><br/>
-                                    ❗ Чтобы получить подарок, покажите это сообщение администратору во время визита.
-                                    <br/><br/>
-                                    Подобрать вам удобный день и время для записи? 😊</p>
+                            {/* Timeline Item 2 */}
+                             <div className="mb-8 ml-12">
+                                <div className="absolute -left-[22px] flex items-center justify-center w-10 h-10 bg-indigo-100 dark:bg-slate-700 rounded-full ring-8 ring-gray-50 dark:ring-slate-900/50">
+                                    <UsersIcon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
+                                </div>
+                                <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 mt-0">Приоритет 2: Посетители (без абонемента)</h4>
+                                    <p className="mt-1 text-gray-600 dark:text-slate-400 text-base">Для этой группы используется предиктивная модель, основанная на их поведении:</p>
+                                    <ul className="list-disc list-inside space-y-1 mt-2 text-sm text-gray-600 dark:text-slate-400">
+                                        <li><strong>Для "Повторных":</strong> Система берет их персональный <TooltipTerm definition={glossary.minInterval}>minInterval</TooltipTerm> и предлагает вернуться за 3 дня до его истечения, работая на опережение. <br/><strong>Формула:</strong> <code>Дата последнего визита + minInterval - 3 дня</code></li>
+                                        <li><strong>Для "Разовых":</strong> Так как персональной истории нет, используется общий <TooltipTerm definition={glossary.avgInterval}>avgInterval</TooltipTerm> по всей базе. <br/><strong>Формула:</strong> <code>Дата визита + avgInterval - 3 дня</code></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            {/* Timeline Item 3 */}
+                            <div className="mb-8 ml-12">
+                                <div className="absolute -left-[22px] flex items-center justify-center w-10 h-10 bg-indigo-100 dark:bg-slate-700 rounded-full ring-8 ring-gray-50 dark:ring-slate-900/50">
+                                    <LifebuoyIcon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
+                                </div>
+                                <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 mt-0">Приоритет 3: Покупатели</h4>
+                                    <p className="mt-1 text-gray-600 dark:text-slate-400 text-base">Сообщение отправляется немедленно (<code>сегодня</code>), если для них находится подходящий по времени шаблон в листе «Шаблоны». Это позволяет, например, сразу отправить инструкцию после покупки сертификата.</p>
+                                </div>
+                            </div>
+                             {/* Timeline Item 4 */}
+                            <div className="ml-12">
+                                <div className="absolute -left-[22px] flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-slate-700 rounded-full ring-8 ring-gray-50 dark:ring-slate-900/50">
+                                    <ExclamationTriangleIcon className="w-6 h-6 text-gray-500 dark:text-slate-400" />
+                                </div>
+                                <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 mt-0">Исключения (не отправлять)</h4>
+                                     <ul className="list-disc list-inside space-y-1 mt-2 text-sm text-gray-600 dark:text-slate-400">
+                                        <li>Если с клиентом уже общались менее 14 дней назад (чтобы избежать спама).</li>
+                                        <li>Если тип клиента — <TooltipTerm definition={glossary.lead}>"Лид"</TooltipTerm> или "Неизвестно".</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
 
-
-            <section id="send-time-logic">
-                <SectionHeader 
-                    icon={<CalendarDaysIcon className="w-8 h-8" />}
-                    title="3. Расчет времени отправки"
-                    subtitle="Правила, по которым система вычисляет оптимальную дату для коммуникации."
-                />
-                <div className="space-y-6 not-prose mt-8">
-                    {/* Rule 1: Subscription */}
-                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border-2 border-amber-500 shadow-lg">
-                        <div className="flex items-center gap-3 mb-3">
-                            <span className="bg-amber-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 text-sm">1</span>
-                            <h4 className="font-bold text-lg text-gray-800 dark:text-slate-200 mt-0 flex items-center gap-2"><StarIcon className="w-5 h-5 text-amber-500"/> Особое правило (Абонемент) - высший приоритет</h4>
+                     <CollapsibleSection title="Показать детальную таблицу логики">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-slate-400">
+                                    <tr>
+                                        <th className="px-4 py-2">Тип клиента</th>
+                                        <th className="px-4 py-2">Условие</th>
+                                        <th className="px-4 py-2">Логика `send_date`</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-gray-700 dark:text-slate-300">
+                                    <tr className="border-b dark:border-slate-700 bg-amber-50 dark:bg-amber-900/20"><td colSpan={3} className="px-4 py-1 text-xs font-bold text-amber-800 dark:text-amber-400">Высший приоритет</td></tr>
+                                    <tr className="border-b dark:border-slate-700">
+                                        <td className="px-4 py-2 font-semibold">Любой</td>
+                                        <td className="px-4 py-2">✅ Активный абонемент</td>
+                                        <td className="px-4 py-2"><code>Дата посл. визита + 30д</code></td>
+                                    </tr>
+                                    <tr className="border-b dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50"><td colSpan={3} className="px-4 py-1 text-xs font-bold">Основная логика</td></tr>
+                                    <tr className="border-b dark:border-slate-700">
+                                        <td className="px-4 py-2 font-semibold" rowSpan={2}>Посетитель</td>
+                                        <td className="px-4 py-2">≥ 2 визитов ("Повторный")</td>
+                                        <td className="px-4 py-2"><code>Дата посл. визита + (min интервал) - 3д</code></td>
+                                    </tr>
+                                     <tr className="border-b dark:border-slate-700">
+                                        <td className="px-4 py-2">1 визит ("Разовый")</td>
+                                        <td className="px-4 py-2"><code>Дата визита + (средний интервал) - 3д</code></td>
+                                    </tr>
+                                    <tr className="border-b dark:border-slate-700">
+                                        <td className="px-4 py-2 font-semibold" rowSpan={2}>Покупатель</td>
+                                        <td className="px-4 py-2">Подходит по таймингу из "Шаблонов"</td>
+                                        <td className="px-4 py-2"><code>сегодня</code></td>
+                                    </tr>
+                                    <tr className="border-b dark:border-slate-700">
+                                        <td className="px-4 py-2">Последнее сообщение &lt; 14д назад</td>
+                                        <td className="px-4 py-2"><code>null</code></td>
+                                    </tr>
+                                    <tr className="border-b dark:border-slate-700">
+                                        <td className="px-4 py-2 font-semibold">Лид / Неизвестно</td>
+                                        <td className="px-4 py-2">-</td>
+                                        <td className="px-4 py-2"><code>null</code> (не отправлять)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <p className="text-base text-gray-700 dark:text-slate-300 pl-11">Если у клиента есть активный <strong>абонемент на массаж</strong>, применяется фиксированная логика.</p>
-                        <div className="mt-4 pl-11 p-3 bg-white dark:bg-slate-800 rounded-md">
-                            <code><TooltipTerm definition={glossary.send_date}>send_date</TooltipTerm> = Дата последнего визита + 30 дней</code>
-                        </div>
-                    </div>
-                    
-                    {/* Arrow */}
-                    <div className="flex justify-center items-center text-gray-400 dark:text-slate-500"><ArrowLongDownIcon className="w-8 h-8" /></div>
-
-                    {/* Rule 2: Visitors */}
-                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-md">
-                        <div className="flex items-center gap-3 mb-3">
-                            <span className="bg-indigo-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 text-sm">2</span>
-                            <h4 className="font-bold text-lg text-gray-800 dark:text-slate-200 mt-0 flex items-center gap-2"><UserGroupIcon className="w-5 h-5 text-indigo-500"/> Логика для «Посетителей»</h4>
-                        </div>
-                        <div className="pl-11 space-y-4">
-                           <div>
-                                <h5 className="font-semibold text-gray-700 dark:text-slate-300">Повторные (≥ 2 визитов):</h5>
-                                <p className="text-base text-gray-600 dark:text-slate-400">Прогнозируем следующий визит на основе их личной истории.</p>
-                                <div className="mt-2 p-3 bg-white dark:bg-slate-800 rounded-md">
-                                    <code><TooltipTerm definition={glossary.send_date}>send_date</TooltipTerm> = Дата посл. визита + (<TooltipTerm definition={glossary.minInterval}>индивид. min интервал</TooltipTerm>) - 3 дня</code>
-                                </div>
-                           </div>
-                           <div>
-                                <h5 className="font-semibold text-gray-700 dark:text-slate-300">Разовые (1 визит):</h5>
-                                <p className="text-base text-gray-600 dark:text-slate-400">Прогнозируем на основе поведения похожих клиентов.</p>
-                                <div className="mt-2 p-3 bg-white dark:bg-slate-800 rounded-md">
-                                    <code><TooltipTerm definition={glossary.send_date}>send_date</TooltipTerm> = Дата визита + (<TooltipTerm definition={glossary.avgInterval}>средний интервал по сегменту</TooltipTerm>) - 3 дня</code>
-                                </div>
-                           </div>
-                        </div>
-                    </div>
-
-                     {/* Arrow */}
-                    <div className="flex justify-center items-center text-gray-400 dark:text-slate-500"><ArrowLongDownIcon className="w-8 h-8" /></div>
-
-                     {/* Rule 3 & 4 */}
-                     <div className="grid md:grid-cols-2 gap-6">
-                        <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-md">
-                             <div className="flex items-center gap-3 mb-3">
-                                <span className="bg-gray-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 text-sm">3</span>
-                                <h4 className="font-bold text-lg text-gray-800 dark:text-slate-200 mt-0 flex items-center gap-2"><UsersIcon className="w-5 h-5 text-slate-500"/> Логика для «Покупателей»</h4>
-                            </div>
-                            <div className="pl-11">
-                                <p className="text-base text-gray-600 dark:text-slate-400">Отправляем сообщение, если подходит по таймингу из «Шаблонов» и не спамим (не чаще раза в 14 дней).</p>
-                                <div className="mt-2 p-3 bg-white dark:bg-slate-800 rounded-md">
-                                    <code><TooltipTerm definition={glossary.send_date}>send_date</TooltipTerm> = сегодня</code>
-                                </div>
-                            </div>
-                        </div>
-                         <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-md">
-                             <div className="flex items-center gap-3 mb-3">
-                                <span className="bg-gray-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 text-sm">4</span>
-                                <h4 className="font-bold text-lg text-gray-800 dark:text-slate-200 mt-0 flex items-center gap-2"><ExclamationTriangleIcon className="w-5 h-5 text-slate-500"/> «Лиды» и «Неизвестные»</h4>
-                            </div>
-                            <div className="pl-11">
-                                <p className="text-base text-gray-600 dark:text-slate-400">Этим категориям клиентов сообщения не отправляются.</p>
-                                <div className="mt-2 p-3 bg-white dark:bg-slate-800 rounded-md">
-                                    <code><TooltipTerm definition={glossary.send_date}>send_date</TooltipTerm> = null</code>
-                                </div>
-                            </div>
-                        </div>
-                     </div>
-                </div>
-            </section>
-
-
-            <section id="tech-details">
-                <SectionHeader 
-                    icon={<CpuChipIcon className="w-8 h-8" />}
-                    title="Технические детали и преимущества"
-                    subtitle="Интеграции, сильные стороны и решаемые проблемы."
-                />
-                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 not-prose">
-                    <InfoCard icon={<CircleStackIcon className="w-8 h-8" />} title="Интеграции и архитектура">
-                         <ul className="list-disc list-inside space-y-2 text-base">
-                            <li><b>YClients</b> как источник данных.</li>
-                            <li><b>WAHelp</b> как «транспорт» для WhatsApp.</li>
-                            <li><b>Google Sheets & Apps Script</b> как ядро системы.</li>
-                            <li><b>Расширяемая архитектура</b> для новых каналов (e‑mail, SMS).</li>
-                        </ul>
-                    </InfoCard>
-                    <InfoCard icon={<SparklesIcon className="w-8 h-8" />} title="Ключевые преимущества">
-                        <ul className="list-disc list-inside space-y-2 text-base">
-                            <li><b>Автоматизация</b> сложных маркетинговых сценариев.</li>
-                            <li><b>Глубокая персонализация</b> предложений.</li>
-                            <li><b>Простота использования</b> из интерфейса Google Sheets.</li>
-                             <li><b>Контроль и стабильность</b> через автотесты и логи.</li>
-                        </ul>
-                    </InfoCard>
-                     <InfoCard icon={<LifebuoyIcon className="w-8 h-8" />} title="Решение проблем WAHelp">
-                       <p className="text-base">
-                           Стандартный WAHelp не позволяет реализовать сложную сегментацию. Этот проект решает проблему, используя WAHelp только как канал доставки, в то время как вся интеллектуальная работа выполняется в Google Apps Script.
-                       </p>
-                    </InfoCard>
+                    </CollapsibleSection>
                 </div>
             </section>
         </div>
     </DocPageLayout>
-  );
+    );
 };
 
 export default ClientSegmentationDocPage;

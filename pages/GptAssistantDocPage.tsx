@@ -1,7 +1,9 @@
 
+
+
 import React from 'react';
 import DocPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CollapsibleSection } from '../components/DocUIComponents';
+import { SectionHeader, InfoCard, CollapsibleSection } from '../components/DocumentationUIComponents';
 import { ChatBubbleLeftRightIcon, CpuChipIcon, CommandLineIcon, CircleStackIcon, CogIcon, DocumentChartBarIcon, BeakerIcon, ArrowDownCircleIcon } from '@heroicons/react/24/outline';
 
 const GptAssistantDocPage: React.FC = () => {

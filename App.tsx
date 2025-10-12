@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
@@ -26,11 +27,11 @@ const App: React.FC = () => {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/project/:slug" element={<ProjectPage />} />
             {/* Documentation Pages */}
-            <Route path="/doc/client-segmentation" element={<ClientSegmentationDocPage />} />
-            <Route path="/doc/interface-generator" element={<InterfaceGenDocPage />} />
-            <Route path="/doc/gpt-assistant" element={<GptAssistantDocPage />} />
-            <Route path="/doc/bot-autotest" element={<BotAutoTestDocPage />} />
-            <Route path="/doc/email-safety-pipeline" element={<EmailSafetyPipelineDocPage />} />
+            <Route path="/documentation/client-segmentation" element={<ClientSegmentationDocPage />} />
+            <Route path="/documentation/interface-generator" element={<InterfaceGenDocPage />} />
+            <Route path="/documentation/gpt-assistant" element={<GptAssistantDocPage />} />
+            <Route path="/documentation/bot-autotest" element={<BotAutoTestDocPage />} />
+            <Route path="/documentation/email-safety-pipeline" element={<EmailSafetyPipelineDocPage />} />
           </Routes>
         </main>
         <Footer mainContentRef={mainContentRef} />

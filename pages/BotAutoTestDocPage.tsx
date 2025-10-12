@@ -1,7 +1,9 @@
 
+
+
 import React from 'react';
 import DocPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CodeBlockWithCopy } from '../components/DocUIComponents';
+import { SectionHeader, InfoCard, CodeBlockWithCopy } from '../components/DocumentationUIComponents';
 import { BugAntIcon, CogIcon, PlayCircleIcon, CodeBracketIcon, ChatBubbleBottomCenterTextIcon, CpuChipIcon } from '@heroicons/react/24/outline';
 
 const BotAutoTestDocPage: React.FC = () => {
