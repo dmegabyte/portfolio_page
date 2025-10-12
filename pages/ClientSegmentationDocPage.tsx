@@ -1,6 +1,8 @@
 
 
 
+
+
 import React, { useState } from 'react';
 import DocPageLayout from '../components/DocPageLayout';
 import { SectionHeader, InfoCard, TooltipTerm, Modal, CollapsibleSection } from '../components/DocumentationUIComponents';
@@ -530,46 +532,84 @@ const ClientSegmentationDocPage: React.FC = () => {
                         </div>
                     </div>
 
-                     <CollapsibleSection title="Показать детальную таблицу логики">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-slate-400">
+                    <CollapsibleSection title="Показать детальную таблицу логики">
+                        <div className="overflow-x-auto my-4 not-prose">
+                            <table className="w-full text-sm text-left border-collapse">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-slate-800 dark:text-slate-400">
                                     <tr>
-                                        <th className="px-4 py-2">Тип клиента</th>
-                                        <th className="px-4 py-2">Условие</th>
-                                        <th className="px-4 py-2">Логика `send_date`</th>
+                                        <th scope="col" className="px-6 py-3 font-semibold tracking-wider">Тип клиента</th>
+                                        <th scope="col" className="px-6 py-3 font-semibold tracking-wider">Условие</th>
+                                        <th scope="col" className="px-6 py-3 font-semibold tracking-wider">Логика `send_date`</th>
                                     </tr>
                                 </thead>
-                                <tbody className="text-gray-700 dark:text-slate-300">
-                                    <tr className="border-b dark:border-slate-700 bg-amber-50 dark:bg-amber-900/20"><td colSpan={3} className="px-4 py-1 text-xs font-bold text-amber-800 dark:text-amber-400">Высший приоритет</td></tr>
-                                    <tr className="border-b dark:border-slate-700">
-                                        <td className="px-4 py-2 font-semibold">Любой</td>
-                                        <td className="px-4 py-2">✅ Активный абонемент</td>
-                                        <td className="px-4 py-2"><code>Дата посл. визита + 30д</code></td>
+                    
+                                {/* Group 1: Highest Priority */}
+                                <tbody className="bg-white dark:bg-slate-900">
+                                    <tr>
+                                        <th colSpan={3} scope="colgroup" className="px-4 py-3 text-base font-bold text-gray-900 dark:text-slate-100 bg-gray-50 dark:bg-slate-800/60 border-y border-gray-200 dark:border-slate-700">
+                                            <div className="flex items-center gap-2">
+                                                <StarIcon className="w-5 h-5 text-amber-500 dark:text-amber-400" />
+                                                <span>Высший приоритет</span>
+                                            </div>
+                                        </th>
                                     </tr>
-                                    <tr className="border-b dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50"><td colSpan={3} className="px-4 py-1 text-xs font-bold">Основная логика</td></tr>
-                                    <tr className="border-b dark:border-slate-700">
-                                        <td className="px-4 py-2 font-semibold" rowSpan={2}>Посетитель</td>
-                                        <td className="px-4 py-2">≥ 2 визитов ("Повторный")</td>
-                                        <td className="px-4 py-2"><code>Дата посл. визита + (min интервал) - 3д</code></td>
+                                    <tr className="border-b border-gray-200 dark:border-slate-700">
+                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-200">Любой</td>
+                                        <td className="px-6 py-4 text-gray-600 dark:text-slate-300">
+                                            <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-md text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                               <CheckCircleIcon className="w-4 h-4" />
+                                               Активный абонемент
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 font-mono text-gray-800 dark:text-slate-300"><code>Дата посл. визита + 30д</code></td>
                                     </tr>
-                                     <tr className="border-b dark:border-slate-700">
-                                        <td className="px-4 py-2">1 визит ("Разовый")</td>
-                                        <td className="px-4 py-2"><code>Дата визита + (средний интервал) - 3д</code></td>
+                                </tbody>
+                    
+                                {/* Group 2: Main Logic */}
+                                <tbody className="bg-white dark:bg-slate-900">
+                                    <tr>
+                                        <th colSpan={3} scope="colgroup" className="px-4 py-3 text-base font-bold text-gray-900 dark:text-slate-100 bg-gray-50 dark:bg-slate-800/60 border-y border-gray-200 dark:border-slate-700">
+                                             <div className="flex items-center gap-2">
+                                                <Cog6ToothIcon className="w-5 h-5 text-gray-500 dark:text-slate-400" />
+                                                <span>Основная логика</span>
+                                            </div>
+                                        </th>
                                     </tr>
-                                    <tr className="border-b dark:border-slate-700">
-                                        <td className="px-4 py-2 font-semibold" rowSpan={2}>Покупатель</td>
-                                        <td className="px-4 py-2">Подходит по таймингу из "Шаблонов"</td>
-                                        <td className="px-4 py-2"><code>сегодня</code></td>
+                                    <tr className="border-b border-gray-200 dark:border-slate-700">
+                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-200 align-top" rowSpan={2}>Посетитель</td>
+                                        <td className="px-6 py-4 text-gray-600 dark:text-slate-300">≥ 2 визитов ("Повторный")</td>
+                                        <td className="px-6 py-4 font-mono text-gray-800 dark:text-slate-300"><code>Дата посл. визита + (min интервал) - 3д</code></td>
                                     </tr>
-                                    <tr className="border-b dark:border-slate-700">
-                                        <td className="px-4 py-2">Последнее сообщение &lt; 14д назад</td>
-                                        <td className="px-4 py-2"><code>null</code></td>
+                                    <tr className="border-b border-gray-200 dark:border-slate-700">
+                                        <td className="px-6 py-4 text-gray-600 dark:text-slate-300">1 визит ("Разовый")</td>
+                                        <td className="px-6 py-4 font-mono text-gray-800 dark:text-slate-300"><code>Дата визита + (средний интервал) - 3д</code></td>
                                     </tr>
-                                    <tr className="border-b dark:border-slate-700">
-                                        <td className="px-4 py-2 font-semibold">Лид / Неизвестно</td>
-                                        <td className="px-4 py-2">-</td>
-                                        <td className="px-4 py-2"><code>null</code> (не отправлять)</td>
+                                     <tr className="border-b border-gray-200 dark:border-slate-700">
+                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-200 align-top">Покупатель</td>
+                                        <td className="px-6 py-4 text-gray-600 dark:text-slate-300">Подходит по таймингу из "Шаблонов"</td>
+                                        <td className="px-6 py-4 font-mono text-gray-800 dark:text-slate-300"><code>сегодня</code></td>
+                                    </tr>
+                                </tbody>
+                    
+                                {/* Group 3: Exceptions */}
+                                <tbody className="bg-white dark:bg-slate-900">
+                                    <tr>
+                                        <th colSpan={3} scope="colgroup" className="px-4 py-3 text-base font-bold text-gray-900 dark:text-slate-100 bg-gray-50 dark:bg-slate-800/60 border-y border-gray-200 dark:border-slate-700">
+                                            <div className="flex items-center gap-2">
+                                               <ExclamationTriangleIcon className="w-5 h-5 text-gray-500 dark:text-slate-400" />
+                                               <span>Исключения (не отправлять)</span>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                     <tr className="border-b border-gray-200 dark:border-slate-700">
+                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-200 align-top">Покупатель</td>
+                                        <td className="px-6 py-4 text-gray-600 dark:text-slate-300">Последнее сообщение &lt; 14д назад</td>
+                                        <td className="px-6 py-4 font-mono text-red-600 dark:text-red-400"><code>null</code></td>
+                                    </tr>
+                                    <tr className="border-b border-gray-200 dark:border-slate-700">
+                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-200">Лид / Неизвестно</td>
+                                        <td className="px-6 py-4 text-gray-600 dark:text-slate-300">-</td>
+                                        <td className="px-6 py-4 font-mono text-red-600 dark:text-red-400"><code>null (не отправлять)</code></td>
                                     </tr>
                                 </tbody>
                             </table>
