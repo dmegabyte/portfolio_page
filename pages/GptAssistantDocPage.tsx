@@ -1,11 +1,11 @@
 import React from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, TooltipTerm } from '../components/DocumentationUIComponents';
+import { SectionHeader, InfoCard, TooltipTerm, CollapsibleSection } from '../components/DocumentationUIComponents';
 import { 
     CpuChipIcon, ShieldCheckIcon, DocumentTextIcon, ChartBarIcon, ServerStackIcon, 
     WrenchScrewdriverIcon, CircleStackIcon, InboxArrowDownIcon, ScaleIcon,
     ArrowLongRightIcon, LightBulbIcon, MagnifyingGlassIcon, PuzzlePieceIcon, SparklesIcon,
-    NoSymbolIcon, PencilSquareIcon, PaperAirplaneIcon, BookOpenIcon, ArrowDownCircleIcon
+    NoSymbolIcon, PencilSquareIcon, PaperAirplaneIcon, BookOpenIcon, ArrowDownCircleIcon, BeakerIcon, ExclamationTriangleIcon, CodeBracketIcon, Cog6ToothIcon, ClockIcon, FolderOpenIcon, LinkIcon
 } from '@heroicons/react/24/outline';
 
 
@@ -83,20 +83,158 @@ const TicketWorkflowDiagram: React.FC = () => {
     );
 };
 
+const ArchitectureDiagram: React.FC = () => (
+    <div className="not-prose my-8">
+        <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-6 text-center">Визуальная схема архитектурных связей</h3>
+        <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 text-center">
+            <div className="inline-block bg-white dark:bg-slate-800 p-3 rounded-lg shadow-md border border-gray-200 dark:border-slate-700 font-mono text-indigo-600 dark:text-indigo-400">
+                CONFIG.js
+            </div>
+            <div className="flex justify-center my-4">
+                <div className="w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 relative">
+                {/* Connecting Lines */}
+                <div className="absolute top-[-2rem] left-1/2 -translate-x-1/2 h-8 w-px bg-gray-300 dark:bg-slate-600"></div>
+                <div className="absolute top-[-2rem] left-[12.5%] lg:left-[12.5%] right-[12.5%] lg:right-[12.5%] h-px bg-gray-300 dark:bg-slate-600"></div>
+                
+                {/* Vertical lines to each node */}
+                <div className="absolute top-[-2rem] left-[12.5%] w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
+                <div className="absolute top-[-2rem] left-[37.5%] w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
+                <div className="absolute top-[-2rem] left-[62.5%] w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
+                <div className="absolute top-[-2rem] left-[87.5%] w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
+
+                {/* Modules */}
+                <div className="space-y-2">
+                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border border-gray-200 dark:border-slate-700">01_ErrorHandler.js</div>
+                </div>
+                <div className="space-y-2">
+                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border border-gray-200 dark:border-slate-700">02_Utils.js</div>
+                </div>
+                <div className="space-y-2">
+                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border border-gray-200 dark:border-slate-700">04_Omnidesk.js</div>
+                </div>
+                 <div className="space-y-2">
+                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border border-gray-200 dark:border-slate-700">12_PlaygroundTester.js</div>
+                </div>
+                
+                {/* Module with dependencies */}
+                <div className="lg:col-span-2 space-y-2 relative pt-8">
+                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
+                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border-2 border-indigo-500 shadow-lg">03_GptApi.js</div>
+                     <div className="w-px h-4 bg-gray-300 dark:bg-slate-600 mx-auto"></div>
+                     <div className="flex justify-center gap-4">
+                        <div className="font-mono text-sm bg-gray-100 dark:bg-slate-700 p-2 rounded-md">06_History.js</div>
+                        <div className="font-mono text-sm bg-gray-100 dark:bg-slate-700 p-2 rounded-md">08_UrlValidator.js</div>
+                        <div className="font-mono text-sm bg-gray-100 dark:bg-slate-700 p-2 rounded-md">10_AdvancedSpamFilter.js</div>
+                    </div>
+                </div>
+                
+                 {/* Another module with dependencies */}
+                 <div className="lg:col-span-2 space-y-2 relative pt-8">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
+                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border-2 border-indigo-500 shadow-lg">05_Triggers.js</div>
+                    <div className="w-px h-4 bg-gray-300 dark:bg-slate-600 mx-auto"></div>
+                     <div className="flex justify-center">
+                        <div className="font-mono text-sm bg-gray-100 dark:bg-slate-700 p-2 rounded-md">07_ReportGenerator.js</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
 
 const GptAssistantDocumentationPage: React.FC = () => {
-    const modules = [
-        { name: '01_ErrorHandler.js', desc: 'Обработка ошибок.' },
-        { name: '02_Utils.js', desc: 'Вспомогательные функции.' },
-        { name: '03_GptApi.js', desc: 'Управление моделями.' },
-        { name: '04_Omnidesk.js', desc: 'Взаимодействие с тикет-системой.' },
-        { name: '05_Triggers.js', desc: 'Запуск задач.' },
-        { name: '06_History.js', desc: 'Хранение истории.' },
-        { name: '07_ReportGenerator.js', desc: 'Генерация отчётов.' },
-        { name: '08_UrlValidator.js', desc: 'Проверка ссылок.' },
-        { name: '10_AdvancedSpamFilter.js', desc: 'Фильтрация спама.' },
-        { name: '12_PlaygroundTester.js', desc: 'Тестирование.' },
-        { name: 'CONFIG.js', desc: 'Параметры системы.' }
+    const modulesWithDetails = [
+        { 
+            name: '01_ErrorHandler.js', 
+            icon: <ExclamationTriangleIcon className="w-6 h-6 text-red-500 dark:text-red-400"/>,
+            summary: 'Центральный обработчик ошибок.',
+            description: 'Перехватывает исключения, формирует читаемые отчёты, логирует критические сбои.',
+            dependencies: ['Utils', 'ReportGenerator'],
+            usage: 'Используется всеми остальными модулями как универсальный try/catch wrapper.'
+        },
+        { 
+            name: '02_Utils.js', 
+            icon: <WrenchScrewdriverIcon className="w-6 h-6 text-gray-500 dark:text-gray-400"/>,
+            summary: 'Универсальные утилиты.',
+            description: 'Парсинг данных, нормализация строк, форматирование дат, проверка типов.',
+            dependencies: [],
+            usage: 'Базовый слой, от которого зависят почти все остальные модули.'
+        },
+        { 
+            name: '03_GptApi.js', 
+            icon: <CpuChipIcon className="w-6 h-6 text-indigo-500 dark:text-indigo-400"/>,
+            summary: 'Управление взаимодействием с LLM.',
+            description: 'Формирование запросов, валидация промтов, контроль токенов и ответов.',
+            dependencies: ['Utils', 'ErrorHandler', 'Config.js', 'AdvancedSpamFilter'],
+            usage: 'Основной модуль для работы с AI-моделями.'
+        },
+        { 
+            name: '04_Omnidesk.js', 
+            icon: <InboxArrowDownIcon className="w-6 h-6 text-sky-500 dark:text-sky-400"/>,
+            summary: 'Интеграция с тикет-системой.',
+            description: 'Создание, обновление, закрытие тикетов, отправка уведомлений в Omnidesk.',
+            dependencies: ['Utils', 'ReportGenerator'],
+            usage: 'Может быть вызван из Triggers при поступлении событий от пользователя.'
+        },
+        { 
+            name: '05_Triggers.js', 
+            icon: <ClockIcon className="w-6 h-6 text-amber-500 dark:text-amber-400"/>,
+            summary: 'Менеджер событий и расписаний.',
+            description: 'Запускает действия на основе условий (входящее сообщение, таймер, системное событие).',
+            dependencies: ['GptApi', 'Omnidesk', 'ReportGenerator', 'Config.js'],
+            usage: 'Оркестратор основных бизнес-процессов.'
+        },
+        { 
+            name: '06_History.js', 
+            icon: <FolderOpenIcon className="w-6 h-6 text-gray-500 dark:text-gray-400"/>,
+            summary: 'Хранение и извлечение истории.',
+            description: 'Управляет доступом к истории диалогов, сообщений и задач.',
+            dependencies: [],
+            usage: 'Используется GptApi (для контекста) и ReportGenerator (для аналитики).'
+        },
+        { 
+            name: '07_ReportGenerator.js', 
+            icon: <ChartBarIcon className="w-6 h-6 text-green-500 dark:text-green-400"/>,
+            summary: 'Генерация отчётов.',
+            description: 'Формирует и отправляет отчёты о работе системы: ошибки, статистика, результаты запросов.',
+            dependencies: ['Utils', 'History'],
+            usage: 'Может быть вызван ErrorHandler или Triggers.'
+        },
+        { 
+            name: '08_UrlValidator.js', 
+            icon: <LinkIcon className="w-6 h-6 text-gray-500 dark:text-gray-400"/>,
+            summary: 'Проверка и классификация URL.',
+            description: 'Проверяет ссылки на валидность, опасные домены, фишинг, редиректы.',
+            dependencies: ['Utils'],
+            usage: 'Результаты используются AdvancedSpamFilter и GptApi.'
+        },
+        { 
+            name: '10_AdvancedSpamFilter.js', 
+            icon: <ShieldCheckIcon className="w-6 h-6 text-red-500 dark:text-red-400"/>,
+            summary: 'Расширенный антиспам-модуль.',
+            description: 'Проверяет тексты и ссылки, классифицирует по цветам (green/yellow/red), учитывает promo-паттерны.',
+            dependencies: ['UrlValidator', 'Utils'],
+            usage: 'Может вызываться из GptApi и Triggers для предварительной проверки контента.'
+        },
+        { 
+            name: '12_PlaygroundTester.js', 
+            icon: <BeakerIcon className="w-6 h-6 text-purple-500 dark:text-purple-400"/>,
+            summary: 'Модуль тестирования и QA.',
+            description: 'Позволяет запускать автоматические проверки сценариев, тестировать ответы модели, валидировать системные коды.',
+            dependencies: ['GptApi', 'History', 'ErrorHandler', 'ReportGenerator'],
+            usage: 'Часто применяется в тестовой среде (Playground/TestSuite).'
+        },
+        { 
+            name: 'CONFIG.js', 
+            icon: <Cog6ToothIcon className="w-6 h-6 text-gray-500 dark:text-gray-400"/>,
+            summary: 'Конфигурация системы.',
+            description: 'API ключи, параметры моделей, расписание задач, включённые функции.',
+            dependencies: [],
+            usage: 'Используется всеми остальными модулями как источник настроек и глобальных констант.'
+        }
     ];
 
     const metrics = [
@@ -162,24 +300,43 @@ const GptAssistantDocumentationPage: React.FC = () => {
                         title="Модули и их ответственность"
                         subtitle="Архитектура системы построена на независимых, переиспользуемых модулях, каждый из которых выполняет свою четко определенную функцию."
                     />
-                    <div className="overflow-x-auto mt-6 not-prose">
-                        <table className="w-full text-left border-collapse">
-                             <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
-                                <tr>
-                                    <th className="p-4 border border-gray-200 dark:border-slate-700">Модуль</th>
-                                    <th className="p-4 border border-gray-200 dark:border-slate-700">Описание</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
-                                {modules.map(module => (
-                                    <tr key={module.name} className="border-b dark:border-slate-700">
-                                        <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-mono text-indigo-600 dark:text-indigo-400">{module.name}</td>
-                                        <td className="p-4 border-x border-gray-200 dark:border-slate-700">{module.desc}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className="mt-6 space-y-4">
+                        {modulesWithDetails.map(module => (
+                             <CollapsibleSection
+                                key={module.name}
+                                title={
+                                    <div className="flex items-center gap-4 w-full">
+                                        {module.icon}
+                                        <div className="flex-grow">
+                                            <p className="font-bold text-lg text-slate-800 dark:text-slate-200">{module.name}</p>
+                                            <p className="text-sm font-normal text-slate-600 dark:text-slate-400">{module.summary}</p>
+                                        </div>
+                                    </div>
+                                }
+                            >
+                                <div className="space-y-4">
+                                    <p>{module.description}</p>
+                                    <div>
+                                        <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Зависимости и связи:</h4>
+                                        {module.dependencies.length > 0 ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {module.dependencies.map(dep => (
+                                                    <span key={dep} className="text-xs font-mono bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-1 rounded-full">{dep}</span>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm text-slate-500 italic">Нет прямых зависимостей.</p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Контекст использования:</h4>
+                                        <p className="text-sm">{module.usage}</p>
+                                    </div>
+                                </div>
+                            </CollapsibleSection>
+                        ))}
                     </div>
+                    <ArchitectureDiagram />
                 </section>
                 
                 <section id="metrics" className="scroll-mt-24">

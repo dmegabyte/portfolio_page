@@ -43,7 +43,8 @@ export const InfoCard: React.FC<InfoCardProps> = ({ icon, title, children }) => 
 
 // --- Collapsible Section (Accordion) ---
 interface CollapsibleSectionProps {
-  title: string;
+  // FIX: Changed type from `string` to `ReactNode` to allow complex JSX elements as titles.
+  title: ReactNode;
   children: ReactNode;
   defaultOpen?: boolean;
 }
