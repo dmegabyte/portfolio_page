@@ -7,6 +7,7 @@ export interface Project {
   description: string;
   imageUrl: string;
   technologies: string[];
+  keyFeatures: string[];
   repoUrl?: string;
   documentationPage?: string; 
 }
@@ -20,6 +21,12 @@ export const projects: Project[] = [
     description: 'Разработка сложной системы рассылок, учитывающей множество категорий клиентов (тип, лояльность, активность, частота, ценовой сегмент). Скрипты Apps Script анализируют данные, подбирают шаблоны и акции, рассчитывают даты и запускают отправку через WAHelp.',
     imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop',
     technologies: ['Google Apps Script', 'Google Sheets', 'JavaScript', 'WAHelp API'],
+    keyFeatures: [
+        'Многофакторная сегментация клиентской базы (более 7 параметров).',
+        'Автоматический подбор персонализированных промо-акций и шаблонов.',
+        'Предиктивный расчет оптимальной даты отправки для повышения LTV.',
+        'Полная автоматизация процесса рассылок через WAHelp API.'
+    ],
     documentationPage: '/documentation/client-segmentation',
   },
   {
@@ -30,6 +37,12 @@ export const projects: Project[] = [
     description: 'Веб-приложение, позволяющее разработчикам описывать структуру UI в формате JSON или YAML и получать на выходе готовый код React-компонентов с поддержкой TypeScript и стилизацией через Tailwind CSS. Ускоряет прототипирование и разработку.',
     imageUrl: 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?q=80&w=1200&auto=format&fit=crop',
     technologies: ['React', 'TypeScript', 'Node.js', 'AST', 'Tailwind CSS'],
+    keyFeatures: [
+        'Генерация React-компонентов из декларативного описания в JSON/YAML.',
+        'Встроенная поддержка TypeScript и стилизация через Tailwind CSS.',
+        'Значительное ускорение прототипирования и разработки UI.',
+        'Основан на манипуляциях с Абстрактным синтаксическим деревом (AST).'
+    ],
     documentationPage: '/documentation/interface-generator',
   },
   {
@@ -40,6 +53,12 @@ export const projects: Project[] = [
     description: 'Разработка ассистента на базе GPT-моделей, который может отвечать на вопросы, используя предоставленную документацию. Реализована векторизация текстов, поиск по семантической близости и интеграция с Telegram Bot API.',
     imageUrl: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=1200&auto=format&fit=crop',
     technologies: ['Python', 'FastAPI', 'OpenAI API', 'Vector Databases', 'Telegram Bot API'],
+    keyFeatures: [
+        'Ответы на вопросы на основе кастомной базы знаний.',
+        'Реализация Retrieval-Augmented Generation (RAG) для высокой точности.',
+        'Использование векторизации текстов и семантического поиска.',
+        'Готовая интеграция с Telegram Bot API.'
+    ],
     documentationPage: '/documentation/gpt-assistant',
   },
   {
@@ -50,6 +69,12 @@ export const projects: Project[] = [
     description: 'Создание системы, которая позволяет описывать тестовые сценарии в формате Gherkin (Cucumber) и автоматически запускать их, эмулируя поведение пользователя. Поддерживает тестирование ботов в Telegram, VK и на веб-сайтах. Интегрируется с CI/CD.',
     imageUrl: 'https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?q=80&w=1200&auto=format&fit=crop',
     technologies: ['JavaScript', 'Playwright', 'Jest', 'Cucumber.js', 'CI/CD'],
+    keyFeatures: [
+        'Описание тестовых сценариев на языке Gherkin (Cucumber).',
+        'Автоматизация E2E-тестирования с эмуляцией действий пользователя.',
+        'Поддержка нескольких платформ: Telegram, VK и веб-сайты.',
+        'Полная интеграция с CI/CD пайплайнами.'
+    ],
     documentationPage: '/documentation/bot-autotest',
   },
   {
@@ -60,6 +85,12 @@ export const projects: Project[] = [
     description: 'Автоматизированный пайплайн, который принимает на вход HTML-шаблон письма, проверяет его через SpamAssassin, анализирует все ссылки на безопасность с помощью Google Safe Browsing API, и делает скриншоты рендеринга в разных почтовых клиентах.',
     imageUrl: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=1200&auto=format&fit=crop',
     technologies: ['Node.js', 'Express', 'Puppeteer', 'SpamAssassin API', 'Docker'],
+    keyFeatures: [
+        'Автоматизированный конвейер для комплексного анализа email-шаблонов.',
+        'Проверка на спам-триггеры с использованием SpamAssassin.',
+        'Анализ безопасности всех ссылок через Google Safe Browsing API.',
+        'Создание скриншотов рендеринга в разных почтовых клиентах.'
+    ],
     documentationPage: '/documentation/email-safety-pipeline',
   },
 ];

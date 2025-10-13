@@ -3,6 +3,7 @@ import React from 'react';
 // FIX: In react-router-dom v6, `Redirect` is replaced by `Navigate`.
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { projects } from '../data/projects';
+import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 
 const ProjectPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -45,6 +46,22 @@ const ProjectPage: React.FC = () => {
           <p className="lead font-semibold text-xl text-slate-700 dark:text-slate-300">{project.summary}</p>
           <p>{project.description}</p>
         </div>
+
+        {project.keyFeatures && project.keyFeatures.length > 0 && (
+            <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-700">
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-200 mb-4">
+                    Ключевые особенности
+                </h2>
+                <ul className="space-y-3">
+                    {project.keyFeatures.map((feature, index) => (
+                        <li key={index} className="flex items-start">
+                            <CheckBadgeIcon className="flex-shrink-0 h-6 w-6 text-indigo-500 dark:text-indigo-400 mt-1 mr-3" />
+                            <span className="text-lg text-slate-700 dark:text-slate-300">{feature}</span>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        )}
 
         <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-700 flex flex-wrap gap-4">
             {project.documentationPage && (

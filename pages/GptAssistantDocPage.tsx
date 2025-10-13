@@ -5,74 +5,107 @@ import {
     CpuChipIcon, ShieldCheckIcon, DocumentTextIcon, ChartBarIcon, ServerStackIcon, 
     WrenchScrewdriverIcon, CircleStackIcon, InboxArrowDownIcon, ScaleIcon,
     ArrowLongRightIcon, LightBulbIcon, MagnifyingGlassIcon, PuzzlePieceIcon, SparklesIcon,
-    NoSymbolIcon, PencilSquareIcon, PaperAirplaneIcon, BookOpenIcon, ArrowDownCircleIcon, BeakerIcon, ExclamationTriangleIcon, CodeBracketIcon, Cog6ToothIcon, ClockIcon, FolderOpenIcon, LinkIcon
+    PencilSquareIcon, PaperAirplaneIcon, BookOpenIcon, ArrowDownCircleIcon, BeakerIcon, ExclamationTriangleIcon, CodeBracketIcon, Cog6ToothIcon, ClockIcon, FolderOpenIcon, LinkIcon
 } from '@heroicons/react/24/outline';
 
 
 const TicketWorkflowDiagram: React.FC = () => {
     const stages = [
-        { icon: <InboxArrowDownIcon className="w-10 h-10 text-indigo-500"/>, title: "1. Получение тикета", description: "Запрос поступает в систему из Omnidesk." },
-        { icon: <NoSymbolIcon className="w-10 h-10 text-red-500"/>, title: "2. Фильтрация", description: "Продвинутый спам-фильтр и проверка безопасности ссылок." },
-        { icon: <MagnifyingGlassIcon className="w-10 h-10 text-sky-500"/>, title: "3. RAG: Поиск фактов", description: "Семантический поиск релевантной информации в векторной базе знаний." },
-        { icon: <SparklesIcon className="w-10 h-10 text-purple-500"/>, title: "4. Генерация ответа", description: "GPT-4o создает черновик ответа на основе найденных фактов." },
-        { icon: <ScaleIcon className="w-10 h-10 text-amber-500"/>, title: "5. Принятие решения", description: "Расчет `confident-score` для оценки уверенности AI в ответе." }
+        { 
+            icon: <InboxArrowDownIcon className="w-10 h-10 text-indigo-500"/>, 
+            title: "1. Получение обращения", 
+            tooltip: "Запрос от клиента поступает в систему из тикет-системы Omnidesk и становится отправной точкой для всего процесса анализа." 
+        },
+        { 
+            icon: <ShieldCheckIcon className="w-10 h-10 text-indigo-500"/>, 
+            title: "2. Фильтрация и безопасность", 
+            tooltip: "Продвинутый спам-фильтр анализирует контент, а валидатор проверяет все ссылки на предмет фишинга и вредоносного ПО." 
+        },
+        { 
+            icon: <MagnifyingGlassIcon className="w-10 h-10 text-indigo-500"/>, 
+            title: "3. Анализ и поиск фактов (RAG)", 
+            tooltip: "Система производит семантический поиск по векторной базе знаний, чтобы найти наиболее релевантную информацию для ответа." 
+        },
+        { 
+            icon: <SparklesIcon className="w-10 h-10 text-indigo-500"/>, 
+            title: "4. Подготовка ответа", 
+            tooltip: "Модель GPT-4o создает черновик ответа, основываясь на найденных фактах из базы знаний и исходном вопросе клиента." 
+        },
+        { 
+            icon: <ScaleIcon className="w-10 h-10 text-indigo-500"/>, 
+            title: "5. Оценка и принятие решения", 
+            tooltip: "Система рассчитывает метрику уверенности (`confident-score`), чтобы оценить, насколько AI уверен в точности и полноте сгенерированного ответа." 
+        }
     ];
 
     const outcomes = [
-        { icon: <PaperAirplaneIcon className="w-10 h-10 text-green-500 -rotate-45"/>, title: "Автоответ", description: "Если `score` высокий, ответ отправляется клиенту автоматически." },
-        { icon: <PencilSquareIcon className="w-10 h-10 text-yellow-600"/>, title: "Черновик + Саммари", description: "Если `score` низкий, создается черновик и краткая сводка для оператора." }
+        { 
+            icon: <PaperAirplaneIcon className="w-10 h-10 text-green-500 -rotate-45"/>, 
+            title: "Автоответ", 
+            description: "Если `score` высокий, ответ отправляется клиенту автоматически.",
+            borderColor: "border-green-300 dark:border-green-700",
+            textColor: "text-green-800 dark:text-green-300"
+        },
+        { 
+            icon: <PencilSquareIcon className="w-10 h-10 text-yellow-600"/>, 
+            title: "Черновик + Саммари", 
+            description: "Если `score` низкий, создается черновик и краткая сводка для оператора.",
+            borderColor: "border-yellow-300 dark:border-yellow-700",
+            textColor: "text-yellow-800 dark:text-yellow-300"
+        }
     ];
 
     return (
         <div className="not-prose my-8">
             <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                <h3 className="text-xl font-bold text-center text-gray-800 dark:text-slate-200 mb-8">Жизненный цикл обработки тикета</h3>
                 <div className="flex flex-col items-center">
-                    {/* Main Pipeline: Reverted to Horizontal Scroll for stability */}
-                    <div className="w-full overflow-x-auto pb-4">
-                        <div className="inline-flex items-stretch justify-start gap-2 min-w-full lg:justify-center">
-                            {stages.map((stage, index) => (
-                                <React.Fragment key={stage.title}>
-                                    <div className="flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm w-[180px] flex-shrink-0">
+                    {/* Main Pipeline - Fully Responsive */}
+                    <div className="flex flex-wrap justify-center items-stretch gap-x-2 gap-y-4 w-full">
+                        {stages.map((stage, index) => (
+                            <React.Fragment key={stage.title}>
+                                <TooltipTerm definition={stage.tooltip}>
+                                    <div className="flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm w-[180px] hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors duration-300 cursor-help">
                                         {stage.icon}
                                         <h4 className="font-semibold mt-3 text-gray-800 dark:text-slate-200">{stage.title}</h4>
-                                        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{stage.description}</p>
                                     </div>
-                                    {index < stages.length - 1 && <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 self-center mx-2 flex-shrink-0" />}
-                                </React.Fragment>
-                            ))}
-                        </div>
+                                </TooltipTerm>
+                                {index < stages.length - 1 && (
+                                    <div className="flex-shrink-0 self-center">
+                                        <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                                    </div>
+                                )}
+                            </React.Fragment>
+                        ))}
                     </div>
 
-                    <ArrowDownCircleIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 my-4" />
+                    {/* Explicit Branching Visual */}
+                    <div className="flex justify-center w-full mt-4">
+                        <div className="w-px h-10 bg-gray-300 dark:bg-slate-600"></div>
+                    </div>
+                    
+                    <div className="relative w-full max-w-3xl flex justify-center mb-6">
+                         <div className="absolute top-0 left-1/4 w-1/2 h-px bg-gray-300 dark:bg-slate-600"></div>
+                         <div className="absolute top-0 left-1/4 w-px h-6 bg-gray-300 dark:bg-slate-600"></div>
+                         <div className="absolute top-0 right-1/4 w-px h-6 bg-gray-300 dark:bg-slate-600"></div>
+                    </div>
 
-                    {/* Decision Outcomes (remains responsive) */}
-                    <div className="relative flex flex-col md:flex-row items-stretch justify-center gap-8 w-full max-w-3xl">
-                        {/* Connecting Lines */}
-                        <div className="hidden md:block absolute top-[-2.5rem] left-1/2 h-10 w-px bg-gray-300 dark:bg-slate-600"></div>
-                        <div className="hidden md:block absolute top-[-0.5rem] left-[25%] w-1/2 h-px bg-gray-300 dark:bg-slate-600"></div>
-                        <div className="hidden md:block absolute top-[-0.5rem] left-[25%] w-px h-10 bg-gray-300 dark:bg-slate-600"></div>
-                        <div className="hidden md:block absolute top-[-0.5rem] right-[25%] w-px h-10 bg-gray-300 dark:bg-slate-600"></div>
-                        
-                        {/* Condition Labels */}
-                        <div className="hidden md:block absolute top-[-2.5rem] left-[25%] ml-2 text-xs text-center">
-                            <span className="font-mono bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 px-2 py-1 rounded-md border border-green-200 dark:border-green-700">
+                    {/* Decision Outcomes with Labels */}
+                    <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl">
+                        <div className="absolute top-[-1.5rem] left-0 right-1/2 text-center text-xs">
+                             <span className="font-mono bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 px-2 py-1 rounded-md border border-green-200 dark:border-green-700">
                                 `score` высокий
                             </span>
                         </div>
-                        <div className="hidden md:block absolute top-[-2.5rem] right-[25%] mr-2 text-xs text-center">
-                            <span className="font-mono bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-md border border-yellow-200 dark:border-yellow-700">
+                         <div className="absolute top-[-1.5rem] left-1/2 right-0 text-center text-xs">
+                             <span className="font-mono bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-md border border-yellow-200 dark:border-yellow-700">
                                `score` низкий
                             </span>
                         </div>
 
-
                         {outcomes.map(outcome => (
-                             <div key={outcome.title} className={`flex-1 flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border-2 shadow-lg hover:shadow-xl transition-shadow duration-300
-                                ${outcome.title === 'Автоответ' ? 'border-green-300 dark:border-green-700' : 'border-yellow-300 dark:border-yellow-700'}`}
-                             >
+                             <div key={outcome.title} className={`flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border-2 shadow-lg hover:shadow-xl transition-shadow duration-300 ${outcome.borderColor}`}>
                                 {outcome.icon}
-                                <h4 className={`font-semibold mt-3 ${outcome.title === 'Автоответ' ? 'text-green-800 dark:text-green-300' : 'text-yellow-800 dark:text-yellow-300'}`}>{outcome.title}</h4>
+                                <h4 className={`font-semibold mt-3 ${outcome.textColor}`}>{outcome.title}</h4>
                                 <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{outcome.description}</p>
                             </div>
                         ))}
@@ -266,7 +299,7 @@ const GptAssistantDocumentationPage: React.FC = () => {
                 <section id="workflow" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<WrenchScrewdriverIcon className="w-8 h-8" />}
-                        title="Детальная механика обработки тикета"
+                        title="Жизненный цикл обработки тикета"
                         subtitle="Пошаговый процесс анализа и ответа на обращение клиента от получения до финального действия."
                     />
                     <TicketWorkflowDiagram />
