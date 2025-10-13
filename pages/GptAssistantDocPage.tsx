@@ -2,13 +2,13 @@
 import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import ReactDOM from 'react-dom';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, TooltipTerm, CollapsibleSection, Modal } from '../components/DocumentationUIComponents';
+import { SectionHeader, InfoCard, TooltipTerm, CollapsibleSection, Modal, CodeBlockWithCopy } from '../components/DocumentationUIComponents';
 import { 
     CpuChipIcon, ShieldCheckIcon, DocumentTextIcon, ChartBarIcon, ServerStackIcon, 
     WrenchScrewdriverIcon, CircleStackIcon, InboxArrowDownIcon, ScaleIcon,
     ArrowLongRightIcon, LightBulbIcon, MagnifyingGlassIcon, PuzzlePieceIcon, SparklesIcon,
     PencilSquareIcon, PaperAirplaneIcon, BookOpenIcon, BeakerIcon, ExclamationTriangleIcon, CodeBracketIcon, Cog6ToothIcon, ClockIcon, FolderOpenIcon, LinkIcon,
-    ArrowLongDownIcon, BugAntIcon, HandRaisedIcon
+    ArrowLongDownIcon, BugAntIcon, HandRaisedIcon, TableCellsIcon, TagIcon
 } from '@heroicons/react/24/outline';
 import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
 
@@ -116,7 +116,7 @@ const TicketWorkflowDiagram: React.FC = () => {
     const stages = [
         { icon: <InboxArrowDownIcon className="w-10 h-10 text-indigo-500"/>, title: "1. Получение обращения", tooltip: "Запрос от клиента поступает в систему из тикет-системы Omnidesk и становится отправной точкой для всего процесса анализа." },
         { icon: <ShieldCheckIcon className="w-10 h-10 text-indigo-500"/>, title: "2. Фильтрация и безопасность", tooltip: "Продвинутый спам-фильтр анализирует контент, а валидатор проверяет все ссылки на предмет фишинга и вредоносного ПО." },
-        { icon: <MagnifyingGlassIcon className="w-10 h-10 text-indigo-500"/>, title: "3. Анализ и поиск фактов (RAG)", tooltip: "Система производит семантический поиск по векторной базе знаний, чтобы найти наиболее релевантную информацию для формирования ответа." },
+        { icon: <MagnifyingGlassIcon className="w-10 h-10 text-indigo-500"/>, title: "3. Анализ и поиск фактов (RAG)", tooltip: "Система производит семантический поиск по векторной базе знаний (созданной из Google-таблицы), чтобы найти наиболее релевантную информацию для формирования ответа." },
         { icon: <PencilSquareIcon className="w-10 h-10 text-indigo-500"/>, title: "4. Генерация черновика ответа", tooltip: "На основе найденных фактов LLM-модель составляет черновой вариант ответа, который максимально точно и полно отвечает на вопрос клиента." },
         { icon: <PaperAirplaneIcon className="w-10 h-10 text-indigo-500"/>, title: "5. Отправка и оценка", tooltip: "Ответ отправляется клиенту. Система также вычисляет score — показатель уверенности в точности ответа. Если score низкий, тикет передается оператору." },
     ];
@@ -147,7 +147,7 @@ const TicketWorkflowDiagram: React.FC = () => {
 };
 
 const GptAssistantDocumentationPage: React.FC = () => {
-    const scoreExplanation = "Score — это параметр уверенности модели в точности ответа, работающий по порогу ≥ 80%. Если порог достигнут, ответ отправляется автоматически. Если score ниже, активируется fallback-механизм: ответ отбрасывается, а тикет передаётся оператору. Этот подход имеет два ключевых преимущества: он экономит токены, так как ресурсы не тратятся на некачественные ответы, и защищает оператора от путаницы, предотвращая передачу ему сомнительных или неполных черновиков.";
+    const scoreExplanation = "Score (или `confidence.answer`) — это параметр уверенности модели в точности ответа (от 0.0 до 1.0). Ответ отправляется клиенту автоматически, только если score ≥ 0.8. В противном случае, чтобы избежать отправки неточного ответа, система отбрасывает черновик, а тикет передаётся оператору. Это экономит токены и защищает от репутационных рисков.";
 
     return (
         <DocumentationPageLayout title="GPT-ассистент с RAG">
@@ -156,16 +156,17 @@ const GptAssistantDocumentationPage: React.FC = () => {
                 <section id="concept" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<CpuChipIcon className="w-8 h-8" />}
-                        title="Концепция и бизнес-задача"
-                        subtitle="Описание AI-ассистента, интегрированного в тикет-систему Omnidesk. Его главная задача — автоматически отвечать на типовые вопросы клиентов, используя базу знаний компании, и тем самым снижать нагрузку на первую линию поддержки."
+                        title="1. Концепция и бизнес-задача"
+                        subtitle="Описание AI-ассистента, интегрированного в тикет-систему Omnidesk. Его главная задача — автоматически отвечать на типовые вопросы клиентов, используя динамическую базу знаний, и тем самым снижать нагрузку на первую линию поддержки."
                     />
-                    <TicketWorkflowDiagram />
+                    
                     <InfoCard icon={<LightBulbIcon className="w-8 h-8" />} title="Ключевые выводы (Key Takeaways)">
                         <ul className="list-disc list-inside space-y-2 text-base">
-                            <li><b>Полная автоматизация:</b> Система самостоятельно получает обращения, ищет информацию, генерирует ответ и отправляет его клиенту.</li>
+                            <li><b>Полная автоматизация:</b> Система самостоятельно получает обращения из Omnidesk, ищет информацию, генерирует ответ и отправляет его клиенту.</li>
+                             <li><b>Интеллектуальная база знаний:</b> База знаний ведется в Google-таблице и обогащается с помощью автоматической разметки (категоризация, ключевые слова) моделью Gemini.</li>
                             <li><b>RAG-архитектура:</b> Использует <TooltipTerm definition="Технология, которая позволяет языковой модели (LLM) получать доступ к внешней, актуальной информации (например, из базы знаний) перед генерацией ответа, чтобы сделать его более точным и контекстуальным.">Retrieval-Augmented Generation</TooltipTerm> для минимизации «галлюцинаций» и повышения точности ответов.</li>
-                            <li><b>Экономия ресурсов:</b> Отвечая на частые вопросы, ассистент высвобождает время операторов для решения более сложных задач.</li>
                             <li><b>Механизм контроля качества:</b> Встроенный параметр <TooltipTerm definition={scoreExplanation}>score</TooltipTerm> позволяет автоматически отправлять только те ответы, в качестве которых система уверена, передавая сомнительные случаи оператору.</li>
+                             <li><b>Прозрачность и отладка:</b> Каждая обработка сопровождается подробным JSON-логом, что позволяет анализировать и улучшать работу системы.</li>
                         </ul>
                     </InfoCard>
                 </section>
@@ -173,77 +174,154 @@ const GptAssistantDocumentationPage: React.FC = () => {
                 <section id="architecture" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<WrenchScrewdriverIcon className="w-8 h-8" />}
-                        title="Архитектура и компоненты"
-                        subtitle="Как устроена система «под капотом»: от получения данных до финальной отправки ответа."
+                        title="2. Архитектура и база знаний"
+                        subtitle="Как устроена система «под капотом»: от управления базой знаний в Google Sheets до обработки клиентского запроса."
                     />
-                    <div className="space-y-8 mt-8">
-                        {/* Component 1: Data Sources */}
-                        <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                             <div className="flex items-start gap-4">
-                                <CircleStackIcon className="w-8 h-8 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
-                                <div>
-                                    <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0">Источники данных и база знаний</h3>
-                                    <p className="mt-2 text-base text-gray-700 dark:text-slate-300">Основа системы — это база знаний (Knowledge Base), которая формируется из двух источников:</p>
-                                    <ul className="list-disc list-inside space-y-2 mt-4 text-base">
-                                        <li><b>Omnidesk:</b> Экспорт статей из публичной базы знаний.</li>
-                                        <li><b>Локальные файлы:</b> Дополнительные документы в форматах `.txt`, `.md`, `.docx`, загружаемые вручную для обогащения контекста.</li>
-                                    </ul>
-                                </div>
+                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 not-prose">
+                        <div className="flex items-start gap-4">
+                            <TableCellsIcon className="w-10 h-10 text-indigo-500 dark:text-indigo-400 flex-shrink-0 mt-1" />
+                            <div>
+                                <h3 className="font-bold text-2xl text-gray-800 dark:text-slate-200 mt-0">База знаний в Google Sheets</h3>
+                                <p className="mt-2 text-base text-gray-700 dark:text-slate-300">
+                                    Основа ассистента — это база знаний, представленная в виде Google-таблицы, где каждая строка соответствует одной паре «вопрос–ответ». Эта таблица — не просто хранилище, а интеллектуальный конструктор с функцией автоматической разметки.
+                                </p>
                             </div>
                         </div>
 
-                        {/* Component 2: Core */}
-                         <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                            <div className="flex items-start gap-4">
-                                <ServerStackIcon className="w-8 h-8 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
-                                <div>
-                                    <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0">Ядро системы (gpttunnel)</h3>
-                                    <p className="mt-2 text-base text-gray-700 dark:text-slate-300">Сервис <a href="https://gptunnel.ru/?ref=DEN_PROMO" target="_blank" rel="noopener noreferrer" className="font-semibold text-indigo-500 dark:text-indigo-400 hover:underline">gpttunnel</a> выступает в роли центрального хаба, который выполняет три ключевые функции:</p>
-                                    <ol className="list-decimal list-inside space-y-2 mt-4 text-base">
-                                        <li><b>Векторизация:</b> Преобразует текстовые данные из базы знаний в числовые векторы для семантического поиска.</li>
-                                        <li><b>Хранение:</b> Индексирует и хранит полученные векторы в специализированной векторной базе данных.</li>
-                                        <li><b>Генерация ответов:</b> Принимает запрос, находит релевантные факты в базе и генерирует на их основе финальный ответ с помощью <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm>.</li>
-                                    </ol>
-                                </div>
-                            </div>
+                        <div className="mt-8">
+                            <h4 className="font-bold text-xl text-gray-800 dark:text-slate-200 flex items-center gap-2"><SparklesIcon className="w-6 h-6"/>Принцип работы авторазметки</h4>
+                            <p className="mt-2 text-base">
+                                Когда оператор добавляет новую вопросно-ответную пару и нажимает кнопку «Авторазметка», запускается скрипт, который (используя Gemini 1.5 flash):
+                            </p>
+                            <ol className="list-decimal list-inside space-y-2 mt-4 text-base pl-4">
+                                <li><b>Очищает текст вопроса</b> — убирает теги, служебные символы и шум.</li>
+                                <li><b>Определяет категорию и подкатегорию</b> — по ключевым словам и контексту.</li>
+                                <li><b>Генерирует набор ключевых слов</b> — выделяет устойчивые выражения для поиска в RAG.</li>
+                                <li><b>Сохраняет результаты</b> в соответствующие колонки таблицы.</li>
+                            </ol>
+                            <p className="mt-4 text-base">Таким образом, оператору достаточно один раз добавить текст — всё остальное скрипт делает сам.</p>
+                        </div>
+                        
+                        <div className="mt-8 overflow-x-auto">
+                            <h4 className="font-bold text-xl text-gray-800 dark:text-slate-200 mb-4">Пример строки в базе знаний:</h4>
+                             <table className="w-full text-left border-collapse text-base">
+                                <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
+                                    <tr>
+                                        <th className="p-3 border border-gray-200 dark:border-slate-700">client_question</th>
+                                        <th className="p-3 border border-gray-200 dark:border-slate-700">Answer</th>
+                                        <th className="p-3 border border-gray-200 dark:border-slate-700">category</th>
+                                        <th className="p-3 border border-gray-200 dark:border-slate-700">subcategory</th>
+                                        <th className="p-3 border border-gray-200 dark:border-slate-700">keywords</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
+                                    <tr className="border-b dark:border-slate-700">
+                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700">Не могу войти в личный кабинет, забыл пароль. Как восстановить доступ?</td>
+                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700">Чтобы восстановить доступ, нажмите «Забыли пароль»...</td>
+                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-semibold">Авторизация</td>
+                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700">Восстановление пароля</td>
+                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700"><code className="text-sm">пароль; доступ; личный кабинет; восстановление; забытый пароль</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </section>
 
-                 <section id="safety" className="scroll-mt-24">
-                    <SectionHeader 
-                        icon={<ShieldCheckIcon className="w-8 h-8" />}
-                        title="Безопасность и контроль"
-                        subtitle="Механизмы, обеспечивающие надежность и предсказуемость работы ассистента."
+                <section id="workflow" className="scroll-mt-24">
+                     <SectionHeader 
+                        icon={<Cog6ToothIcon className="w-8 h-8" />}
+                        title="3. Жизненный цикл обработки тикета"
+                        subtitle="Общий принцип работы: от получения клиентского запроса из Omnidesk до автоматической отправки ответа."
                     />
-                    <div className="grid md:grid-cols-2 gap-6 mt-6">
-                        <InfoCard icon={<ScaleIcon className="w-8 h-8" />} title="Score — Порог уверенности">
-                            <p>Ключевой механизм контроля. Каждый сгенерированный ответ сопровождается параметром <TooltipTerm definition={scoreExplanation}>score</TooltipTerm> (от 0 до 100). Ответ отправляется клиенту автоматически, только если <b>score ≥ 80%</b>. В противном случае, чтобы избежать отправки неточного ответа, система отбрасывает черновик, а тикет передаётся оператору. Это экономит токены и защищает от репутационных рисков.</p>
-                        </InfoCard>
-                        <InfoCard icon={<HandRaisedIcon className="w-8 h-8" />} title="Fallback-механизм">
-                             <p>Если система не находит релевантной информации в базе знаний или <TooltipTerm definition={scoreExplanation}>score</TooltipTerm> ответа слишком низок, она не пытается «додумать» ответ. Вместо этого активируется fallback-сценарий: тикет без изменений передаётся в общую очередь для обработки человеком. Это гарантирует, что ни один сложный или нестандартный вопрос не останется без внимания.</p>
-                        </InfoCard>
-                        <InfoCard icon={<FolderOpenIcon className="w-8 h-8" />} title="Контекстное обогащение">
-                            <p>Перед тем как отправить запрос в <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm>, система автоматически добавляет к нему <b>всю историю переписки</b> по текущему тикету. Это позволяет модели понимать полный контекст диалога и давать более точные и релевантные ответы, учитывая предыдущие вопросы и ответы клиента.</p>
-                        </InfoCard>
-                         <InfoCard icon={<LinkIcon className="w-8 h-8" />} title="Валидация ссылок">
-                            <p>Встроенный механизм безопасности проверяет все URL-адреса в обращении клиента. Если ссылка ведёт на известный фишинговый или вредоносный сайт, система немедленно помечает тикет как подозрительный и передаёт его оператору с соответствующим предупреждением, предотвращая переход по опасным ссылкам.</p>
-                        </InfoCard>
-                    </div>
+                    <TicketWorkflowDiagram />
+                </section>
+
+                 <section id="json-logs" className="scroll-mt-24">
+                    <SectionHeader 
+                        icon={<CodeBracketIcon className="w-8 h-8" />}
+                        title="4. Анализ ответов: JSON-логи и отладка"
+                        subtitle="Для каждой обработки создаётся подробный JSON-лог. В нём фиксируется, по каким тематикам ассистент выполнял поиск, какие темы он нашёл и какую в итоге выбрал. Это позволяет при необходимости корректировать разметку и улучшать точность."
+                    />
+                    <CollapsibleSection title="Показать структуру JSON-лога">
+                        <p className="mb-4">Система может генерировать многоуровневые ответы. Ниже представлены примеры основного и уточняющего ответа.</p>
+                        <div className="space-y-6">
+                            <CodeBlockWithCopy title="Основной ответ (Level 1)" code={`
+{
+  // Итоговый текст ответа, сгенерированный моделью.
+  // Может содержать ссылки, нумерованные шаги, обращения к пользователю.
+  "answer": "Чтобы восстановить доступ, нажмите «Забыли пароль»...",
+
+  // Список кандидатов, которые модель рассматривала в процессе выбора финального ответа.
+  "candidates": [
+    {
+      "id": "rag_doc_101",
+      "score": 0.92,
+      "category": "Авторизация"
+    },
+    {
+      "id": "rag_doc_105",
+      "score": 0.78,
+      "category": "Профиль"
+    }
+  ],
+
+  // Язык, на котором был сформирован ответ.
+  "language": "ru",
+
+  // Главная категория, выбранная системой для данного ответа.
+  "category": "Авторизация",
+
+  // Массив ссылок, которые модель включила в ответ.
+  "urls": ["https://example.com/reset-password"],
+
+  // Блок числовых метрик уверенности модели.
+  "confidence": {
+    "answer": 0.95, // Уверенность в правильности самого ответа.
+    "urls": 0.99   // Уверенность в корректности или актуальности ссылок.
+  }
+}
+                            `} />
+                             <CodeBlockWithCopy title="Уточняющий ответ (Level 2)" code={`
+{
+  // Уточнённый или промежуточный ответ, который уточняет детали level1.
+  "answer": "Если письмо не пришло, проверьте папку «Спам».",
+
+  // Здесь может быть один кандидат (наиболее релевантный) или несколько уточнённых.
+  "candidates": [
+    {
+      "id": "rag_doc_102",
+      "score": 0.98,
+      "category": "Авторизация"
+    }
+  ],
+
+  "language": "ru",
+  "category": "Авторизация",
+  "urls": [],
+
+  "confidence": {
+    "answer": 0.99,
+    "urls": 1.0
+  }
+}
+                            `} />
+                        </div>
+                    </CollapsibleSection>
                 </section>
                 
                 <section id="limitations" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<BugAntIcon className="w-8 h-8" />}
-                        title="Ограничения и будущие улучшения"
+                        title="5. Ограничения и будущие улучшения"
                         subtitle="Текущие рамки и потенциальные направления для развития системы."
                     />
                      <div className="space-y-4">
                         <InfoCard icon={<ExclamationTriangleIcon className="w-6 h-6"/>} title="Текущие ограничения">
                             <ul className="list-disc list-inside space-y-2">
-                                <li><b>Отсутствие поддержки таблиц:</b> Система пока не умеет эффективно извлекать и интерпретировать данные из таблиц в документах.</li>
-                                <li><b>Зависимость от качества базы знаний:</b> Точность ответов напрямую зависит от полноты и актуальности информации в Omnidesk и локальных файлах.</li>
-                                <li><b>Ограниченный файловый процессинг:</b> Поддерживаются только текстовые форматы (`.txt`, `.md`, `.docx`). Изображения и PDF не анализируются.</li>
+                                <li><b>Зависимость от качества базы знаний:</b> Точность ответов напрямую зависит от полноты и актуальности информации в Google-таблице.</li>
+                                <li><b>Ограниченный файловый процессинг:</b> Поддерживаются только текстовые форматы. Изображения и PDF не анализируются.</li>
+                                <li><b>Простые структуры:</b> Система пока не умеет эффективно извлекать и интерпретировать данные из сложных таблиц или вложенных структур в базе знаний.</li>
                             </ul>
                         </InfoCard>
                          <InfoCard icon={<SparklesIcon className="w-6 h-6"/>} title="Планы на будущее">
