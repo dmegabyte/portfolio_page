@@ -5,7 +5,7 @@ import {
     CubeTransparentIcon, CodeBracketIcon, BoltIcon, CommandLineIcon, QuestionMarkCircleIcon, 
     TableCellsIcon, DocumentTextIcon, ArchiveBoxIcon, ExclamationTriangleIcon, PlayIcon, 
     UserIcon, ArrowsRightLeftIcon, SparklesIcon, ArrowLongRightIcon, LightBulbIcon, WrenchScrewdriverIcon, ShieldExclamationIcon, PuzzlePieceIcon,
-    CheckBadgeIcon
+    CheckBadgeIcon, MagnifyingGlassIcon, PaintBrushIcon, CodeBracketSquareIcon, HandRaisedIcon, NoSymbolIcon, CheckIcon, PencilSquareIcon, InboxStackIcon, CircleStackIcon
 } from '@heroicons/react/24/outline';
 
 
@@ -380,28 +380,43 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-12">
-                    {/* Mode 1: CSS */}
+                    {/* Mode 1: CSS (Reworked) */}
                     <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                         <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 1: Стилизация (CSS)</h3>
-                        <p className="mt-2 text-base"><b>Что это?</b> Используйте этот режим, когда вам нужно изменить внешний вид существующего элемента, не меняя его HTML-структуру.</p>
+                        <p className="mt-2 text-base"><b>Что это?</b> Используйте этот режим, когда вам нужно изменить внешний вид существующего элемента, не меняя его <TooltipTerm definition="Язык гипертекстовой разметки, который определяет структуру веб-страницы.">HTML-структуру</TooltipTerm>.</p>
                         <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `cssOnlyHandler`</i></p>
 
-                        <h4 className="font-bold text-lg mt-6 mb-2">Как это работает?</h4>
-                        <ol className="list-decimal list-inside space-y-1 text-base">
-                           <li>Анализирует ваш запрос, чтобы найти CSS-селектор (например, `.card` или `#header`).</li>
-                           <li>Определяет, какие CSS-свойства нужно изменить.</li>
-                           <li>Генерирует чистый CSS-код.</li>
-                        </ol>
+                        <h4 className="font-bold text-lg mt-6 mb-4">Как это работает?</h4>
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
+                            <div className="flex flex-col items-center w-40"><MagnifyingGlassIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>1. Анализ запроса</strong><p className="text-sm text-gray-500 dark:text-slate-400">Поиск CSS-селектора</p></div>
+                            <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                            <div className="flex flex-col items-center w-40"><PaintBrushIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>2. Определение свойств</strong><p className="text-sm text-gray-500 dark:text-slate-400">Что нужно изменить</p></div>
+                             <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                            <div className="flex flex-col items-center w-40"><CodeBracketSquareIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>3. Генерация кода</strong><p className="text-sm text-gray-500 dark:text-slate-400">Вывод чистого CSS</p></div>
+                        </div>
 
-                        <h4 className="font-bold text-lg mt-6 mb-2">Лучшие практики для запросов</h4>
-                        <ul className="list-disc list-inside space-y-1 mt-2 text-base">
-                            <li><b>Всегда указывайте селектор:</b> Четко определите, к какому элементу применяются стили (`.btn-primary`, `#header nav`, `div.card > h2`).</li>
-                            <li><b>Будьте конкретны:</b> Вместо "сделай кнопку красивой" используйте "сделай кнопку синей (#3b82f6) с белым текстом и скруглением 8px".</li>
-                            <li><b>Описывайте состояния:</b> Не забывайте про состояния `:hover`, `:focus` для интерактивных элементов.</li>
-                        </ul>
+                        <h4 className="font-bold text-lg mt-8 mb-4">Лучшие практики для запросов</h4>
+                        <div className="grid md:grid-cols-2 gap-4 text-base not-prose">
+                            <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                                <h5 className="font-semibold flex items-center gap-2 text-green-800 dark:text-green-300"><CheckIcon className="w-5 h-5"/>Рекомендуется</h5>
+                                <ul className="list-disc list-inside mt-2 space-y-1 text-green-900 dark:text-green-200">
+                                    <li><b>Указывайте селектор:</b> `.btn-primary`, `#header nav`</li>
+                                    <li><b>Будьте конкретны:</b> "сделай кнопку синей (#3b82f6)"</li>
+                                    <li><b>Описывайте состояния:</b> `:hover`, `:focus`</li>
+                                </ul>
+                            </div>
+                             <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                                <h5 className="font-semibold flex items-center gap-2 text-red-800 dark:text-red-300"><NoSymbolIcon className="w-5 h-5"/>Не рекомендуется</h5>
+                                 <ul className="list-disc list-inside mt-2 space-y-1 text-red-900 dark:text-red-200">
+                                    <li><b>Общие фразы:</b> "сделай красиво"</li>
+                                    <li><b>Запросы на изменение HTML:</b> "добавь иконку"</li>
+                                </ul>
+                            </div>
+                        </div>
                         
-                        <h4 className="font-bold text-lg mt-6 mb-2">Ограничения</h4>
-                        <p className="text-base">Этот режим **не изменяет** HTML-структуру. Он может только добавлять или изменять CSS-правила.</p>
+                        <InfoCard icon={<HandRaisedIcon className="w-6 h-6"/>} title="Ограничения">
+                           <p>Этот режим **не изменяет** <TooltipTerm definition="Язык гипертекстовой разметки, который определяет структуру веб-страницы.">HTML-структуру</TooltipTerm>. Он может только добавлять или изменять CSS-правила.</p>
+                        </InfoCard>
 
                         <CollapsibleSection title="Показать пример ввода/вывода для CSS-режима">
                             <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС:
@@ -421,28 +436,43 @@ footer a:hover {
                         </CollapsibleSection>
                     </div>
 
-                    {/* Mode 2: HTML + JS */}
+                    {/* Mode 2: HTML + JS (Reworked) */}
                     <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                         <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 2: Создание интерфейса (HTML + JS)</h3>
                         <p className="mt-2 text-base"><b>Что это?</b> Основной режим для генерации новых компонентов, блоков или целых страниц.</p>
                         <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `generateHTMLJS`</i></p>
                         
-                        <h4 className="font-bold text-lg mt-6 mb-2">Как это работает?</h4>
-                        <ol className="list-decimal list-inside space-y-1 text-base">
-                           <li>Анализирует описание требуемой структуры и поведения.</li>
-                           <li>Генерирует семантически корректную HTML-разметку.</li>
-                           <li>Добавляет тег `<script>` с `vanilla JS` для реализации интерактивности.</li>
-                        </ol>
+                        <h4 className="font-bold text-lg mt-6 mb-4">Как это работает?</h4>
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
+                            <div className="flex flex-col items-center w-40"><PencilSquareIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>1. Анализ описания</strong><p className="text-sm text-gray-500 dark:text-slate-400">Структура и поведение</p></div>
+                            <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                            <div className="flex flex-col items-center w-40"><CodeBracketIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>2. Генерация HTML</strong><p className="text-sm text-gray-500 dark:text-slate-400">Создание разметки</p></div>
+                             <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                            <div className="flex flex-col items-center w-40"><BoltIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>3. Добавление JS</strong><p className="text-sm text-gray-500 dark:text-slate-400">Реализация интерактивности</p></div>
+                        </div>
+
+                        <h4 className="font-bold text-lg mt-8 mb-4">Лучшие практики для запросов</h4>
+                         <div className="grid md:grid-cols-2 gap-4 text-base not-prose">
+                            <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                                <h5 className="font-semibold flex items-center gap-2 text-green-800 dark:text-green-300"><CheckIcon className="w-5 h-5"/>Рекомендуется</h5>
+                                <ul className="list-disc list-inside mt-2 space-y-1 text-green-900 dark:text-green-200">
+                                    <li><b>Описывайте структуру:</b> "карточка с картинкой сверху..."</li>
+                                    <li><b>Описывайте интерактивность:</b> "при клике на заголовок..."</li>
+                                    <li><b>Запрашивайте стили:</b> "используй темную тему"</li>
+                                </ul>
+                            </div>
+                             <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                                <h5 className="font-semibold flex items-center gap-2 text-red-800 dark:text-red-300"><NoSymbolIcon className="w-5 h-5"/>Не рекомендуется</h5>
+                                 <ul className="list-disc list-inside mt-2 space-y-1 text-red-900 dark:text-red-200">
+                                    <li><b>Запрашивать серверную логику:</b> "сохрани в базу данных"</li>
+                                    <li><b>Использовать неоднозначные термины</b></li>
+                                </ul>
+                            </div>
+                        </div>
                         
-                        <h4 className="font-bold text-lg mt-6 mb-2">Лучшие практики для запросов</h4>
-                        <ul className="list-disc list-inside space-y-1 mt-2 text-base">
-                            <li><b>Описывайте структуру:</b> Перечисляйте элементы, которые должны быть внутри компонента ("карточка с картинкой сверху, заголовком и текстом под ней").</li>
-                            <li><b>Описывайте интерактивность:</b> Если требуется поведение, опишите его ("при клике на заголовок должен открываться/скрываться текст под ним").</li>
-                            <li><b>Запрашивайте стили:</b> Упомяните, что нужны стили (например, "используй темную тему" или "сделай карточки в виде сетки").</li>
-                        </ul>
-                        
-                        <h4 className="font-bold text-lg mt-6 mb-2">Ограничения</h4>
-                        <p className="text-base">Режим работает **только на стороне клиента**. Он не генерирует серверную логику (PHP, Python, Node.js). Места, где она может понадобиться, помечаются комментарием `// TODO`.</p>
+                        <InfoCard icon={<HandRaisedIcon className="w-6 h-6"/>} title="Ограничения">
+                           <p>Режим работает <strong>только на стороне клиента</strong>. Он не генерирует серверную логику (PHP, Python, Node.js). Места, где она может понадобиться, помечаются комментарием `// TODO`.</p>
+                        </InfoCard>
 
                         <CollapsibleSection title="Показать пример ввода/вывода для HTML + JS режима">
                              <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС:
@@ -465,21 +495,23 @@ footer a:hover {
                         </CollapsibleSection>
                     </div>
                     
-                    {/* Mode 3: JSON */}
+                    {/* Mode 3: JSON (Reworked) */}
                     <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                         <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 3: Извлечение данных (JSON)</h3>
                         <p className="mt-2 text-base"><b>Что это?</b> Используется для получения информации (системных кодов и их описаний) из внутренней базы знаний.</p>
                         <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `system_code_parser`</i></p>
 
-                        <h4 className="font-bold text-lg mt-6 mb-2">Как это работает?</h4>
-                         <ol className="list-decimal list-inside space-y-1 text-base">
-                           <li>Получает строго структурированный JSON-запрос.</li>
-                           <li>Ищет совпадения в «Корпусе контекста» на основе полей `module` и `template`.</li>
-                           <li>Возвращает JSON-объект с найденными кодами и их описаниями.</li>
-                        </ol>
+                        <h4 className="font-bold text-lg mt-6 mb-4">Как это работает?</h4>
+                         <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
+                            <div className="flex flex-col items-center w-40"><InboxStackIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>1. Получение JSON</strong><p className="text-sm text-gray-500 dark:text-slate-400">Прием структурированного запроса</p></div>
+                            <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                            <div className="flex flex-col items-center w-40"><CircleStackIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>2. Поиск в базе</strong><p className="text-sm text-gray-500 dark:text-slate-400">Поиск в «Корпусе контекста»</p></div>
+                             <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                            <div className="flex flex-col items-center w-40"><DocumentTextIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>3. Возврат JSON</strong><p className="text-sm text-gray-500 dark:text-slate-400">Отправка найденных кодов</p></div>
+                        </div>
 
-                        <h4 className="font-bold text-lg mt-6 mb-2">Формат ввода</h4>
-                        <p className="text-base">Запрос должен быть в строгом JSON-формате и содержать следующие поля:</p>
+                        <h4 className="font-bold text-lg mt-8 mb-4">Формат ввода</h4>
+                        <p className="text-base">Запрос должен быть в строгом <TooltipTerm definition="Текстовый формат обмена данными, основанный на JavaScript. Легко читается людьми и легко парсится машинами.">JSON-формате</TooltipTerm> и содержать следующие поля:</p>
                         <div className="text-sm my-2 not-prose">
                             <ul className="list-disc list-inside bg-white dark:bg-slate-800 p-4 rounded-md border dark:border-slate-700">
                                 <li>`module` (string): Имя модуля (например, "E-commerce Store").</li>
@@ -489,8 +521,9 @@ footer a:hover {
                             </ul>
                         </div>
                         
-                        <h4 className="font-bold text-lg mt-6 mb-2">Ограничения</h4>
-                        <p className="text-base">Система возвращает **не более 3** наиболее релевантных системных кодов за один запрос.</p>
+                        <InfoCard icon={<HandRaisedIcon className="w-6 h-6"/>} title="Ограничения">
+                           <p>Система возвращает **не более 3** наиболее релевантных системных кодов за один запрос.</p>
+                        </InfoCard>
 
                         <CollapsibleSection title="Показать пример ввода/вывода для JSON-режима">
                             <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС (в виде JSON):
@@ -519,7 +552,7 @@ footer a:hover {
                  <div className="space-y-4">
                     <InfoCard icon={<QuestionMarkCircleIcon className="w-6 h-6"/>} title="Неоднозначные запросы (Fallback-поведение)">
                         <p>Если запрос недостаточно конкретен, особенно в CSS-режиме (например, "измени цвет кнопки" без указания селектора), система не будет "додумывать" и вернет уточняющий вопрос. Это поведение обеспечивается промтом `askUserIntent`.</p>
-                        <p className="mt-2"><strong>Пример ответа системы:</strong> «Не удалось определить, к какой кнопке применить стили. Пожалуйста, укажите CSS-селектор (например, `.btn-submit` или `#main-button`).»</p>
+                        <p className="mt-2"><strong>Пример ответа системы:</strong> «Не удалось определить, к какой кнопке применить стили. Пожалуйста, укажите <TooltipTerm definition="Строка, которая определяет, к какому HTML-элементу или элементам применяются CSS-правила.">CSS-селектор</TooltipTerm> (например, `.btn-submit` или `#main-button`).»</p>
                     </InfoCard>
                     <InfoCard icon={<ExclamationTriangleIcon className="w-6 h-6"/>} title="Некорректные запросы">
                         <p>Если запрос совершенно не связан с генерацией кода или является бессмысленным набором символов, система вернет стандартный ответ об ошибке, указывая на невозможность обработки. Она не будет пытаться "угадать" намерение пользователя, чтобы избежать непредсказуемых результатов.</p>
