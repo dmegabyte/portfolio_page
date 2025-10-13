@@ -81,7 +81,7 @@ const ProjectPage: React.FC = () => {
             {project.documentationPage && (
             <Link
                 to={project.documentationPage}
-                className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-all duration-300 no-underline shadow-sm transform hover:-translate-y-0.5"
+                className="inline-block bg-[var(--color-interactive-primary-strong)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[var(--color-interactive-primary-strong-hover)] transition-all duration-300 no-underline shadow-sm transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color-interactive-primary)] focus-visible:ring-offset-2 ring-offset-[var(--ring-offset-light)] dark:focus-visible:ring-offset-[var(--ring-offset-dark-card)]"
             >
                 Читать документацию
             </Link>
@@ -91,7 +91,7 @@ const ProjectPage: React.FC = () => {
                 href={project.repoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block bg-slate-700 dark:bg-slate-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-slate-800 dark:hover:bg-slate-600 transition-all duration-300 no-underline shadow-sm transform hover:-translate-y-0.5"
+                className="inline-block bg-slate-700 dark:bg-slate-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-slate-800 dark:hover:bg-slate-600 transition-all duration-300 no-underline shadow-sm transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color-interactive-tertiary)] focus-visible:ring-offset-2 ring-offset-[var(--ring-offset-light)] dark:focus-visible:ring-offset-[var(--ring-offset-dark-card)]"
             >
                 Репозиторий
             </a>

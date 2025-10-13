@@ -1,27 +1,10 @@
-import React, { useState, useEffect, RefObject } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { RefObject } from 'react';
+import { useCharacterCount } from '../hooks/useCharacterCount';
 
 // Renamed for clarity, following Principle 1: Clarity Over Brevity.
+// Logic has been extracted to a custom hook, making this a pure presentational component.
 const PageCharacterCounter: React.FC<{ contentRef: RefObject<HTMLElement> }> = ({ contentRef }) => {
-  const [charCount, setCharCount] = useState(0);
-  const { pathname, search, hash } = useLocation();
-
-  useEffect(() => {
-    // Reset count immediately on navigation to prepare for fade-in
-    setCharCount(0);
-    
-    // A small delay to ensure the DOM is updated after a route change in the SPA
-    const timer = setTimeout(() => {
-      if (contentRef.current) {
-        // textContent is used to ensure all content, including inside collapsed sections, is counted.
-        // This is critical for upholding Principle 3: Content Integrity.
-        const text = contentRef.current.textContent || '';
-        setCharCount(text.replace(/\s/g, '').length);
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [contentRef, pathname, search, hash]); // Rerun on any part of the URL changing
+  const charCount = useCharacterCount(contentRef);
 
   return (
     <span className={`transition-opacity duration-300 ${charCount > 0 ? 'opacity-100' : 'opacity-0'}`}>

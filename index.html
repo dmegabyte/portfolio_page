@@ -93,6 +93,31 @@
           transform: translateY(0);
       }
     </style>
+    <style>
+      :root {
+        /* --- Centralized Theme Variables for Interactivity --- */
+        /* This centralizes key colors and values for interactive elements (hover, focus) */
+        /* to ensure consistency and easier theme management, per Principles 4 and 8. */
+
+        /* Primary action color (Indigo) */
+        --color-interactive-primary: #6366f1; /* indigo-500 */
+        --color-interactive-primary-strong: #4f46e5; /* indigo-600 */
+        --color-interactive-primary-strong-hover: #4338ca; /* indigo-700 */
+        --color-interactive-primary-light-focus: #a5b4fc; /* indigo-300 */
+        --color-interactive-primary-dark-focus: #3730a3; /* indigo-800 */
+
+        /* Secondary action color (Sky) */
+        --color-interactive-secondary: #38bdf8; /* sky-500 */
+        
+        /* Tertiary action color (Slate) */
+        --color-interactive-tertiary: #64748b; /* slate-500 */
+
+        /* Ring offset colors based on component background */
+        --ring-offset-light: white;
+        --ring-offset-dark-card: #1e293b; /* slate-800 */
+        --ring-offset-dark-page: #0f172a; /* slate-900 */
+      }
+    </style>
   </head>
   <body class="bg-gray-100 dark:bg-slate-900">
     <div id="root"></div>

@@ -15,7 +15,7 @@ const ContactPage: React.FC = () => {
       <div className="max-w-md mx-auto space-y-6">
         <a 
           href="mailto:d.megabyte@gmail.com"
-          className="group flex items-center justify-center w-full p-4 border border-gray-300 dark:border-slate-700 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-slate-700 transform hover:-translate-y-1"
+          className="group flex items-center justify-center w-full p-4 border border-gray-300 dark:border-slate-700 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg hover:border-[var(--color-interactive-primary)] dark:hover:border-[var(--color-interactive-primary)] hover:bg-indigo-50 dark:hover:bg-slate-700 transform hover:-translate-y-1 focus:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color-interactive-primary)] focus-visible:ring-offset-2 ring-offset-[var(--ring-offset-light)] dark:focus-visible:ring-offset-[var(--ring-offset-dark-card)]"
         >
           <EnvelopeIcon className="h-8 w-8 text-gray-500 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
           <span className="ml-4 text-lg font-medium text-slate-800 dark:text-slate-200 group-hover:text-indigo-700 dark:group-hover:text-indigo-300">
@@ -27,7 +27,7 @@ const ContactPage: React.FC = () => {
           href="https://t.me/Nothingname001"
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex items-center justify-center w-full p-4 border border-gray-300 dark:border-slate-700 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg hover:border-sky-500 dark:hover:border-sky-500 hover:bg-sky-50 dark:hover:bg-slate-700 transform hover:-translate-y-1"
+          className="group flex items-center justify-center w-full p-4 border border-gray-300 dark:border-slate-700 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg hover:border-[var(--color-interactive-secondary)] dark:hover:border-[var(--color-interactive-secondary)] hover:bg-sky-50 dark:hover:bg-slate-700 transform hover:-translate-y-1 focus:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color-interactive-secondary)] focus-visible:ring-offset-2 ring-offset-[var(--ring-offset-light)] dark:focus-visible:ring-offset-[var(--ring-offset-dark-card)]"
         >
           <PaperAirplaneIcon className="h-8 w-8 text-gray-500 dark:text-slate-400 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors" />
           <span className="ml-4 text-lg font-medium text-slate-800 dark:text-slate-200 group-hover:text-sky-700 dark:group-hover:text-sky-300">

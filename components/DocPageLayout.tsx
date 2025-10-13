@@ -1,4 +1,6 @@
-import React, { ReactNode, useEffect, useState, useRef } from 'react';
+
+import React, { ReactNode, useEffect, useState, useRef, useMemo } from 'react';
+import { useScrollSpy } from '../hooks/useScrollSpy';
 
 interface DocumentationPageLayoutProps {
     children: ReactNode;
@@ -7,9 +9,15 @@ interface DocumentationPageLayoutProps {
 
 const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ children, title }) => {
     const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
-    const [activeId, setActiveId] = useState<string>('');
     const contentRef = useRef<HTMLDivElement>(null);
-    const observerRef = useRef<IntersectionObserver | null>(null);
+
+    // By memoizing the `headingIds` array with `useMemo`, we prevent the `useScrollSpy` hook's
+    // internal useEffect from re-running on every render of this component. This is a key
+    // performance optimization that ensures the IntersectionObserver is only recreated
+    // when the actual list of headings changes, adhering to best practices.
+    const headingIds = useMemo(() => headings.map(h => h.id), [headings]);
+    
+    const activeId = useScrollSpy(headingIds, contentRef);
 
     // FIX: The `history.pushState` call was fundamentally incompatible with HashRouter,
     // causing unpredictable navigation behavior and crashes. According to Principle 9,
@@ -27,7 +35,7 @@ const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ child
         }
     };
 
-    // Effect 1: Scans the document for section headings and builds the TOC.
+    // Effect to scan the document for section headings and build the TOC.
     // This runs whenever the page content (`children`) changes.
     useEffect(() => {
         if (!contentRef.current) return;
@@ -47,62 +55,6 @@ const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ child
 
     }, [children]); // Dependency on children ensures TOC is always up-to-date with content.
 
-    // Effect 2: Manages the IntersectionObserver for scroll spying.
-    // This effect runs when the list of headings is updated, setting up the observer.
-    useEffect(() => {
-        // Disconnect any previous observer before creating a new one.
-        if (observerRef.current) {
-            observerRef.current.disconnect();
-        }
-        if (headings.length === 0) return;
-
-        const visibleSections = new Set<string>();
-
-        const observerCallback: IntersectionObserverCallback = (entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    visibleSections.add(entry.target.id);
-                } else {
-                    visibleSections.delete(entry.target.id);
-                }
-            });
-
-            // Find the first heading in the document's order that is currently intersecting.
-            // This reliably identifies the topmost visible section.
-            let newActiveId = '';
-            for (const heading of headings) {
-                if (visibleSections.has(heading.id)) {
-                    newActiveId = heading.id;
-                    break;
-                }
-            }
-            
-            if (newActiveId) {
-                setActiveId(newActiveId);
-            }
-        };
-        
-        observerRef.current = new IntersectionObserver(observerCallback, {
-            // The "active" area is a horizontal band between 20% from the top and 25% from the bottom of the viewport.
-            rootMargin: '-20% 0px -75% 0px',
-            threshold: 0, // Fire as soon as a single pixel enters/leaves the margin.
-        });
-
-        // Start observing all section elements.
-        const elements = contentRef.current?.querySelectorAll('section[id]');
-        if (elements) {
-            elements.forEach(el => observerRef.current!.observe(el));
-        }
-
-        // Cleanup function to disconnect the observer on component unmount.
-        return () => {
-            if (observerRef.current) {
-                observerRef.current.disconnect();
-            }
-        };
-    }, [headings]); // Reruns only when the headings array itself changes.
-
-
     return (
         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl animate-fade-in border border-gray-200 dark:border-slate-700">
             <div className="lg:flex">
@@ -117,11 +69,11 @@ const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ child
                                 
                                 const linkClasses = `
                                     block w-full text-left transition-colors duration-200
-                                    border-l-2 py-1.5 pr-3
+                                    border-l-2 py-1.5 pr-3 focus:outline-none
                                     ${isSubheading ? 'pl-7' : 'pl-3 font-semibold'}
                                     ${isActive
                                         ? 'text-slate-900 dark:text-slate-200 font-bold border-indigo-500 dark:border-indigo-400'
-                                        : 'text-gray-600 dark:text-slate-400 border-transparent hover:text-gray-900 dark:hover:text-slate-100 hover:border-gray-300 dark:hover:border-slate-600'
+                                        : 'text-gray-600 dark:text-slate-400 border-transparent hover:text-gray-900 dark:hover:text-slate-100 hover:border-gray-300 dark:hover:border-slate-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:text-slate-900 dark:focus:text-slate-100'
                                     }
                                 `;
 

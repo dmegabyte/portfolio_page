@@ -1,6 +1,7 @@
 import React, { useState, ReactNode, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useModalLogic } from '../hooks/useModalLogic';
 
 // --- Section Header ---
 interface SectionHeaderProps {
@@ -172,7 +173,7 @@ export const TooltipTerm: React.FC<TooltipTermProps> = ({ children, definition }
                 onBlur={handleHide}
                 tabIndex={0}
                 aria-describedby={isVisible ? tooltipId : undefined}
-                className="text-indigo-500 dark:text-indigo-400 font-semibold underline decoration-indigo-300 dark:decoration-indigo-500 decoration-dashed underline-offset-4 hover:text-indigo-600 dark:hover:text-indigo-300 hover:decoration-solid hover:decoration-indigo-500 dark:hover:decoration-indigo-400 transition-all cursor-help focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800 rounded-sm"
+                className="text-indigo-500 dark:text-indigo-400 font-semibold underline decoration-indigo-300 dark:decoration-indigo-500 decoration-dashed underline-offset-4 hover:text-indigo-600 dark:hover:text-indigo-300 hover:decoration-solid hover:decoration-indigo-500 dark:hover:decoration-indigo-400 transition-all cursor-help focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-interactive-primary)] ring-offset-[var(--ring-offset-light)] dark:focus:ring-offset-[var(--ring-offset-dark-card)] rounded-sm"
             >
                 {children}
             </span>
@@ -192,36 +193,16 @@ interface ModalProps {
 
 export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
     const [isMounted, setIsMounted] = useState(false);
+    const modalRef = useRef<HTMLDivElement>(null);
 
-    // This effect runs only once on the client to confirm that the component has mounted.
-    // This is necessary for the portal to work correctly without SSR issues.
+    // This custom hook now encapsulates all the complex side effects like focus trapping,
+    // keyboard event handling, and body scroll locking. This makes the Modal component
+    // a clean, presentational component, adhering to Principle #8.
+    useModalLogic({ isOpen, onClose, modalRef });
+
     useEffect(() => {
         setIsMounted(true);
     }, []);
-
-    // This effect handles all side-effects related to the modal's open state,
-    // such as disabling body scroll and adding an escape key listener.
-    useEffect(() => {
-        if (!isOpen) {
-            return; // Do nothing if the modal is not open.
-        }
-
-        const handleEsc = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                onClose();
-            }
-        };
-
-        document.addEventListener('keydown', handleEsc);
-        document.body.style.overflow = 'hidden';
-
-        // The cleanup function is crucial: it runs when `isOpen` changes from true to false
-        // or when the component unmounts, ensuring all side-effects are reversed.
-        return () => {
-            document.removeEventListener('keydown', handleEsc);
-            document.body.style.overflow = '';
-        };
-    }, [isOpen, onClose]);
 
     if (!isMounted || !isOpen) {
         return null;
@@ -242,6 +223,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
             onClick={onClose}
         >
             <div
+                ref={modalRef}
                 role="document"
                 className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-3xl w-full m-4 border border-gray-200 dark:border-slate-800 animate-modal-enter"
                 onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
@@ -250,7 +232,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
                     <h3 id="modal-title" className="text-2xl font-bold text-slate-900 dark:text-slate-200">{title}</h3>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-transform hover:scale-110"
+                        className="p-2 rounded-full text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive-primary)] transition-transform hover:scale-110"
                         aria-label="Закрыть модальное окно"
                     >
                         <XMarkIcon className="w-6 h-6" />

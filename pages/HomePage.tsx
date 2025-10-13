@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { projects } from '../data/projects';
@@ -19,7 +18,7 @@ const HomePage: React.FC = () => {
           <Link 
             to={`/project/${project.slug}`} 
             key={project.id} 
-            className="group block bg-white dark:bg-slate-900 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 transform hover:-translate-y-1 hover:scale-105"
+            className="group block bg-white dark:bg-slate-900 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-slate-700 hover:border-[var(--color-interactive-primary)] dark:hover:border-[var(--color-interactive-primary)] transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color-interactive-primary)] focus-visible:ring-offset-2 ring-offset-[var(--ring-offset-light)] dark:focus-visible:ring-offset-[var(--ring-offset-dark-card)]"
           >
             <div className="overflow-hidden aspect-video">
               <img

@@ -1,18 +1,10 @@
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ArrowUpIcon } from '@heroicons/react/24/solid';
+import { useScrollVisibility } from '../hooks/useScrollVisibility';
 
 const ScrollToTopButton: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  const toggleVisibility = () => {
-    // Show button if page is scrolled down more than 300px
-    if (window.pageYOffset > 300) {
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-    }
-  };
+  // Encapsulated logic in a reusable custom hook.
+  const isVisible = useScrollVisibility(300);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -21,23 +13,17 @@ const ScrollToTopButton: React.FC = () => {
     });
   };
 
-  useEffect(() => {
-    window.addEventListener('scroll', toggleVisibility);
-    return () => {
-      window.removeEventListener('scroll', toggleVisibility);
-    };
-  }, []);
-
   return (
     <div className="fixed bottom-6 right-6 z-50">
         <button
             type="button"
             onClick={scrollToTop}
+            tabIndex={isVisible ? 0 : -1}
             className={`
-              bg-indigo-600 hover:bg-indigo-700 text-white
-              dark:bg-indigo-500 dark:hover:bg-indigo-600
+              bg-[var(--color-interactive-primary-strong)] hover:bg-[var(--color-interactive-primary-strong-hover)] text-white
+              dark:bg-[var(--color-interactive-primary)] dark:hover:bg-[var(--color-interactive-primary-strong)]
               rounded-full p-3 shadow-lg transition-all duration-300 ease-in-out
-              focus:outline-none focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-800
+              focus:outline-none focus:ring-4 focus:ring-[var(--color-interactive-primary-light-focus)] dark:focus:ring-[var(--color-interactive-primary-dark-focus)]
               transform
               ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}
             `}

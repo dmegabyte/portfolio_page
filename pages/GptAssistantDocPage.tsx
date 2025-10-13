@@ -10,6 +10,7 @@ import {
     PencilSquareIcon, PaperAirplaneIcon, BookOpenIcon, BeakerIcon, ExclamationTriangleIcon, CodeBracketIcon, Cog6ToothIcon, ClockIcon, FolderOpenIcon, LinkIcon,
     ArrowLongDownIcon, BugAntIcon, HandRaisedIcon
 } from '@heroicons/react/24/outline';
+import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
 
 
 // --- Local Components for the Diagram ---
@@ -92,26 +93,9 @@ const WorkflowStage: React.FC<WorkflowStageProps> = ({ icon, title, tooltip, cla
 const TicketWorkflowDiagram: React.FC = () => {
     const diagramRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            },
-            { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-        );
-
-        const elements = diagramRef.current?.querySelectorAll('.workflow-stage');
-        if (elements) elements.forEach((el) => observer.observe(el));
-
-        return () => {
-            if (elements) elements.forEach((el) => observer.unobserve(el));
-        };
-    }, []);
+    // This custom hook now handles the intersection observer logic for scroll animations,
+    // making the component cleaner and the logic reusable, per Principle #8.
+    useAnimateOnScroll(diagramRef, { targetSelector: '.workflow-stage' });
 
     const scoreExplanation = "Score — это параметр уверенности модели в точности ответа, работающий по порогу ≥ 80%. Если порог достигнут, ответ отправляется автоматически. Если score ниже, активируется fallback-механизм: ответ отбрасывается, а тикет передаётся оператору. Этот подход имеет два ключевых преимущества: он экономит токены, так как ресурсы не тратятся на некачественные ответы, и защищает оператора от путаницы, предотвращая передачу ему сомнительных или неполных черновиков.";
     
