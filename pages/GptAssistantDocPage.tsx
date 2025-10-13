@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import ReactDOM from 'react-dom';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, TooltipTerm, CollapsibleSection } from '../components/DocumentationUIComponents';
+import { SectionHeader, InfoCard, TooltipTerm, CollapsibleSection, Modal } from '../components/DocumentationUIComponents';
 import { 
     CpuChipIcon, ShieldCheckIcon, DocumentTextIcon, ChartBarIcon, ServerStackIcon, 
     WrenchScrewdriverIcon, CircleStackIcon, InboxArrowDownIcon, ScaleIcon,
     ArrowLongRightIcon, LightBulbIcon, MagnifyingGlassIcon, PuzzlePieceIcon, SparklesIcon,
     PencilSquareIcon, PaperAirplaneIcon, BookOpenIcon, BeakerIcon, ExclamationTriangleIcon, CodeBracketIcon, Cog6ToothIcon, ClockIcon, FolderOpenIcon, LinkIcon,
-    ArrowLongDownIcon
+    ArrowLongDownIcon, BugAntIcon
 } from '@heroicons/react/24/outline';
 
 
@@ -304,97 +304,210 @@ const TicketWorkflowDiagram: React.FC = () => {
 
 
 const GptAssistantDocumentationPage: React.FC = () => {
+    const [modalContent, setModalContent] = useState<{ title: string; content: ReactNode } | null>(null);
+
     const modulesWithDetails = [
         { 
             name: '01_ErrorHandler.js', 
             icon: <ExclamationTriangleIcon className="w-6 h-6 text-red-500 dark:text-red-400"/>,
             summary: 'Центральный обработчик ошибок.',
-            description: 'Перехватывает исключения, формирует читаемые отчёты, логирует критические сбои.',
-            dependencies: ['Utils', 'ReportGenerator'],
-            usage: 'Используется всеми остальными модулями как универсальный try/catch wrapper.'
+            details: {
+                description: 'Перехватывает исключения, формирует читаемые отчёты, логирует критические сбои.',
+                functions: [],
+                dependencies: ['Utils', 'ReportGenerator'],
+                usage: 'Используется всеми остальными модулями как универсальный try/catch wrapper.'
+            }
         },
         { 
             name: '02_Utils.js', 
             icon: <WrenchScrewdriverIcon className="w-6 h-6 text-gray-500 dark:text-gray-400"/>,
             summary: 'Универсальные утилиты.',
-            description: 'Парсинг данных, нормализация строк, форматирование дат, проверка типов.',
-            dependencies: [],
-            usage: 'Базовый слой, от которого зависят почти все остальные модули.'
+            details: {
+                description: 'Парсинг данных, нормализация строк, форматирование дат, проверка типов.',
+                functions: [],
+                dependencies: [],
+                usage: 'Базовый слой, от которого зависят почти все остальные модули.'
+            }
         },
         { 
             name: '03_GptApi.js', 
             icon: <CpuChipIcon className="w-6 h-6 text-indigo-500 dark:text-indigo-400"/>,
             summary: 'Управление взаимодействием с LLM.',
-            description: 'Формирование запросов, валидация промтов, контроль токенов и ответов.',
-            dependencies: ['Utils', 'ErrorHandler', 'Config.js', 'AdvancedSpamFilter'],
-            usage: 'Основной модуль для работы с AI-моделями.'
+            details: {
+                description: 'Формирование запросов, валидация промтов, контроль токенов и ответов.',
+                functions: [],
+                dependencies: ['Utils', 'ErrorHandler', 'Config.js', 'AdvancedSpamFilter'],
+                usage: 'Основной модуль для работы с AI-моделями.'
+            }
         },
         { 
             name: '04_Omnidesk.js', 
             icon: <InboxArrowDownIcon className="w-6 h-6 text-sky-500 dark:text-sky-400"/>,
             summary: 'Интеграция с тикет-системой.',
-            description: 'Создание, обновление, закрытие тикетов, отправка уведомлений в Omnidesk.',
-            dependencies: ['Utils', 'ReportGenerator'],
-            usage: 'Может быть вызван из Triggers при поступлении событий от пользователя.'
+            details: {
+                description: 'Создание, обновление, закрытие тикетов, отправка уведомлений в Omnidesk.',
+                functions: [],
+                dependencies: ['Utils', 'ReportGenerator'],
+                usage: 'Может быть вызван из Triggers при поступлении событий от пользователя.'
+            }
         },
         { 
             name: '05_Triggers.js', 
             icon: <ClockIcon className="w-6 h-6 text-amber-500 dark:text-amber-400"/>,
             summary: 'Менеджер событий и расписаний.',
-            description: 'Запускает действия на основе условий (входящее сообщение, таймер, системное событие).',
-            dependencies: ['GptApi', 'Omnidesk', 'ReportGenerator', 'Config.js'],
-            usage: 'Оркестратор основных бизнес-процессов.'
+            details: {
+                description: 'Запускает действия на основе условий (входящее сообщение, таймер, системное событие).',
+                functions: [],
+                dependencies: ['GptApi', 'Omnidesk', 'ReportGenerator', 'Config.js'],
+                usage: 'Оркестратор основных бизнес-процессов.'
+            }
         },
         { 
             name: '06_History.js', 
             icon: <FolderOpenIcon className="w-6 h-6 text-gray-500 dark:text-gray-400"/>,
-            summary: 'Хранение и извлечение истории.',
-            description: 'Управляет доступом к истории диалогов, сообщений и задач.',
-            dependencies: [],
-            usage: 'Используется GptApi (для контекста) и ReportGenerator (для аналитики).'
+            summary: 'Контекстное саммари для операторов.',
+            details: {
+                description: 'Этот модуль — ключевой инструмент для экономии времени операторов. Вместо того чтобы вручную просматривать длинную историю переписки, оператор получает краткое, но емкое саммари по последним обращениям клиента. Система автоматически собирает данные из Omnidesk, кэширует их и передает в AI-модель (Gemini или GPTunnel) для генерации лаконичной сводки. Это позволяет оператору мгновенно погрузиться в контекст и предоставить более качественный и быстрый ответ.',
+                functions: [
+                    'getUserIdByCaseId() — получает user_id по ID обращения.',
+                    'getRecentCaseInfosByUser() — список последних обращений (до 90 дней).',
+                    'getCaseDialogQA() — формирует историю диалога в формате Q/A.',
+                    'getSummaryFromGemini() & getSummaryFromGPTunnel() — создают саммари через AI.',
+                    'getUserHistorySummary() — итоговое резюме последних трёх обращений.',
+                    'getAllUserHistoryRaw() — краткий список всех обращений.'
+                ],
+                dependencies: ['PropertiesService', 'CacheService', 'UrlFetchApp', 'Gemini API', 'Omnidesk API'],
+                usage: 'Работает совместно с модулями логирования и error-репортинга.'
+            }
         },
         { 
             name: '07_ReportGenerator.js', 
             icon: <ChartBarIcon className="w-6 h-6 text-green-500 dark:text-green-400"/>,
             summary: 'Генерация отчётов.',
-            description: 'Формирует и отправляет отчёты о работе системы: ошибки, статистика, результаты запросов.',
-            dependencies: ['Utils', 'History'],
-            usage: 'Может быть вызван ErrorHandler или Triggers.'
+            details: {
+                description: 'Формирует и отправляет отчёты о работе системы: ошибки, статистика, результаты запросов.',
+                functions: [],
+                dependencies: ['Utils', 'History'],
+                usage: 'Может быть вызван ErrorHandler или Triggers.'
+            }
         },
         { 
             name: '08_UrlValidator.js', 
             icon: <LinkIcon className="w-6 h-6 text-gray-500 dark:text-gray-400"/>,
-            summary: 'Проверка и классификация URL.',
-            description: 'Проверяет ссылки на валидность, опасные домены, фишинг, редиректы.',
-            dependencies: ['Utils'],
-            usage: 'Результаты используются AdvancedSpamFilter и GptApi.'
+            summary: 'Валидация и нормализация ссылок.',
+            details: {
+                description: 'Проверяет корректность URL, очищает от UTM- и tracking-параметров, и автоматически исправляет неточные ссылки, предложенные AI.',
+                functions: [
+                    'ValidUrlsCache — кэширует whitelist допустимых ссылок на 1 час.',
+                    'calculateUrlSimilarity() — вычисляет схожесть AI-ссылки с валидной.',
+                    'normalizeUrl() — очищает URL от мусорных параметров.',
+                    'extractAndNormalizeUrls() — извлекает и нормализует все URL из текста.',
+                    'replaceMarkdownLinksWithUrls() — заменяет [текст](url) на обычные URL.'
+                ],
+                dependencies: ['whitelist-база ссылок'],
+                usage: 'Используется в фильтрах безопасности. Поддерживает резервный (regex) метод очистки.'
+            }
         },
         { 
             name: '10_AdvancedSpamFilter.js', 
             icon: <ShieldCheckIcon className="w-6 h-6 text-red-500 dark:text-red-400"/>,
-            summary: 'Расширенный антиспам-модуль.',
-            description: 'Проверяет тексты и ссылки, классифицирует по цветам (green/yellow/red), учитывает promo-паттерны.',
-            dependencies: ['UrlValidator', 'Utils'],
-            usage: 'Может вызываться из GptApi и Triggers для предварительной проверки контента.'
+            summary: 'Продвинутый антиспам.',
+            details: {
+                description: 'Определяет и классифицирует спам в сообщениях по весовой системе. Поддерживает белые списки, многоуровневые паттерны и адаптивные пороги.',
+                functions: [
+                    'SPAM_FILTER_CONFIG — веса и пороги (80 — спам, 50 — подозрительное).',
+                    'SPAM_PATTERNS — более 30 паттернов (SEO, Instagram, фишинг и т.п.).',
+                    'WHITELIST_PATTERNS — легитимные уведомления (Mail.ru, uKit).',
+                    'Поддержка весовой оценки (score), а не просто true/false.'
+                ],
+                dependencies: ['SpamFilterTests.js'],
+                usage: 'Интегрируется с системой отчётов и механизмом rollback. Работает совместно с базовой версией фильтра и унифицированным isSpamUnified().'
+            }
         },
         { 
             name: '12_PlaygroundTester.js', 
             icon: <BeakerIcon className="w-6 h-6 text-purple-500 dark:text-purple-400"/>,
             summary: 'Модуль тестирования и QA.',
-            description: 'Позволяет запускать автоматические проверки сценариев, тестировать ответы модели, валидировать системные коды.',
-            dependencies: ['GptApi', 'History', 'ErrorHandler', 'ReportGenerator'],
-            usage: 'Часто применяется в тестовой среде (Playground/TestSuite).'
+            details: {
+                description: 'Позволяет запускать автоматические проверки сценариев, тестировать ответы модели, валидировать системные коды.',
+                functions: [],
+                dependencies: ['GptApi', 'History', 'ErrorHandler', 'ReportGenerator'],
+                usage: 'Часто применяется в тестовой среде (Playground/TestSuite).'
+            }
+        },
+         { 
+            name: 'SpamFilterTests.js', 
+            icon: <BugAntIcon className="w-6 h-6 text-rose-500 dark:text-rose-400"/>,
+            summary: 'Тестирование спам-фильтра.',
+            details: {
+                description: 'Автоматически проверяет корректность работы всех версий фильтра: базовой, продвинутой и унифицированной. Позволяет отследить несовместимости и процент успешных срабатываний.',
+                functions: [
+                    'Категории тестов: TECHNICAL_SPAM, COMMERCIAL_SPAM, LEGITIMATE, EDGE_CASES.',
+                    'runSpamFilterTests() — полный прогон тестов и статистика успеха.',
+                    'testUnifiedSpamFilter() — сравнение старой и новой архитектуры.',
+                    'testRollbackMechanism() — тестирование отката и совместимости версий.'
+                ],
+                dependencies: ['10_AdvancedSpamFilter.js'],
+                usage: 'Использует тестовые кейсы для проверки точности и ложных срабатываний.'
+            }
         },
         { 
             name: 'CONFIG.js', 
             icon: <Cog6ToothIcon className="w-6 h-6 text-gray-500 dark:text-gray-400"/>,
             summary: 'Конфигурация системы.',
-            description: 'API ключи, параметры моделей, расписание задач, включённые функции.',
-            dependencies: [],
-            usage: 'Используется всеми остальными модулями как источник настроек и глобальных констант.'
+            details: {
+                description: 'API ключи, параметры моделей, расписание задач, включённые функции.',
+                functions: [],
+                dependencies: [],
+                usage: 'Используется всеми остальными модулями как источник настроек и глобальных констант.'
+            }
         }
     ];
 
+    const deepDiveStages = {
+        'Получение обращения': [],
+        'Фильтрация и безопасность': ['10_AdvancedSpamFilter.js', '08_UrlValidator.js'],
+        'Анализ и поиск фактов (RAG)': ['06_History.js'],
+        'Подготовка ответа': ['03_GptApi.js'],
+        'Оценка и принятие решения': [],
+    };
+
+    const handleModuleClick = (moduleName: string) => {
+        const moduleData = modulesWithDetails.find(m => m.name === moduleName);
+        if (moduleData) {
+            setModalContent({
+                title: moduleData.name,
+                content: (
+                    <div className="space-y-4 text-base">
+                        <p className="font-semibold">{moduleData.details.description}</p>
+                        {moduleData.details.functions && moduleData.details.functions.length > 0 && (
+                            <div>
+                                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Основные функции/компоненты:</h4>
+                                <ul className="list-disc list-inside space-y-1 text-sm">
+                                    {moduleData.details.functions.map((func, index) => <li key={index}>{func}</li>)}
+                                </ul>
+                            </div>
+                        )}
+                        <div>
+                            <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Связи:</h4>
+                             {moduleData.details.dependencies.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {moduleData.details.dependencies.map(dep => (
+                                        <span key={dep} className="text-xs font-mono bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-1 rounded-full">{dep}</span>
+                                    ))}
+                                </div>
+                            ) : <p className="text-sm italic">Нет прямых зависимостей.</p>}
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Контекст использования:</h4>
+                            <p className="text-sm">{moduleData.details.usage}</p>
+                        </div>
+                    </div>
+                )
+            });
+        }
+    };
+    
     const metrics = [
         { stage: 'Этап 1', model: 'gemini-2.5-flash + GPT-4o', auto_reply: '12.5%', accuracy: '4.86', style: '4.86' },
         { stage: 'Этап 2', model: 'gemini-2.5-flash + GPT-4o', auto_reply: '23.6%', accuracy: '6.60', style: '6.90' },
@@ -428,6 +541,31 @@ const GptAssistantDocumentationPage: React.FC = () => {
                         subtitle="Пошаговый процесс анализа и ответа на обращение клиента от получения до финального действия."
                     />
                     <TicketWorkflowDiagram />
+                    <div className="mt-12">
+                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4 not-prose">Глубокое погружение в этапы</h3>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {Object.entries(deepDiveStages).map(([stageTitle, modules]) => (
+                                <div key={stageTitle} className="bg-white dark:bg-slate-800/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm">
+                                    <h4 className="font-bold text-lg text-slate-900 dark:text-slate-200 mb-3">{stageTitle}</h4>
+                                    {modules.length > 0 ? (
+                                        <div className="flex flex-wrap gap-2">
+                                            {modules.map(moduleName => (
+                                                <button 
+                                                    key={moduleName}
+                                                    onClick={() => handleModuleClick(moduleName)}
+                                                    className="text-sm font-mono bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-200 px-3 py-1 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-900/50 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+                                                >
+                                                    {moduleName}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm text-slate-500 italic">Общий процесс.</p>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </section>
                 
                 <section id="knowledge-base" className="scroll-mt-24">
@@ -473,12 +611,20 @@ const GptAssistantDocumentationPage: React.FC = () => {
                                 }
                             >
                                 <div className="space-y-4">
-                                    <p>{module.description}</p>
+                                    <p>{module.details.description}</p>
+                                    {module.details.functions && module.details.functions.length > 0 && (
+                                        <div>
+                                            <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Основные функции/компоненты:</h4>
+                                            <ul className="list-disc list-inside space-y-1 text-sm">
+                                                {module.details.functions.map((func, index) => <li key={index}>{func}</li>)}
+                                            </ul>
+                                        </div>
+                                    )}
                                     <div>
                                         <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Зависимости и связи:</h4>
-                                        {module.dependencies.length > 0 ? (
+                                        {module.details.dependencies.length > 0 ? (
                                             <div className="flex flex-wrap gap-2">
-                                                {module.dependencies.map(dep => (
+                                                {module.details.dependencies.map(dep => (
                                                     <span key={dep} className="text-xs font-mono bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-1 rounded-full">{dep}</span>
                                                 ))}
                                             </div>
@@ -488,12 +634,23 @@ const GptAssistantDocumentationPage: React.FC = () => {
                                     </div>
                                     <div>
                                         <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-2">Контекст использования:</h4>
-                                        <p className="text-sm">{module.usage}</p>
+                                        <p className="text-sm">{module.details.usage}</p>
                                     </div>
                                 </div>
                             </CollapsibleSection>
                         ))}
                     </div>
+                </section>
+                
+                <section id="quality-control" className="scroll-mt-24">
+                    <SectionHeader 
+                        icon={<BeakerIcon className="w-8 h-8" />}
+                        title="Контроль качества и Тестирование"
+                        subtitle="Обеспечение надежности и стабильности ключевых компонентов системы, таких как спам-фильтр."
+                    />
+                    <InfoCard icon={<BugAntIcon className="w-8 h-8 text-rose-500 dark:text-rose-400" />} title="SpamFilterTests.js — Тестирование спам-фильтра">
+                        <p>Этот модуль играет критическую роль в поддержании высокого качества фильтрации спама. Он автоматически проверяет корректность работы всех версий фильтра (базовой, продвинутой, унифицированной) на большом наборе тестовых кейсов, включая коммерческий и технический спам, легитимные сообщения и пограничные случаи. Это позволяет отслеживать регрессии, оценивать точность и гарантировать, что обновления в одном фильтре не ломают общую логику.</p>
+                    </InfoCard>
                 </section>
                 
                 <section id="metrics" className="scroll-mt-24">
@@ -527,6 +684,15 @@ const GptAssistantDocumentationPage: React.FC = () => {
                         </table>
                     </div>
                 </section>
+                 {modalContent && (
+                    <Modal
+                        isOpen={!!modalContent}
+                        onClose={() => setModalContent(null)}
+                        title={modalContent.title}
+                    >
+                        {modalContent.content}
+                    </Modal>
+                )}
             </div>
         </DocumentationPageLayout>
     );
