@@ -1,93 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Bars3Icon, XMarkIcon, SunIcon, MoonIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline';
-
-type Theme = 'light' | 'dark' | 'system';
-
-const ThemeToggle: React.FC = () => {
-    // Initialize state from localStorage or default to 'system' to prevent hydration mismatch and flashes
-    const [theme, setTheme] = useState<Theme>(() => {
-        if (typeof window === 'undefined') {
-            return 'system'; // Default for SSR
-        }
-        return (localStorage.getItem('theme') as Theme) || 'system';
-    });
-
-    // Effect to apply theme class and manage listeners for system changes
-    useEffect(() => {
-        let mediaQuery: MediaQueryList;
-        const handleSystemThemeChange = (e: MediaQueryListEvent | MediaQueryList) => {
-            // Apply dark mode if the media query matches
-            document.documentElement.classList.toggle('dark', e.matches);
-        };
-
-        if (theme === 'system') {
-            localStorage.removeItem('theme');
-            mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            handleSystemThemeChange(mediaQuery);
-            mediaQuery.addEventListener('change', handleSystemThemeChange);
-        } else {
-            localStorage.setItem('theme', theme);
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        }
-        
-        // Cleanup listener when component unmounts or theme changes
-        return () => {
-            if (mediaQuery) {
-                mediaQuery.removeEventListener('change', handleSystemThemeChange);
-            }
-        };
-    }, [theme]);
-
-    // Handler to cycle through themes, intelligently skipping visually identical states
-    const handleThemeChange = () => {
-        const cycle: Theme[] = ['light', 'dark', 'system'];
-        
-        setTheme(currentTheme => {
-            const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            const currentIndex = cycle.indexOf(currentTheme);
-            let nextTheme = cycle[(currentIndex + 1) % cycle.length];
-
-            // Determine if the current and next states are visually the same
-            const isCurrentVisuallyDark = currentTheme === 'dark' || (currentTheme === 'system' && systemIsDark);
-            const isNextVisuallyDark = nextTheme === 'dark' || (nextTheme === 'system' && systemIsDark);
-            
-            // If the next logical step would be a visual no-op, skip to the following step in the cycle
-            if (isCurrentVisuallyDark === isNextVisuallyDark) {
-                const nextIndex = cycle.indexOf(nextTheme);
-                nextTheme = cycle[(nextIndex + 1) % cycle.length];
-            }
-            
-            return nextTheme;
-        });
-    };
-
-    const getIcon = () => {
-        switch(theme) {
-            case 'light': return <SunIcon className="w-5 h-5"/>;
-            case 'dark': return <MoonIcon className="w-5 h-5"/>;
-            case 'system': return <ComputerDesktopIcon className="w-5 h-5"/>;
-        }
-    }
-
-    return (
-        <button
-            onClick={handleThemeChange}
-            className="p-2 rounded-md text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900 focus:ring-indigo-500 transition-colors"
-            aria-label={`Current theme: ${theme}`}
-        >
-            {getIcon()}
-        </button>
-    );
-};
-
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isProjectOrDocPage = location.pathname.startsWith('/project/') || location.pathname.startsWith('/documentation/');
+
+  // Effect to manage system theme changes, as the manual toggle is removed.
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      document.documentElement.classList.toggle('dark', e.matches);
+    };
+    
+    // Apply initial theme based on system preference
+    handleSystemThemeChange(mediaQuery);
+    
+    // Listen for changes
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    
+    // Cleanup listener on component unmount
+    return () => {
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
+  }, []);
+
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -112,7 +51,6 @@ const Header: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             {isProjectOrDocPage ? (
               <div>
                 <button
