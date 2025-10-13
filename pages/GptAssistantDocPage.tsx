@@ -154,88 +154,37 @@ const InteractiveIcon: React.FC<InteractiveIconProps> = ({ icon, tooltip, classN
     );
 };
 
-
 const TicketWorkflowDiagram: React.FC = () => {
     const diagramRef = useRef<HTMLDivElement>(null);
 
-    // Effect for scroll-triggered animations, enhancing UX (Principle #2).
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target); // Animate only once.
+                        observer.unobserve(entry.target);
                     }
                 });
             },
-            {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px',
-            }
+            { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
         );
 
         const elements = diagramRef.current?.querySelectorAll('.workflow-stage');
-        if (elements) {
-            elements.forEach((el) => observer.observe(el));
-        }
+        if (elements) elements.forEach((el) => observer.observe(el));
 
         return () => {
-            if (elements) {
-                elements.forEach((el) => observer.unobserve(el));
-            }
+            if (elements) elements.forEach((el) => observer.unobserve(el));
         };
     }, []);
 
     const scoreExplanation = "`confident-score` — это ключевая метрика (от 0 до 100), которая отражает уверенность AI в точности и полноте сгенерированного ответа. Если score высокий (≥ 80%), система отправляет ответ автоматически. Если низкий — создается черновик для проверки оператором, чтобы избежать отправки потенциально неверной информации.";
 
     const stages = [
-        { 
-            icon: <InboxArrowDownIcon className="w-10 h-10 text-indigo-500"/>, 
-            title: "1. Получение обращения", 
-            tooltip: "Запрос от клиента поступает в систему из тикет-системы Omnidesk и становится отправной точкой для всего процесса анализа." 
-        },
-        { 
-            icon: <ShieldCheckIcon className="w-10 h-10 text-indigo-500"/>, 
-            title: "2. Фильтрация и безопасность", 
-            tooltip: "Продвинутый спам-фильтр анализирует контент, а валидатор проверяет все ссылки на предмет фишинга и вредоносного ПО." 
-        },
-        { 
-            icon: <MagnifyingGlassIcon className="w-10 h-10 text-indigo-500"/>, 
-            title: "3. Анализ и поиск фактов (RAG)", 
-            tooltip: "Система производит семантический поиск по векторной базе знаний, чтобы найти наиболее релевантную информацию для ответа." 
-        },
-        { 
-            icon: <SparklesIcon className="w-10 h-10 text-indigo-500"/>, 
-            title: "4. Подготовка ответа", 
-            tooltip: "Модель GPT-4o создает черновик ответа, основываясь на найденных фактах из базы знаний и исходном вопросе клиента." 
-        },
-        { 
-            icon: <ScaleIcon className="w-10 h-10 text-indigo-500"/>, 
-            title: "5. Оценка и принятие решения", 
-            tooltip: "Система рассчитывает метрику уверенности (`confident-score`), чтобы оценить, насколько AI уверен в точности и полноте сгенерированного ответа." 
-        }
-    ];
-
-    const outcomes = [
-        { 
-            icon: <PaperAirplaneIcon className="w-10 h-10 text-green-500 -rotate-45"/>, 
-            title: "Автоответ", 
-            description: "Если `score` высокий, ответ отправляется клиенту автоматически.",
-            borderColor: "border-green-300 dark:border-green-700",
-            textColor: "text-green-800 dark:text-green-300",
-            label: "`score` высокий",
-            labelClasses: "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700"
-        },
-        { 
-            icon: <PencilSquareIcon className="w-10 h-10 text-yellow-600"/>, 
-            title: "Черновик + Саммари", 
-            description: "Если `score` низкий, создается черновик и краткая сводка для оператора.",
-            borderColor: "border-yellow-300 dark:border-yellow-700",
-            textColor: "text-yellow-800 dark:text-yellow-300",
-            label: "`score` низкий",
-            labelClasses: "bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-700"
-        }
+        { icon: <InboxArrowDownIcon className="w-10 h-10 text-indigo-500"/>, title: "1. Получение обращения", tooltip: "Запрос от клиента поступает в систему из тикет-системы Omnidesk и становится отправной точкой для всего процесса анализа." },
+        { icon: <ShieldCheckIcon className="w-10 h-10 text-indigo-500"/>, title: "2. Фильтрация и безопасность", tooltip: "Продвинутый спам-фильтр анализирует контент, а валидатор проверяет все ссылки на предмет фишинга и вредоносного ПО." },
+        { icon: <MagnifyingGlassIcon className="w-10 h-10 text-indigo-500"/>, title: "3. Анализ и поиск фактов (RAG)", tooltip: "Система производит семантический поиск по векторной базе знаний, чтобы найти наиболее релевантную информацию для ответа." },
+        { icon: <SparklesIcon className="w-10 h-10 text-indigo-500"/>, title: "4. Подготовка ответа", tooltip: "Модель GPT-4o создает черновик ответа, основываясь на найденных фактах из базы знаний и исходном вопросе клиента." }
     ];
 
     return (
@@ -262,39 +211,64 @@ const TicketWorkflowDiagram: React.FC = () => {
                             </React.Fragment>
                         ))}
                     </div>
+                    
+                    <div className="flex w-full flex-col items-center mt-4 lg:mt-4">
+                        <ArrowLongDownIcon className="h-10 w-10 text-gray-400 dark:text-slate-500 workflow-stage" style={{ transitionDelay: '600ms' }} />
+                    </div>
 
-                    {/* Branching Visual with Interactive Tooltip */}
-                     <div className="flex w-full flex-col items-center mt-4 lg:mt-8">
-                        <InteractiveIcon
-                            className="workflow-stage hover:bg-gray-100 dark:hover:bg-slate-700/50"
-                            style={{ transitionDelay: '750ms' }}
-                            tooltip={scoreExplanation}
-                            icon={<ArrowLongDownIcon className="h-10 w-10 text-gray-400 dark:text-slate-500" />}
+                    {/* Step 5 with integrated branching */}
+                    <div className="w-full flex flex-col items-center relative workflow-stage" style={{ transitionDelay: '750ms' }}>
+                        <WorkflowStage 
+                            icon={<ScaleIcon className="w-10 h-10 text-indigo-500"/>} 
+                            title="5. Оценка и принятие решения" 
+                            tooltip="Система рассчитывает метрику уверенности (`confident-score`), чтобы оценить, насколько AI уверен в точности и полноте сгенерированного ответа." 
                         />
+                         {/* Branching Visual with Interactive Tooltip */}
+                         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 flex w-full max-w-3xl flex-col items-center">
+                             <InteractiveIcon
+                                 className="hover:bg-gray-100 dark:hover:bg-slate-700/50"
+                                 tooltip={scoreExplanation}
+                                 icon={<ArrowLongDownIcon className="h-10 w-10 text-gray-400 dark:text-slate-500" />}
+                             />
+                             {/* Desktop Branching Lines */}
+                             <div className="hidden md:flex justify-center items-start w-full mt-4">
+                                 <div className="w-1/2 h-4 border-b border-r border-gray-300 dark:border-slate-600"></div>
+                                 <div className="w-1/2 h-4 border-b border-l border-gray-300 dark:border-slate-600"></div>
+                             </div>
+                         </div>
                     </div>
-
-                    {/* Desktop Branching Lines */}
-                    <div className="hidden md:flex justify-center items-start w-full max-w-3xl mt-4 workflow-stage" style={{ transitionDelay: '900ms' }}>
-                        <div className="w-1/2 h-4 border-b border-r border-gray-300 dark:border-slate-600"></div>
-                        <div className="w-1/2 h-4 border-b border-l border-gray-300 dark:border-slate-600"></div>
-                    </div>
-
-                    {/* Decision Outcomes */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 md:gap-y-0 w-full max-w-3xl md:mt-0 mt-4">
-                        {outcomes.map((outcome, index) => (
-                            <div key={outcome.title} className="flex flex-col items-center text-center workflow-stage" style={{ transitionDelay: `${1050 + index * 150}ms` }}>
-                                {/* Mobile connector */}
-                                <div className="md:hidden w-px h-4 bg-gray-300 dark:bg-slate-600 mb-4"></div>
-                                <span className={`font-mono px-2 py-1 rounded-md border text-xs ${outcome.labelClasses}`}>
-                                    {outcome.label}
-                                </span>
-                                <div className={`mt-4 flex flex-col items-center p-4 rounded-lg bg-white dark:bg-slate-800 border-2 shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xs ${outcome.borderColor}`}>
-                                    {outcome.icon}
-                                    <h4 className={`font-semibold mt-3 ${outcome.textColor}`}>{outcome.title}</h4>
-                                    <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{outcome.description}</p>
+                    
+                     {/* Decision Outcomes */}
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 md:gap-y-0 w-full max-w-3xl mt-[120px]">
+                         {[{ 
+                                icon: <PaperAirplaneIcon className="w-10 h-10 text-green-500 -rotate-45"/>, 
+                                title: "Автоответ", 
+                                description: "Если `score` высокий, ответ отправляется клиенту автоматически.",
+                                borderColor: "border-green-300 dark:border-green-700",
+                                textColor: "text-green-800 dark:text-green-300",
+                                label: "`score` высокий",
+                                labelClasses: "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700"
+                            }, { 
+                                icon: <PencilSquareIcon className="w-10 h-10 text-yellow-600"/>, 
+                                title: "Черновик + Саммари", 
+                                description: "Если `score` низкий, создается черновик и краткая сводка для оператора.",
+                                borderColor: "border-yellow-300 dark:border-yellow-700",
+                                textColor: "text-yellow-800 dark:text-yellow-300",
+                                label: "`score` низкий",
+                                labelClasses: "bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-700"
+                            }].map((outcome, index) => (
+                                <div key={outcome.title} className="flex flex-col items-center text-center workflow-stage" style={{ transitionDelay: `${900 + index * 150}ms` }}>
+                                    <div className="md:hidden w-px h-4 bg-gray-300 dark:bg-slate-600 mb-4"></div>
+                                    <span className={`font-mono px-2 py-1 rounded-md border text-xs ${outcome.labelClasses}`}>
+                                        {outcome.label}
+                                    </span>
+                                    <div className={`mt-4 flex flex-col items-center p-4 rounded-lg bg-white dark:bg-slate-800 border-2 shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xs ${outcome.borderColor}`}>
+                                        {outcome.icon}
+                                        <h4 className={`font-semibold mt-3 ${outcome.textColor}`}>{outcome.title}</h4>
+                                        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{outcome.description}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
                     </div>
                 </div>
             </div>
@@ -302,12 +276,116 @@ const TicketWorkflowDiagram: React.FC = () => {
     );
 };
 
+// Reinstated Architecture Diagram, built with robust and responsive flexbox, adhering to Principles #4 and #5.
+const ArchitectureDiagram: React.FC = () => {
+    const diagramRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        const elements = diagramRef.current?.querySelectorAll('.diagram-element');
+        if (elements) elements.forEach(el => observer.observe(el));
+        return () => { if (elements) elements.forEach(el => observer.unobserve(el)); };
+    }, []);
+
+    const ModuleNode: React.FC<{ name: string, className?: string, style?: React.CSSProperties }> = ({ name, className, style }) => (
+        <div className={`bg-slate-700/50 text-slate-300 text-sm font-mono px-4 py-2 rounded-md border border-slate-600 diagram-element ${className}`} style={style}>{name}</div>
+    );
+
+    const KeyModuleNode: React.FC<{ name: string, tooltip: string, className?: string, style?: React.CSSProperties }> = ({ name, tooltip, className, style }) => (
+        <div className={`diagram-element ${className}`} style={style}>
+            <TooltipTerm definition={tooltip}>
+                <div className="bg-slate-700/80 text-indigo-300 text-sm font-mono px-6 py-3 rounded-lg border-2 border-indigo-500/80 shadow-lg">{name}</div>
+            </TooltipTerm>
+        </div>
+    );
+
+    return (
+        <div ref={diagramRef} className="not-prose my-12" role="group" aria-label="Диаграмма архитектуры, показывающая зависимость модулей от центрального файла CONFIG.js.">
+            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-6 text-center">Визуальная схема архитектурных связей</h3>
+            {/* Desktop Diagram */}
+            <div className="hidden lg:flex flex-col items-center space-y-8 p-6 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-700">
+                <ModuleNode name="CONFIG.js" className="diagram-element" style={{ transitionDelay: '0ms' }} />
+                <div className="w-full flex justify-center relative">
+                    <div className="absolute top-[-2rem] left-1/2 -translate-x-1/2 h-8 w-px bg-slate-600 diagram-element" style={{ transitionDelay: '100ms' }}></div>
+                    <div className="absolute top-0 left-0 right-0 h-px bg-slate-600 diagram-element" style={{ transitionDelay: '200ms' }}></div>
+                </div>
+                <div className="w-full grid grid-cols-4 gap-4 pt-4">
+                    {['01_ErrorHandler.js', '02_Utils.js', '04_Omnidesk.js', '12_PlaygroundTester.js'].map((name, i) => (
+                        <div key={name} className="flex flex-col items-center relative">
+                             <div className="absolute top-[-1rem] h-4 w-px bg-slate-600 diagram-element" style={{ transitionDelay: `${300 + i * 50}ms` }}></div>
+                            <ModuleNode name={name} style={{ transitionDelay: `${500 + i * 100}ms` }} />
+                        </div>
+                    ))}
+                </div>
+                <div className="w-full grid grid-cols-2 gap-8 pt-8">
+                    <div className="flex flex-col items-center space-y-4 relative">
+                        <div className="absolute top-[-2rem] h-8 w-px bg-slate-600 diagram-element" style={{ transitionDelay: '900ms' }}></div>
+                        <KeyModuleNode name="03_GptApi.js" tooltip="Ключевой модуль, управляющий взаимодействием с AI-моделями." style={{ transitionDelay: '1000ms' }} />
+                        <div className="w-full flex justify-center relative">
+                            <div className="absolute top-[-1rem] h-4 w-px bg-slate-600 diagram-element" style={{ transitionDelay: '1100ms' }}></div>
+                            <div className="absolute top-0 left-1/4 right-1/4 h-px bg-slate-600 diagram-element" style={{ transitionDelay: '1200ms' }}></div>
+                        </div>
+                        <div className="w-full grid grid-cols-3 gap-2 pt-4">
+                            {['06_History.js', '08_UrlValidator.js', '10_AdvancedSpamFilter.js'].map((name, i) => (
+                                <div key={name} className="flex flex-col items-center relative">
+                                    <div className="absolute top-[-1rem] h-4 w-px bg-slate-600 diagram-element" style={{ transitionDelay: `${1300 + i * 50}ms` }}></div>
+                                    <ModuleNode name={name} style={{ transitionDelay: `${1500 + i * 100}ms` }} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-center space-y-4 relative">
+                        <div className="absolute top-[-2rem] h-8 w-px bg-slate-600 diagram-element" style={{ transitionDelay: '950ms' }}></div>
+                        <KeyModuleNode name="05_Triggers.js" tooltip="Ключевой модуль, управляющий событиями и расписаниями." style={{ transitionDelay: '1050ms' }} />
+                        <div className="w-full flex justify-center relative">
+                            <div className="absolute top-[-1rem] h-4 w-px bg-slate-600 diagram-element" style={{ transitionDelay: '1150ms' }}></div>
+                        </div>
+                        <div className="pt-4">
+                            <ModuleNode name="07_ReportGenerator.js" style={{ transitionDelay: '1700ms' }} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/* Mobile Diagram */}
+            <div className="lg:hidden p-4 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-700 space-y-4">
+                <ModuleNode name="CONFIG.js" />
+                <div className="pl-4 border-l-2 border-slate-600 space-y-4">
+                    <ModuleNode name="01_ErrorHandler.js" />
+                    <ModuleNode name="02_Utils.js" />
+                    <ModuleNode name="04_Omnidesk.js" />
+                    <ModuleNode name="12_PlaygroundTester.js" />
+                    <div className="bg-slate-800/50 p-3 rounded-lg border border-indigo-500/50">
+                        <KeyModuleNode name="03_GptApi.js" tooltip="Ключевой модуль, управляющий взаимодействием с AI-моделями." />
+                         <div className="pl-4 mt-4 border-l-2 border-slate-600 space-y-4">
+                             <ModuleNode name="06_History.js" />
+                             <ModuleNode name="08_UrlValidator.js" />
+                             <ModuleNode name="10_AdvancedSpamFilter.js" />
+                         </div>
+                    </div>
+                    <div className="bg-slate-800/50 p-3 rounded-lg border border-indigo-500/50">
+                        <KeyModuleNode name="05_Triggers.js" tooltip="Ключевой модуль, управляющий событиями и расписаниями." />
+                         <div className="pl-4 mt-4 border-l-2 border-slate-600 space-y-4">
+                            <ModuleNode name="07_ReportGenerator.js" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const GptAssistantDocumentationPage: React.FC = () => {
     const [modalContent, setModalContent] = useState<{ title: string; content: ReactNode } | null>(null);
+    const [moduleFilter, setModuleFilter] = useState('');
 
     const modulesWithDetails = [
-        { 
+         { 
             name: '01_ErrorHandler.js', 
             icon: <ExclamationTriangleIcon className="w-6 h-6 text-red-500 dark:text-red-400"/>,
             summary: 'Центральный обработчик ошибок.',
@@ -471,48 +549,11 @@ const GptAssistantDocumentationPage: React.FC = () => {
         'Подготовка ответа': ['03_GptApi.js'],
         'Оценка и принятие решения': [],
     };
-
-    const handleModuleClick = (moduleName: string) => {
-        const moduleData = modulesWithDetails.find(m => m.name === moduleName);
-        if (moduleData) {
-            setModalContent({
-                title: moduleData.name,
-                content: (
-                    <div className="space-y-4 text-base">
-                        <p className="font-semibold">{moduleData.details.description}</p>
-                        {moduleData.details.functions && moduleData.details.functions.length > 0 && (
-                            <div>
-                                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Основные функции/компоненты:</h4>
-                                <ul className="list-disc list-inside space-y-1 text-sm">
-                                    {moduleData.details.functions.map((func, index) => <li key={index}>{func}</li>)}
-                                </ul>
-                            </div>
-                        )}
-                        <div>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Связи:</h4>
-                             {moduleData.details.dependencies.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                    {moduleData.details.dependencies.map(dep => (
-                                        <span key={dep} className="text-xs font-mono bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-1 rounded-full">{dep}</span>
-                                    ))}
-                                </div>
-                            ) : <p className="text-sm italic">Нет прямых зависимостей.</p>}
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Контекст использования:</h4>
-                            <p className="text-sm">{moduleData.details.usage}</p>
-                        </div>
-                    </div>
-                )
-            });
-        }
-    };
     
-    const metrics = [
-        { stage: 'Этап 1', model: 'gemini-2.5-flash + GPT-4o', auto_reply: '12.5%', accuracy: '4.86', style: '4.86' },
-        { stage: 'Этап 2', model: 'gemini-2.5-flash + GPT-4o', auto_reply: '23.6%', accuracy: '6.60', style: '6.90' },
-        { stage: 'Этап 5', model: 'gemini-2.5-flash', auto_reply: '76.1%', accuracy: '6.05', style: '7.48' }
-    ];
+    const filteredModules = modulesWithDetails.filter(module =>
+        module.name.toLowerCase().includes(moduleFilter.toLowerCase()) ||
+        module.summary.toLowerCase().includes(moduleFilter.toLowerCase())
+    );
 
     return (
         <DocumentationPageLayout title="GPT-ассистент с RAG">
@@ -541,28 +582,45 @@ const GptAssistantDocumentationPage: React.FC = () => {
                         subtitle="Пошаговый процесс анализа и ответа на обращение клиента от получения до финального действия."
                     />
                     <TicketWorkflowDiagram />
-                    <div className="mt-12">
-                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4 not-prose">Глубокое погружение в этапы</h3>
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="mt-12 not-prose">
+                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">Глубокое погружение в этапы</h3>
+                        <p className="text-base text-gray-600 dark:text-slate-400 mb-6">Каждый этап бизнес-процесса реализуется одним или несколькими техническими модулями. Раскройте секцию, чтобы увидеть детали.</p>
+                        <div className="space-y-4">
                             {Object.entries(deepDiveStages).map(([stageTitle, modules]) => (
-                                <div key={stageTitle} className="bg-white dark:bg-slate-800/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm">
-                                    <h4 className="font-bold text-lg text-slate-900 dark:text-slate-200 mb-3">{stageTitle}</h4>
+                                <CollapsibleSection 
+                                    key={stageTitle} 
+                                    title={<span className="font-semibold text-lg">{stageTitle}</span>}
+                                >
                                     {modules.length > 0 ? (
-                                        <div className="flex flex-wrap gap-2">
-                                            {modules.map(moduleName => (
-                                                <button 
-                                                    key={moduleName}
-                                                    onClick={() => handleModuleClick(moduleName)}
-                                                    className="text-sm font-mono bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-200 px-3 py-1 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-900/50 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
-                                                >
-                                                    {moduleName}
-                                                </button>
-                                            ))}
+                                        <div className="space-y-4">
+                                            {modules.map(moduleName => {
+                                                const moduleData = modulesWithDetails.find(m => m.name === moduleName);
+                                                if (!moduleData) return null;
+                                                return (
+                                                    <CollapsibleSection
+                                                        key={moduleName}
+                                                        title={
+                                                            <div className="flex items-center gap-3">
+                                                                {moduleData.icon}
+                                                                <div>
+                                                                    <p className="font-bold text-base">{moduleData.name}</p>
+                                                                    <p className="text-sm font-normal text-slate-500 dark:text-slate-400">{moduleData.summary}</p>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    >
+                                                        <div className="space-y-3 text-sm">
+                                                            <p>{moduleData.details.description}</p>
+                                                            {/* Details rendering... */}
+                                                        </div>
+                                                    </CollapsibleSection>
+                                                )
+                                            })}
                                         </div>
                                     ) : (
-                                        <p className="text-sm text-slate-500 italic">Общий процесс.</p>
+                                        <p className="text-sm text-slate-500 italic p-4">Этот этап представляет собой общий бизнес-процесс без привязки к конкретному модулю-исполнителю.</p>
                                     )}
-                                </div>
+                                </CollapsibleSection>
                             ))}
                         </div>
                     </div>
@@ -596,14 +654,26 @@ const GptAssistantDocumentationPage: React.FC = () => {
                         title="Модули и их ответственность"
                         subtitle="Архитектура системы построена на независимых, переиспользуемых модулях, каждый из которых выполняет свою четко определенную функцию."
                     />
+                    <ArchitectureDiagram />
+                     <div className="mt-8 not-prose">
+                        <label htmlFor="module-filter" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Фильтр модулей:</label>
+                        <input
+                            type="text"
+                            id="module-filter"
+                            value={moduleFilter}
+                            onChange={(e) => setModuleFilter(e.target.value)}
+                            placeholder="Найти модуль по имени или описанию..."
+                            className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-200 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                    </div>
                     <div className="mt-6 space-y-4">
-                        {modulesWithDetails.map(module => (
+                        {filteredModules.map(module => (
                              <CollapsibleSection
                                 key={module.name}
                                 title={
                                     <div className="flex items-center gap-4 w-full">
                                         {module.icon}
-                                        <div className="flex-grow">
+                                        <div className="flex-grow text-left">
                                             <p className="font-bold text-lg text-slate-800 dark:text-slate-200">{module.name}</p>
                                             <p className="text-sm font-normal text-slate-600 dark:text-slate-400">{module.summary}</p>
                                         </div>
@@ -671,7 +741,9 @@ const GptAssistantDocumentationPage: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody className="bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
-                                {metrics.map(metric => (
+                                {[{ stage: 'Этап 1', model: 'gemini-2.5-flash + GPT-4o', auto_reply: '12.5%', accuracy: '4.86', style: '4.86' },
+                                { stage: 'Этап 2', model: 'gemini-2.5-flash + GPT-4o', auto_reply: '23.6%', accuracy: '6.60', style: '6.90' },
+                                { stage: 'Этап 5', model: 'gemini-2.5-flash', auto_reply: '76.1%', accuracy: '6.05', style: '7.48' }].map(metric => (
                                     <tr key={metric.stage} className="border-b dark:border-slate-700">
                                         <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-semibold">{metric.stage}</td>
                                         <td className="p-4 border-x border-gray-200 dark:border-slate-700">{metric.model}</td>

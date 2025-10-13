@@ -17,7 +17,7 @@ const AboutPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-center">
           <div className="md:col-span-1 animate-fade-in">
             <img 
-              src="https://i.ibb.co/68q8f5X/developer-photo.jpg" 
+              src="https://storage.googleapis.com/aistudio-hosting/workspace-scans/b82be6c0-7817-4f6c-8431-7290f6759711.png" 
               alt="Фотография молодого разработчика в темном худи с капюшоном, сосредоточенно работающего за компьютером с механической клавиатурой в слабо освещенной комнате." 
               width="800"
               height="1200"
