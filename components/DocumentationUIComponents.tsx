@@ -50,25 +50,41 @@ interface CollapsibleSectionProps {
   defaultOpen?: boolean;
 }
 
-export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, children, defaultOpen = false }) => (
-    <details className="group/collapsible not-prose" open={defaultOpen}>
-        <summary className="list-none flex justify-between items-center p-4 font-bold text-lg cursor-pointer text-slate-900 dark:text-slate-200 bg-gray-50 dark:bg-slate-900/50 hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-all duration-200 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md rounded-lg group-open/collapsible:rounded-b-none group-open/collapsible:shadow-md">
-            <span>{title}</span>
-            <div className="p-1 rounded-full bg-white/50 dark:bg-slate-700/50">
-                <ChevronDownIcon className="w-5 h-5 text-gray-600 dark:text-slate-400 group-open/collapsible:rotate-180 transition-transform duration-300"/>
-            </div>
-        </summary>
-        <div className="grid grid-rows-[0fr] group-open/collapsible:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-in-out bg-white dark:bg-slate-800 border-b border-x border-gray-200 dark:border-slate-700 rounded-b-lg shadow-sm">
-            <div className="overflow-hidden">
-                <div className="p-6">
-                    <div className="prose prose-base dark:prose-invert max-w-none">
-                        {children}
+// FIX: Re-implemented CollapsibleSection using React state to manage its open/closed status.
+// The previous implementation relied on the native HTML <details> element, which can cause
+// unpredictable behavior or conflicts within a complex React component tree, potentially
+// leading to the observed hook-related error (#306). This new version uses a standard,
+// controlled component pattern with `useState`, ensuring predictable state management
+// and eliminating potential side effects from native element interactions.
+export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, children, defaultOpen = false }) => {
+    const [isOpen, setIsOpen] = useState(defaultOpen);
+
+    return (
+        <div className="not-prose border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                aria-expanded={isOpen}
+                className={`w-full flex justify-between items-center p-4 font-bold text-lg text-left cursor-pointer text-slate-900 dark:text-slate-200 bg-gray-50 dark:bg-slate-900/50 hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors duration-200 ${isOpen ? 'border-b border-gray-200 dark:border-slate-700' : ''}`}
+            >
+                <span>{title}</span>
+                <div className="p-1 rounded-full bg-white/50 dark:bg-slate-700/50">
+                    <ChevronDownIcon className={`w-5 h-5 text-gray-600 dark:text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}/>
+                </div>
+            </button>
+            <div className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                <div className="overflow-hidden bg-white dark:bg-slate-800 rounded-b-lg">
+                    <div className="p-6">
+                        <div className="prose prose-base dark:prose-invert max-w-none">
+                            {children}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </details>
-);
+    );
+};
+
 
 // --- Code Block with Copy Button ---
 interface CodeBlockWithCopyProps {
@@ -244,5 +260,63 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
             </div>
         </div>,
         modalRoot
+    );
+};
+
+// --- Read More Toggle ---
+interface ReadMoreProps {
+    children: ReactNode;
+    lines: number;
+}
+
+export const ReadMore: React.FC<ReadMoreProps> = ({ children, lines }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [showButton, setShowButton] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
+    
+    const dynamicStyle: React.CSSProperties = !isExpanded ? {
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        display: '-webkit-box',
+        WebkitBoxOrient: 'vertical',
+        WebkitLineClamp: lines,
+    } : {};
+    
+    useEffect(() => {
+        const checkOverflow = () => {
+            const element = contentRef.current;
+            if (element) {
+                // In a clamped state, scrollHeight is the full height, clientHeight is the visible height.
+                const hasOverflow = element.scrollHeight > element.clientHeight;
+                setShowButton(hasOverflow);
+            }
+        };
+        
+        // Check after a brief moment to let the DOM settle, and on window resize.
+        const timer = setTimeout(checkOverflow, 100);
+        window.addEventListener('resize', checkOverflow);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('resize', checkOverflow);
+        };
+    }, [children, lines]);
+
+
+    return (
+        <div>
+            <div ref={contentRef} style={dynamicStyle}>
+                {children}
+            </div>
+            {(showButton || isExpanded) && (
+                <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    aria-expanded={isExpanded}
+                    className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors duration-200 mt-2"
+                >
+                    {isExpanded ? 'Читать меньше' : 'Читать дальше'}
+                </button>
+            )}
+        </div>
     );
 };

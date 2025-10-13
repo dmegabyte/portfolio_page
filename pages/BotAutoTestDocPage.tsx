@@ -1,6 +1,6 @@
 import React from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm } from '../components/DocumentationUIComponents';
+import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, ReadMore } from '../components/DocumentationUIComponents';
 import { BugAntIcon, CogIcon, PlayCircleIcon, CodeBracketIcon, ChatBubbleBottomCenterTextIcon, CpuChipIcon } from '@heroicons/react/24/outline';
 
 const BotAutoTestDocumentationPage: React.FC = () => {
@@ -13,9 +13,11 @@ const BotAutoTestDocumentationPage: React.FC = () => {
                     title="Общее описание"
                     subtitle="Универсальная система автоматизированного тестирования чат-ботов и промо-акций."
                 />
-                <p>
-                    <b>BOT_AUTO_TEST</b> — система, которая проверяет корректность условий акций, ответы бота и работу интерфейса. Проект построен на базе <b>Playwright / Selenium</b> для эмуляции действий пользователя и поддерживает работу через <b>REST <TooltipTerm definition="Программный интерфейс приложения — это набор правил и инструментов, который позволяет различным программным приложениям взаимодействовать друг с другом.">API</TooltipTerm></b>. Финальные отчёты формируются <b><TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm>-моделью</b>, которая анализирует диалоги и сверяет их с загруженными файлами (например, <code>promo.json</code>).
-                </p>
+                <ReadMore lines={3}>
+                    <p>
+                        <b>BOT_AUTO_TEST</b> — система, которая проверяет корректность условий акций, ответы бота и работу интерфейса. Проект построен на базе <b>Playwright / Selenium</b> для эмуляции действий пользователя и поддерживает работу через <b>REST <TooltipTerm definition="Программный интерфейс приложения — это набор правил и инструментов, который позволяет различным программным приложениям взаимодействовать друг с другом.">API</TooltipTerm></b>. Финальные отчёты формируются <b><TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm>-моделью</b>, которая анализирует диалоги и сверяет их с загруженными файлами (например, <code>promo.json</code>).
+                    </p>
+                </ReadMore>
             </section>
 
             <section id="scenarios" className="scroll-mt-24">
