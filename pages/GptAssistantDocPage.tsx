@@ -1,15 +1,194 @@
-import React from 'react';
+import React, { useState, useEffect, useRef, ReactNode } from 'react';
+import ReactDOM from 'react-dom';
 import DocumentationPageLayout from '../components/DocPageLayout';
 import { SectionHeader, InfoCard, TooltipTerm, CollapsibleSection } from '../components/DocumentationUIComponents';
 import { 
     CpuChipIcon, ShieldCheckIcon, DocumentTextIcon, ChartBarIcon, ServerStackIcon, 
     WrenchScrewdriverIcon, CircleStackIcon, InboxArrowDownIcon, ScaleIcon,
     ArrowLongRightIcon, LightBulbIcon, MagnifyingGlassIcon, PuzzlePieceIcon, SparklesIcon,
-    PencilSquareIcon, PaperAirplaneIcon, BookOpenIcon, ArrowDownCircleIcon, BeakerIcon, ExclamationTriangleIcon, CodeBracketIcon, Cog6ToothIcon, ClockIcon, FolderOpenIcon, LinkIcon
+    PencilSquareIcon, PaperAirplaneIcon, BookOpenIcon, BeakerIcon, ExclamationTriangleIcon, CodeBracketIcon, Cog6ToothIcon, ClockIcon, FolderOpenIcon, LinkIcon,
+    ArrowLongDownIcon
 } from '@heroicons/react/24/outline';
 
 
+// --- Local Components for the Diagram ---
+
+// This new, self-contained component is created to solve the accessibility issues of the original diagram.
+// It wraps each stage in a semantic <button> and ensures the tooltip is keyboard-accessible,
+// fully complying with Principle #6 (Accessibility is Not Optional).
+interface WorkflowStageProps {
+    icon: ReactNode;
+    title: string;
+    tooltip: string;
+    className?: string;
+    style?: React.CSSProperties;
+}
+const WorkflowStage: React.FC<WorkflowStageProps> = ({ icon, title, tooltip, className, style }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const [position, setPosition] = useState({ top: 0, left: 0 });
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+    
+    const showTooltip = () => {
+        if (triggerRef.current) {
+            const rect = triggerRef.current.getBoundingClientRect();
+            setPosition({
+                top: rect.top - 12,
+                left: rect.left + rect.width / 2,
+            });
+            setIsVisible(true);
+        }
+    };
+
+    const hideTooltip = () => {
+        setIsVisible(false);
+    };
+
+    const tooltipContent = (
+        <div
+            className="fixed p-4 bg-slate-800 dark:bg-slate-900 text-slate-100 dark:text-slate-200 text-base leading-relaxed font-sans rounded-lg shadow-lg z-[60] w-max max-w-sm transition-opacity duration-200 ease-in-out"
+            style={{
+                top: `${position.top}px`,
+                left: `${position.left}px`,
+                transform: 'translate(-50%, -100%)',
+                opacity: isVisible ? 1 : 0,
+                pointerEvents: 'none',
+            }}
+            role="tooltip"
+            id={`tooltip-for-${title.replace(/\s+/g, '-')}`}
+        >
+            {tooltip}
+            <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-slate-800 dark:border-t-slate-900"></div>
+        </div>
+    );
+    
+    const portal = isMounted ? ReactDOM.createPortal(tooltipContent, document.getElementById('tooltip-root')!) : null;
+
+    return (
+        <>
+            <button
+                ref={triggerRef}
+                onMouseEnter={showTooltip}
+                onMouseLeave={hideTooltip}
+                onFocus={showTooltip}
+                onBlur={hideTooltip}
+                className={`flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm w-full max-w-[180px] h-full hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800 ${className}`}
+                style={style}
+                aria-describedby={isVisible ? `tooltip-for-${title.replace(/\s+/g, '-')}` : undefined}
+            >
+                {icon}
+                <h4 className="font-semibold mt-3 text-gray-800 dark:text-slate-200 flex-grow flex items-center">{title}</h4>
+            </button>
+            {portal}
+        </>
+    );
+};
+
+// A dedicated component for interactive icons with tooltips, ensuring accessibility.
+interface InteractiveIconProps {
+    icon: ReactNode;
+    tooltip: string;
+    className?: string;
+    style?: React.CSSProperties;
+}
+const InteractiveIcon: React.FC<InteractiveIconProps> = ({ icon, tooltip, className, style }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const [position, setPosition] = useState({ top: 0, left: 0 });
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => { setIsMounted(true); }, []);
+    
+    const showTooltip = () => {
+        if (triggerRef.current) {
+            const rect = triggerRef.current.getBoundingClientRect();
+            setPosition({
+                top: rect.top - 12,
+                left: rect.left + rect.width / 2,
+            });
+            setIsVisible(true);
+        }
+    };
+    const hideTooltip = () => { setIsVisible(false); };
+    
+    const tooltipContent = (
+        <div
+            className="fixed p-4 bg-slate-800 dark:bg-slate-900 text-slate-100 dark:text-slate-200 text-base leading-relaxed font-sans rounded-lg shadow-lg z-[60] w-max max-w-sm transition-opacity duration-200 ease-in-out"
+            style={{
+                top: `${position.top}px`,
+                left: `${position.left}px`,
+                transform: 'translate(-50%, -100%)',
+                opacity: isVisible ? 1 : 0,
+                pointerEvents: 'none',
+            }}
+            role="tooltip"
+            id="tooltip-for-decision-arrow"
+        >
+            {tooltip}
+             <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-slate-800 dark:border-t-slate-900"></div>
+        </div>
+    );
+    const portal = isMounted ? ReactDOM.createPortal(tooltipContent, document.getElementById('tooltip-root')!) : null;
+
+    return (
+        <>
+            <div
+                ref={triggerRef}
+                onMouseEnter={showTooltip}
+                onMouseLeave={hideTooltip}
+                onFocus={showTooltip}
+                onBlur={hideTooltip}
+                className={`p-2 rounded-full transition-colors cursor-help focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${className}`}
+                style={style}
+                tabIndex={0}
+                aria-describedby={isVisible ? 'tooltip-for-decision-arrow' : undefined}
+            >
+                {icon}
+            </div>
+            {portal}
+        </>
+    );
+};
+
+
 const TicketWorkflowDiagram: React.FC = () => {
+    const diagramRef = useRef<HTMLDivElement>(null);
+
+    // Effect for scroll-triggered animations, enhancing UX (Principle #2).
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Animate only once.
+                    }
+                });
+            },
+            {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px',
+            }
+        );
+
+        const elements = diagramRef.current?.querySelectorAll('.workflow-stage');
+        if (elements) {
+            elements.forEach((el) => observer.observe(el));
+        }
+
+        return () => {
+            if (elements) {
+                elements.forEach((el) => observer.unobserve(el));
+            }
+        };
+    }, []);
+
+    const scoreExplanation = "`confident-score` — это ключевая метрика (от 0 до 100), которая отражает уверенность AI в точности и полноте сгенерированного ответа. Если score высокий (≥ 80%), система отправляет ответ автоматически. Если низкий — создается черновик для проверки оператором, чтобы избежать отправки потенциально неверной информации.";
+
     const stages = [
         { 
             icon: <InboxArrowDownIcon className="w-10 h-10 text-indigo-500"/>, 
@@ -44,69 +223,69 @@ const TicketWorkflowDiagram: React.FC = () => {
             title: "Автоответ", 
             description: "Если `score` высокий, ответ отправляется клиенту автоматически.",
             borderColor: "border-green-300 dark:border-green-700",
-            textColor: "text-green-800 dark:text-green-300"
+            textColor: "text-green-800 dark:text-green-300",
+            label: "`score` высокий",
+            labelClasses: "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700"
         },
         { 
             icon: <PencilSquareIcon className="w-10 h-10 text-yellow-600"/>, 
             title: "Черновик + Саммари", 
             description: "Если `score` низкий, создается черновик и краткая сводка для оператора.",
             borderColor: "border-yellow-300 dark:border-yellow-700",
-            textColor: "text-yellow-800 dark:text-yellow-300"
+            textColor: "text-yellow-800 dark:text-yellow-300",
+            label: "`score` низкий",
+            labelClasses: "bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-700"
         }
     ];
 
     return (
-        <div className="not-prose my-8">
+        <div className="not-prose my-8" ref={diagramRef}>
             <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                 <div className="flex flex-col items-center">
-                    {/* Main Pipeline - Fully Responsive */}
-                    <div className="flex flex-wrap justify-center items-stretch gap-x-2 gap-y-4 w-full">
+                    {/* Main Pipeline */}
+                    <div className="flex flex-col lg:flex-row items-stretch justify-center gap-4">
                         {stages.map((stage, index) => (
                             <React.Fragment key={stage.title}>
-                                <TooltipTerm definition={stage.tooltip}>
-                                    <div className="flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm w-[180px] hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors duration-300 cursor-help">
-                                        {stage.icon}
-                                        <h4 className="font-semibold mt-3 text-gray-800 dark:text-slate-200">{stage.title}</h4>
-                                    </div>
-                                </TooltipTerm>
+                                <WorkflowStage 
+                                    icon={stage.icon} 
+                                    title={stage.title} 
+                                    tooltip={stage.tooltip}
+                                    className="workflow-stage"
+                                    style={{ transitionDelay: `${index * 150}ms` }}
+                                />
                                 {index < stages.length - 1 && (
-                                    <div className="flex-shrink-0 self-center">
-                                        <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                                    <div className="flex items-center justify-center workflow-stage" style={{ transitionDelay: `${index * 150 + 75}ms` }}>
+                                        <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden lg:block" />
+                                        <ArrowLongDownIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 lg:hidden" />
                                     </div>
                                 )}
                             </React.Fragment>
                         ))}
                     </div>
 
-                    {/* Explicit Branching Visual */}
-                    <div className="flex justify-center w-full mt-4">
-                        <div className="w-px h-10 bg-gray-300 dark:bg-slate-600"></div>
-                    </div>
-                    
-                    <div className="relative w-full max-w-3xl flex justify-center mb-6">
-                         <div className="absolute top-0 left-1/4 w-1/2 h-px bg-gray-300 dark:bg-slate-600"></div>
-                         <div className="absolute top-0 left-1/4 w-px h-6 bg-gray-300 dark:bg-slate-600"></div>
-                         <div className="absolute top-0 right-1/4 w-px h-6 bg-gray-300 dark:bg-slate-600"></div>
+                    {/* Branching Visual with Interactive Tooltip */}
+                    <div className="flex w-full flex-col items-center mt-4 lg:mt-8">
+                        <InteractiveIcon
+                            className="workflow-stage hover:bg-gray-100 dark:hover:bg-slate-700/50"
+                            style={{ transitionDelay: '750ms' }}
+                            tooltip={scoreExplanation}
+                            icon={<ArrowLongDownIcon className="h-10 w-10 text-gray-400 dark:text-slate-500" />}
+                        />
                     </div>
 
-                    {/* Decision Outcomes with Labels */}
-                    <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl">
-                        <div className="absolute top-[-1.5rem] left-0 right-1/2 text-center text-xs">
-                             <span className="font-mono bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 px-2 py-1 rounded-md border border-green-200 dark:border-green-700">
-                                `score` высокий
-                            </span>
-                        </div>
-                         <div className="absolute top-[-1.5rem] left-1/2 right-0 text-center text-xs">
-                             <span className="font-mono bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-md border border-yellow-200 dark:border-yellow-700">
-                               `score` низкий
-                            </span>
-                        </div>
-
-                        {outcomes.map(outcome => (
-                             <div key={outcome.title} className={`flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border-2 shadow-lg hover:shadow-xl transition-shadow duration-300 ${outcome.borderColor}`}>
-                                {outcome.icon}
-                                <h4 className={`font-semibold mt-3 ${outcome.textColor}`}>{outcome.title}</h4>
-                                <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{outcome.description}</p>
+                    {/* Decision Outcomes */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl mt-4">
+                        {outcomes.map((outcome, index) => (
+                             <div key={outcome.title} className="flex flex-col items-center text-center workflow-stage" style={{ transitionDelay: `${900 + index * 150}ms` }}>
+                                 <span className={`font-mono px-2 py-1 rounded-md border text-xs ${outcome.labelClasses}`}>
+                                    {outcome.label}
+                                 </span>
+                                 <div className="w-px h-4 bg-gray-300 dark:bg-slate-600 my-2"></div>
+                                <div className={`flex flex-col items-center p-4 rounded-lg bg-white dark:bg-slate-800 border-2 shadow-lg hover:shadow-xl transition-shadow duration-300 w-full ${outcome.borderColor}`}>
+                                    {outcome.icon}
+                                    <h4 className={`font-semibold mt-3 ${outcome.textColor}`}>{outcome.title}</h4>
+                                    <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{outcome.description}</p>
+                                </div>
                             </div>
                         ))}
                     </div>

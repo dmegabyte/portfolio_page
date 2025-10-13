@@ -1,9 +1,23 @@
-
 import React from 'react';
 // FIX: In react-router-dom v6, `Redirect` is replaced by `Navigate`.
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { projects } from '../data/projects';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
+
+const renderFeatureWithLinks = (feature: string) => {
+    // This regex will split the string by "gpttunnel" or "Omnidesk", keeping the delimiters.
+    const parts = feature.split(/(gpttunnel|Omnidesk)/g);
+
+    return parts.map((part, i) => {
+        if (part === 'gpttunnel') {
+            return <a key={i} href="https://gptunnel.ru/?ref=DEN_PROMO" target="_blank" rel="noopener noreferrer" className="font-semibold text-indigo-500 dark:text-indigo-400 hover:underline transition-colors">gpttunnel</a>;
+        }
+        if (part === 'Omnidesk') {
+            return <a key={i} href="https://omnidesk.ru/features/" target="_blank" rel="noopener noreferrer" className="font-semibold text-indigo-500 dark:text-indigo-400 hover:underline transition-colors">Omnidesk</a>;
+        }
+        return part;
+    });
+};
 
 const ProjectPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -56,7 +70,7 @@ const ProjectPage: React.FC = () => {
                     {project.keyFeatures.map((feature, index) => (
                         <li key={index} className="flex items-start">
                             <CheckBadgeIcon className="flex-shrink-0 h-6 w-6 text-indigo-500 dark:text-indigo-400 mt-1 mr-3" />
-                            <span className="text-lg text-slate-700 dark:text-slate-300">{feature}</span>
+                            <span className="text-lg text-slate-700 dark:text-slate-300">{renderFeatureWithLinks(feature)}</span>
                         </li>
                     ))}
                 </ul>

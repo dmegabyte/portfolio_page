@@ -1,4 +1,3 @@
-
 export interface Project {
   id: number;
   slug: string;
@@ -52,12 +51,12 @@ export const projects: Project[] = [
     summary: 'Чат-бот с кастомной базой знаний, использующий Retrieval-Augmented Generation.',
     description: 'Разработка ассистента на базе GPT-моделей, который может отвечать на вопросы, используя предоставленную документацию. Реализована векторизация текстов, поиск по семантической близости и интеграция с Telegram Bot API.',
     imageUrl: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=1200&auto=format&fit=crop',
-    technologies: ['Python', 'FastAPI', 'OpenAI API', 'Vector Databases', 'Telegram Bot API'],
+    technologies: ['gpttunel', 'Vector Databases', 'Omnidesk API'],
     keyFeatures: [
         'Ответы на вопросы на основе кастомной базы знаний.',
         'Реализация Retrieval-Augmented Generation (RAG) для высокой точности.',
         'Использование векторизации текстов и семантического поиска.',
-        'Готовая интеграция с Telegram Bot API.'
+        'Полная интеграция с ключевыми сервисами: gpttunnel и Omnidesk.'
     ],
     documentationPage: '/documentation/gpt-assistant',
   },
