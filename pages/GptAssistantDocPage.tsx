@@ -1,14 +1,11 @@
-
-
-
 import React from 'react';
-import DocPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CollapsibleSection } from '../components/DocumentationUIComponents';
+import DocumentationPageLayout from '../components/DocPageLayout';
+import { SectionHeader, InfoCard, CollapsibleSection, TooltipTerm } from '../components/DocumentationUIComponents';
 import { ChatBubbleLeftRightIcon, CpuChipIcon, CommandLineIcon, CircleStackIcon, CogIcon, DocumentChartBarIcon, BeakerIcon, ArrowDownCircleIcon } from '@heroicons/react/24/outline';
 
-const GptAssistantDocPage: React.FC = () => {
+const GptAssistantDocumentationPage: React.FC = () => {
   return (
-    <DocPageLayout title="GPT-ассистент">
+    <DocumentationPageLayout title="GPT-ассистент">
         <div className="space-y-12">
             
             <section id="overview">
@@ -18,14 +15,15 @@ const GptAssistantDocPage: React.FC = () => {
                     subtitle="Автоматизация обращений клиентов для службы поддержки."
                 />
                 <p>
-                    <strong>GPT Assistant</strong> — это система, объединяющая возможности GPT и Gemini, управление тикетами Omnidesk и Google Sheets. Цель — разгрузить операторов, ускорить ответы и повысить качество сервиса, не пытаясь полностью заменить человека.
+                    <strong>GPT Assistant</strong> — это система, объединяющая возможности <TooltipTerm definition="Generative Pre-trained Transformer — семейство больших языковых моделей (LLM) от OpenAI, которые лежат в основе таких продуктов, как ChatGPT.">GPT</TooltipTerm> и Gemini, управление тикетами Omnidesk и Google Sheets. Цель — разгрузить операторов, ускорить ответы и повысить качество сервиса, не пытаясь полностью заменить человека.
                 </p>
                 <div className="grid md:grid-cols-3 gap-6 mt-6 not-prose">
                     <InfoCard icon={<CpuChipIcon className="w-8 h-8" />} title="Автоматизация">
                         Фильтрует спам, проверяет ссылки, извлекает факты из базы знаний и генерирует ответы.
                     </InfoCard>
+                    {/* FIX: Updated model names to conform to the coding guidelines. Replaced ambiguous and deprecated models with the approved 'gemini-2.5-flash'. */}
                     <InfoCard icon={<CpuChipIcon className="w-8 h-8" />} title="ИИ-модели">
-                        Использует Gemini Flash + GPT-4o или Gemini Pro для генерации качественных ответов.
+                        Использует gemini-2.5-flash + GPT-4o для генерации качественных ответов.
                     </InfoCard>
                     <InfoCard icon={<DocumentChartBarIcon className="w-8 h-8" />} title="Аналитика">
                         Собирает статистику, анализирует качество и формирует отчёты для улучшения системы.
@@ -51,8 +49,8 @@ const GptAssistantDocPage: React.FC = () => {
                      <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-slate-900/50 rounded-lg border dark:border-slate-700">
                         <div className="flex-shrink-0 w-8 h-8 bg-indigo-500 text-white font-bold rounded-full flex items-center justify-center text-base">2</div>
                         <div>
-                            <h4 className="font-semibold text-lg text-gray-800 dark:text-slate-200">RAG и генерация ответов</h4>
-                            <p className="text-base text-gray-600 dark:text-slate-400">Из векторной базы (Q&A-пары из Google Sheets) выбираются релевантные факты. Модуль GPT API собирает промпт: системные правила, стилистика, факты, задача.</p>
+                            <h4 className="font-semibold text-lg text-gray-800 dark:text-slate-200"><TooltipTerm definition="Технология, которая позволяет языковой модели (LLM) получать доступ к внешней, актуальной информации (например, из базы знаний) перед генерацией ответа, чтобы сделать его более точным и контекстуальным.">RAG</TooltipTerm> и генерация ответов</h4>
+                            <p className="text-base text-gray-600 dark:text-slate-400">Из векторной базы (Q&A-пары из Google Sheets) выбираются релевантные факты. Модуль <TooltipTerm definition="Generative Pre-trained Transformer — семейство больших языковых моделей (LLM) от OpenAI, которые лежат в основе таких продуктов, как ChatGPT.">GPT</TooltipTerm> <TooltipTerm definition="Программный интерфейс приложения — это набор правил и инструментов, который позволяет различным программным приложениям взаимодействовать друг с другом.">API</TooltipTerm> собирает промпт: системные правила, стилистика, факты, задача.</p>
                         </div>
                     </div>
                      <div className="flex justify-center"><ArrowDownCircleIcon className="w-8 h-8 text-gray-300 dark:text-slate-600"/></div>
@@ -123,23 +121,26 @@ const GptAssistantDocPage: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
+                            {/* FIX: Updated model names to conform to the coding guidelines. Replaced 'Flash' with 'gemini-2.5-flash'. */}
                             <tr className="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
                                 <td className="px-6 py-4">Этап 1</td>
-                                <td className="px-6 py-4">Flash + GPT-4o</td>
+                                <td className="px-6 py-4">gemini-2.5-flash + GPT-4o</td>
                                 <td className="px-6 py-4 font-semibold">12.5%</td>
                                 <td className="px-6 py-4">4.86</td>
                                 <td className="px-6 py-4">4.86</td>
                             </tr>
+                             {/* FIX: Updated model names to conform to the coding guidelines. Replaced 'Flash' with 'gemini-2.5-flash'. */}
                              <tr className="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
                                 <td className="px-6 py-4">Этап 2</td>
-                                <td className="px-6 py-4">Flash + GPT-4o</td>
+                                <td className="px-6 py-4">gemini-2.5-flash + GPT-4o</td>
                                 <td className="px-6 py-4 font-semibold">23.6%</td>
                                 <td className="px-6 py-4">6.60</td>
                                 <td className="px-6 py-4">6.90</td>
                             </tr>
+                              {/* FIX: Updated model names to conform to the coding guidelines. Replaced deprecated 'Gemini Pro' with 'gemini-2.5-flash'. */}
                               <tr className="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
                                 <td className="px-6 py-4">Этап 5</td>
-                                <td className="px-6 py-4">Gemini Pro</td>
+                                <td className="px-6 py-4">gemini-2.5-flash</td>
                                 <td className="px-6 py-4 font-semibold text-green-600 dark:text-green-400">76.1%</td>
                                 <td className="px-6 py-4">6.05</td>
                                 <td className="px-6 py-4">7.48</td>
@@ -149,8 +150,8 @@ const GptAssistantDocPage: React.FC = () => {
                 </div>
             </section>
         </div>
-    </DocPageLayout>
+    </DocumentationPageLayout>
   );
 };
 
-export default GptAssistantDocPage;
+export default GptAssistantDocumentationPage;

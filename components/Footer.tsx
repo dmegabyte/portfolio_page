@@ -55,7 +55,7 @@ const Footer: React.FC<FooterProps> = ({ mainContentRef }) => {
     <footer className="bg-slate-800 dark:bg-slate-900 text-white border-t border-slate-700 dark:border-slate-800">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="text-center text-sm text-gray-400 dark:text-slate-400">
-          <p>&copy; {currentYear} Моё Портфолио. Все права защищены.</p>
+          <p>&copy; {currentYear} Мои проекты. Все права защищены.</p>
           <div className="text-xs text-gray-500 dark:text-slate-500 mt-2 flex justify-center items-center gap-4" aria-live="polite">
             <PageCharacterCounter contentRef={mainContentRef} />
             <span className="text-slate-600">|</span>

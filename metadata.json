@@ -1,5 +1,5 @@
 {
-  "name": "Portfolio",
+  "name": "Мои проекты",
   "description": "A multi-page React application demonstrating navigation using HashRouter, designed to work in environments like AI Studio where URL path manipulation is not supported. It features several pages and a clean UI styled with Tailwind CSS.",
   "requestFramePermissions": []
 }

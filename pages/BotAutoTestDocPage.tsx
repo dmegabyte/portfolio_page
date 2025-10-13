@@ -1,14 +1,11 @@
-
-
-
 import React from 'react';
-import DocPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CodeBlockWithCopy } from '../components/DocumentationUIComponents';
+import DocumentationPageLayout from '../components/DocPageLayout';
+import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm } from '../components/DocumentationUIComponents';
 import { BugAntIcon, CogIcon, PlayCircleIcon, CodeBracketIcon, ChatBubbleBottomCenterTextIcon, CpuChipIcon } from '@heroicons/react/24/outline';
 
-const BotAutoTestDocPage: React.FC = () => {
+const BotAutoTestDocumentationPage: React.FC = () => {
   return (
-    <DocPageLayout title="AI-тестировщик чат-ботов">
+    <DocumentationPageLayout title="AI-тестировщик чат-ботов">
         <div className="space-y-12">
             <section id="overview">
                 <SectionHeader 
@@ -17,7 +14,7 @@ const BotAutoTestDocPage: React.FC = () => {
                     subtitle="Универсальная система автоматизированного тестирования чат-ботов и промо-акций."
                 />
                 <p>
-                    <b>BOT_AUTO_TEST</b> — система, которая проверяет корректность условий акций, ответы бота и работу интерфейса. Проект построен на базе <b>Playwright / Selenium</b> для эмуляции действий пользователя и поддерживает работу через <b>REST API</b>. Финальные отчёты формируются <b>LLM-моделью</b>, которая анализирует диалоги и сверяет их с загруженными файлами (например, <code>promo.json</code>).
+                    <b>BOT_AUTO_TEST</b> — система, которая проверяет корректность условий акций, ответы бота и работу интерфейса. Проект построен на базе <b>Playwright / Selenium</b> для эмуляции действий пользователя и поддерживает работу через <b>REST <TooltipTerm definition="Программный интерфейс приложения — это набор правил и инструментов, который позволяет различным программным приложениям взаимодействовать друг с другом.">API</TooltipTerm></b>. Финальные отчёты формируются <b><TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm>-моделью</b>, которая анализирует диалоги и сверяет их с загруженными файлами (например, <code>promo.json</code>).
                 </p>
             </section>
 
@@ -29,7 +26,7 @@ const BotAutoTestDocPage: React.FC = () => {
                 />
                 <ul className="list-disc list-inside space-y-2">
                     <li>Сценарии могут задаваться в свободной форме или как фиксированный диалог.</li>
-                    <li>Если есть список акций, LLM анализирует его, формирует тест-кейсы, задаёт вопросы и ожидает ответы.</li>
+                    <li>Если есть список акций, <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm> анализирует его, формирует тест-кейсы, задаёт вопросы и ожидает ответы.</li>
                     <li>Ответы автоматически сверяются с условиями акций, прописанными в правилах.</li>
                     <li>Метрики (корректность, полнота, исключения) формулируются в свободной форме.</li>
                 </ul>
@@ -68,10 +65,10 @@ const BotAutoTestDocPage: React.FC = () => {
                 <p>Процесс тестирования автоматизирован и проходит следующие этапы:</p>
                 <ol className="list-decimal list-inside space-y-2 mt-4">
                     <li>Загружается справочный файл (например, <code>promo.json</code> со списком акций).</li>
-                    <li>LLM анализирует файл и формирует набор тест-кейсов под материал.</li>
-                    <li>Выполняются сценарии (через API или эмуляцию UI), фиксируются вопросы и ответы бота.</li>
+                    <li><TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm> анализирует файл и формирует набор тест-кейсов под материал.</li>
+                    <li>Выполняются сценарии (через <TooltipTerm definition="Программный интерфейс приложения — это набор правил и инструментов, который позволяет различным программным приложениям взаимодействовать друг с другом.">API</TooltipTerm> или эмуляцию UI), фиксируются вопросы и ответы бота.</li>
                     <li>Ответы сверяются с правилами акции и ожидаемыми условиями.</li>
-                    <li>Финальный отчёт формируется автоматически LLM на основании загруженного файла и реального диалога.</li>
+                    <li>Финальный отчёт формируется автоматически <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm> на основании загруженного файла и реального диалога.</li>
                 </ol>
             </section>
 
@@ -89,8 +86,8 @@ const BotAutoTestDocPage: React.FC = () => {
                 </div>
             </section>
         </div>
-    </DocPageLayout>
+    </DocumentationPageLayout>
   );
 };
 
-export default BotAutoTestDocPage;
+export default BotAutoTestDocumentationPage;

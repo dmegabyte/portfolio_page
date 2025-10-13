@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ArrowUpIcon } from '@heroicons/react/24/solid';
 
@@ -5,8 +6,8 @@ const ScrollToTopButton: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = () => {
-    // Show button if page is scrolled down more than half a viewport height
-    if (window.pageYOffset > window.innerHeight / 2) {
+    // Show button if page is scrolled down more than 300px
+    if (window.pageYOffset > 300) {
       setIsVisible(true);
     } else {
       setIsVisible(false);
@@ -28,15 +29,21 @@ const ScrollToTopButton: React.FC = () => {
   }, []);
 
   return (
-    <div className={`mt-auto pt-8 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+    <div className="fixed bottom-6 right-6 z-50">
         <button
             type="button"
             onClick={scrollToTop}
-            className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 p-3 rounded-lg transition-colors"
+            className={`
+              bg-indigo-600 hover:bg-indigo-700 text-white
+              dark:bg-indigo-500 dark:hover:bg-indigo-600
+              rounded-full p-3 shadow-lg transition-all duration-300 ease-in-out
+              focus:outline-none focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-800
+              transform
+              ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}
+            `}
             aria-label="Вернуться к началу"
             >
-            <ArrowUpIcon className="h-5 w-5" />
-            Наверх
+            <ArrowUpIcon className="h-6 w-6" />
         </button>
     </div>
   );

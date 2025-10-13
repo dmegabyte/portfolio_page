@@ -7,11 +7,12 @@ import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import ProjectPage from './pages/ProjectPage';
-import ClientSegmentationDocPage from './pages/ClientSegmentationDocPage';
-import InterfaceGenDocPage from './pages/InterfaceGenDocPage';
-import GptAssistantDocPage from './pages/GptAssistantDocPage';
-import BotAutoTestDocPage from './pages/BotAutoTestDocPage';
-import EmailSafetyPipelineDocPage from './pages/EmailSafetyPipelineDocPage';
+import ClientSegmentationDocumentationPage from './pages/ClientSegmentationDocPage';
+import InterfaceGeneratorDocumentationPage from './pages/InterfaceGenDocPage';
+import GptAssistantDocumentationPage from './pages/GptAssistantDocPage';
+import BotAutoTestDocumentationPage from './pages/BotAutoTestDocPage';
+import EmailSafetyPipelineDocumentationPage from './pages/EmailSafetyPipelineDocPage';
+import ScrollToTopButton from './components/ScrollToTopButton';
 
 const App: React.FC = () => {
   const mainContentRef = useRef<HTMLElement>(null);
@@ -27,14 +28,15 @@ const App: React.FC = () => {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/project/:slug" element={<ProjectPage />} />
             {/* Documentation Pages */}
-            <Route path="/documentation/client-segmentation" element={<ClientSegmentationDocPage />} />
-            <Route path="/documentation/interface-generator" element={<InterfaceGenDocPage />} />
-            <Route path="/documentation/gpt-assistant" element={<GptAssistantDocPage />} />
-            <Route path="/documentation/bot-autotest" element={<BotAutoTestDocPage />} />
-            <Route path="/documentation/email-safety-pipeline" element={<EmailSafetyPipelineDocPage />} />
+            <Route path="/documentation/client-segmentation" element={<ClientSegmentationDocumentationPage />} />
+            <Route path="/documentation/interface-generator" element={<InterfaceGeneratorDocumentationPage />} />
+            <Route path="/documentation/gpt-assistant" element={<GptAssistantDocumentationPage />} />
+            <Route path="/documentation/bot-autotest" element={<BotAutoTestDocumentationPage />} />
+            <Route path="/documentation/email-safety-pipeline" element={<EmailSafetyPipelineDocumentationPage />} />
           </Routes>
         </main>
         <Footer mainContentRef={mainContentRef} />
+        <ScrollToTopButton />
       </div>
     </Router>
   );

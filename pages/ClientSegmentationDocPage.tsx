@@ -1,30 +1,101 @@
 
-
-
-
-
-import React, { useState } from 'react';
-import DocPageLayout from '../components/DocPageLayout';
+import React, { useState, ReactNode, useRef, useEffect } from 'react';
+import DocumentationPageLayout from '../components/DocPageLayout';
 import { SectionHeader, InfoCard, TooltipTerm, Modal, CollapsibleSection } from '../components/DocumentationUIComponents';
-// FIX: Import the missing LifebuoyIcon.
 import { 
     RocketLaunchIcon, CircleStackIcon, Cog6ToothIcon, TagIcon, TableCellsIcon, 
     ArrowPathIcon, CheckBadgeIcon, ExclamationTriangleIcon, CpuChipIcon,
     ScaleIcon, UserGroupIcon, IdentificationIcon, FunnelIcon, ChartBarIcon, CalendarDaysIcon, 
-    LightBulbIcon, SparklesIcon, ArchiveBoxIcon, ShieldCheckIcon, ClipboardDocumentCheckIcon, ArrowLongDownIcon, StarIcon, UsersIcon, LifebuoyIcon, PaperAirplaneIcon, CheckCircleIcon, ArrowLongRightIcon
+    LightBulbIcon, SparklesIcon, ArchiveBoxIcon, ShieldCheckIcon, ClipboardDocumentCheckIcon, ArrowLongDownIcon, StarIcon, UsersIcon, LifebuoyIcon, PaperAirplaneIcon, CheckCircleIcon, ArrowLongRightIcon, NoSymbolIcon, UserCircleIcon, QuestionMarkCircleIcon, ClockIcon, ArrowPathRoundedSquareIcon
 } from '@heroicons/react/24/outline';
 
 const InteractiveWorkflowDiagram: React.FC = () => {
-    // The modal logic is removed from here to improve UX.
-    // Details are now shown in a CollapsibleSection within the relevant document section.
+    const [modalContent, setModalContent] = useState<{ title: string; content: ReactNode } | null>(null);
+    const diagramRef = useRef<HTMLDivElement>(null);
+
+    // This effect sets up the Intersection Observer to animate elements on scroll.
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Optional: stop observing once visible
+                    }
+                });
+            },
+            {
+                threshold: 0.1, // Trigger when 10% of the element is visible
+                rootMargin: '0px 0px -50px 0px', // Start animation a bit before it's fully in view
+            }
+        );
+
+        const elementsToAnimate = diagramRef.current?.querySelectorAll('.workflow-stage');
+        if (elementsToAnimate) {
+            elementsToAnimate.forEach((el) => observer.observe(el));
+        }
+
+        return () => {
+            if (elementsToAnimate) {
+                elementsToAnimate.forEach((el) => observer.unobserve(el));
+            }
+        };
+    }, []);
+
+    const modalDescriptions = {
+        segmentation: {
+            title: "Подробнее о сегментации",
+            content: (
+                <div className="space-y-4 text-base">
+                    <p>Это первый и самый важный шаг, на котором система формирует 360-градусный профиль каждого клиента. Анализируются десятки параметров, включая:</p>
+                    <ul className="list-disc list-inside space-y-2">
+                        <li><b>История визитов и покупок:</b> Как часто клиент приходит? Что покупает?</li>
+                        <li><b>Лояльность:</b> Это новый клиент или постоянный?</li>
+                        <li><b>Активность:</b> Как давно был последний контакт?</li>
+                        <li><b>Потребительские предпочтения:</b> Какие категории услуг ему интересны?</li>
+                    </ul>
+                    <p>На основе этих данных каждому клиенту присваивается уникальный набор сегментов, что позволяет подобрать для него наиболее релевантное и своевременное предложение.</p>
+                </div>
+            )
+        },
+        dateCalculation: {
+            title: "Подробнее о расчете даты",
+            content: (
+                 <div className="space-y-4 text-base">
+                    <p>Система не отправляет сообщения вслепую, а прогнозирует оптимальный момент для контакта. Логика зависит от типа клиента:</p>
+                    <ul className="list-disc list-inside space-y-2">
+                        <li><b>Для "Повторных" клиентов:</b> Система анализирует их персональную историю визитов, находит самый короткий интервал между ними (<TooltipTerm definition="Самый короткий промежуток времени между двумя последовательными визитами конкретного клиента.">minInterval</TooltipTerm>) и планирует отправку за 3 дня до истечения этого срока. Это позволяет работать на опережение.</li>
+                        <li><b>Для "Разовых" клиентов:</b> Так как у них нет своей истории, система использует средний интервал по всей базе (<TooltipTerm definition="Среднестатистический промежуток времени между визитами для всех клиентов.">avgInterval</TooltipTerm>), чтобы сделать наиболее вероятное предположение о следующем визите.</li>
+                    </ul>
+                    <p>Такой подход значительно повышает шансы на возврат клиента.</p>
+                </div>
+            )
+        },
+        messageAssembly: {
+            title: "Подробнее о сборке сообщения",
+            content: (
+                <div className="space-y-4 text-base">
+                    <p>Когда сегменты определены и дата рассчитана, система собирает финальное сообщение как конструктор:</p>
+                    <ol className="list-decimal list-inside space-y-2">
+                        <li><b>Выбор промо-акции:</b> Сначала система ищет персональное предложение. Если его нет, подбирается общая акция, подходящая для сегмента клиента.</li>
+                        <li><b>Выбор шаблона текста:</b> Из базы данных выбирается наиболее релевантный текстовый шаблон, который соответствует профилю клиента (например, текст для "потерянного" клиента будет отличаться от текста для "активного").</li>
+                        {/* FIX: The placeholders were causing a JSX parsing error. Wrapping them in `<code>` tags and explicit string literals makes the code more robust and prevents misinterpretation by the compiler. */}
+                        <li><b>Замена плейсхолдеров:</b> Система вставляет в текст персональные данные: имя клиента (<code>{'\`{{NAME}}\`'}</code>), название акции (<code>{'\`{{TEXT_promo}}\`'}</code>) и другие переменные.</li>
+                    </ol>
+                    <p>В результате получается уникальное, личное сообщение, готовое к отправке.</p>
+                </div>
+            )
+        }
+    };
+
     return (
-        <div className="my-8 not-prose">
+        <div className="my-8 not-prose" ref={diagramRef}>
             <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                 <h3 className="text-xl font-bold text-center text-gray-800 dark:text-slate-200 mb-6">Полный цикл работы AI-маркетолога</h3>
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                     
                     {/* Stage 1: Data Sources */}
-                    <div className="text-center w-48">
+                    <div className="text-center w-48 workflow-stage" style={{ transitionDelay: '0ms' }}>
                         <div className="flex justify-center items-center mx-auto w-16 h-16 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full shadow-md">
                             <CircleStackIcon className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
                         </div>
@@ -32,45 +103,39 @@ const InteractiveWorkflowDiagram: React.FC = () => {
                         <p className="text-sm text-gray-500 dark:text-slate-400">YClients, Google Sheets</p>
                     </div>
                     
-                    <ArrowLongRightIcon className="hidden md:block w-12 h-12 text-gray-300 dark:text-slate-600" />
-                    <ArrowLongDownIcon className="md:hidden w-8 h-8 text-gray-300 dark:text-slate-600" />
+                    <ArrowLongRightIcon className="hidden md:block w-12 h-12 text-gray-300 dark:text-slate-600 workflow-stage" style={{ transitionDelay: '150ms' }} />
+                    <ArrowLongDownIcon className="md:hidden w-8 h-8 text-gray-300 dark:text-slate-600 workflow-stage" style={{ transitionDelay: '150ms' }} />
 
                     {/* Stage 2: AI Core */}
-                    <div className="flex-grow bg-white dark:bg-slate-800 rounded-lg p-4 border border-gray-200 dark:border-slate-700 shadow-inner w-full md:w-auto">
+                    <div className="flex-grow bg-white dark:bg-slate-800 rounded-lg p-4 border border-gray-200 dark:border-slate-700 shadow-inner w-full md:w-auto workflow-stage" style={{ transitionDelay: '300ms' }}>
                         <h4 className="font-semibold text-center text-gray-800 dark:text-slate-200 mb-3">Ядро AI-маркетолога</h4>
                         <div className="flex flex-col sm:flex-row justify-around gap-2">
-                             <div className="flex-1 text-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors">
-                                <TooltipTerm definition="Система анализирует клиентов по 7+ параметрам (тип, лояльность, активность, потребление и др.), присваивая каждому уникальный сегмент для подбора наиболее релевантного предложения.">
-                                    <div className="flex flex-col items-center justify-center cursor-help">
-                                        <UserGroupIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
-                                        <span className="text-xs font-semibold">1. Сегментация</span>
-                                    </div>
-                                </TooltipTerm>
-                            </div>
-                             <div className="flex-1 text-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors w-full">
-                                <TooltipTerm definition="Система прогнозирует оптимальную дату отправки, используя историю визитов клиента. Детальная логика раскрыта в соответствующем разделе документации.">
-                                    <div className="flex flex-col items-center justify-center cursor-help">
-                                        <CalendarDaysIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
-                                        <span className="text-xs font-semibold">2. Расчет даты</span>
-                                    </div>
-                                </TooltipTerm>
-                            </div>
-                            <div className="flex-1 text-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors">
-                                <TooltipTerm definition="Система автоматически подбирает релевантный шаблон текста и промо-акцию, а затем подставляет персональные данные клиента.">
-                                    <div className="flex flex-col items-center justify-center cursor-help">
-                                        <TagIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
-                                        <span className="text-xs font-semibold">3. Сборка сообщения</span>
-                                    </div>
-                                </TooltipTerm>
-                            </div>
+                             <button onClick={() => setModalContent(modalDescriptions.segmentation)} className="flex-1 text-center p-2 rounded-md hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <div className="flex flex-col items-center justify-center">
+                                    <UserGroupIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
+                                    <span className="text-xs font-semibold">1. Сегментация</span>
+                                </div>
+                            </button>
+                             <button onClick={() => setModalContent(modalDescriptions.dateCalculation)} className="flex-1 text-center p-2 rounded-md hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <div className="flex flex-col items-center justify-center">
+                                    <CalendarDaysIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
+                                    <span className="text-xs font-semibold">2. Расчет даты</span>
+                                </div>
+                            </button>
+                            <button onClick={() => setModalContent(modalDescriptions.messageAssembly)} className="flex-1 text-center p-2 rounded-md hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <div className="flex flex-col items-center justify-center">
+                                    <TagIcon className="w-6 h-6 mx-auto text-indigo-500 dark:text-indigo-400" />
+                                    <span className="text-xs font-semibold">3. Сборка сообщения</span>
+                                </div>
+                            </button>
                         </div>
                     </div>
 
-                    <ArrowLongRightIcon className="hidden md:block w-12 h-12 text-gray-300 dark:text-slate-600" />
-                    <ArrowLongDownIcon className="md:hidden w-8 h-8 text-gray-300 dark:text-slate-600" />
+                    <ArrowLongRightIcon className="hidden md:block w-12 h-12 text-gray-300 dark:text-slate-600 workflow-stage" style={{ transitionDelay: '450ms' }} />
+                    <ArrowLongDownIcon className="md:hidden w-8 h-8 text-gray-300 dark:text-slate-600 workflow-stage" style={{ transitionDelay: '450ms' }} />
 
                     {/* Stage 3: Dispatch */}
-                    <div className="text-center w-48">
+                    <div className="text-center w-48 workflow-stage" style={{ transitionDelay: '600ms' }}>
                          <div className="flex justify-center items-center mx-auto w-16 h-16 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full shadow-md">
                             <PaperAirplaneIcon className="w-8 h-8 text-indigo-500 dark:text-indigo-400 -rotate-45" />
                         </div>
@@ -78,11 +143,11 @@ const InteractiveWorkflowDiagram: React.FC = () => {
                         <p className="text-sm text-gray-500 dark:text-slate-400">WAHelp API</p>
                     </div>
 
-                    <ArrowLongRightIcon className="hidden md:block w-12 h-12 text-gray-300 dark:text-slate-600" />
-                    <ArrowLongDownIcon className="md:hidden w-8 h-8 text-gray-300 dark:text-slate-600" />
+                    <ArrowLongRightIcon className="hidden md:block w-12 h-12 text-gray-300 dark:text-slate-600 workflow-stage" style={{ transitionDelay: '750ms' }} />
+                    <ArrowLongDownIcon className="md:hidden w-8 h-8 text-gray-300 dark:text-slate-600 workflow-stage" style={{ transitionDelay: '750ms' }} />
 
                      {/* Stage 4: Result */}
-                    <div className="text-center w-48">
+                    <div className="text-center w-48 workflow-stage" style={{ transitionDelay: '900ms' }}>
                          <div className="flex justify-center items-center mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/50 border border-green-200 dark:border-green-800 rounded-full shadow-md">
                             <CheckCircleIcon className="w-8 h-8 text-green-500 dark:text-green-400" />
                         </div>
@@ -91,21 +156,56 @@ const InteractiveWorkflowDiagram: React.FC = () => {
                     </div>
                 </div>
             </div>
+            {modalContent && (
+                <Modal
+                    isOpen={!!modalContent}
+                    onClose={() => setModalContent(null)}
+                    title={modalContent.title}
+                >
+                    {modalContent.content}
+                </Modal>
+            )}
         </div>
     );
 };
 
 
-const ClientSegmentationDocPage: React.FC = () => {
+const ClientSegmentationDocumentationPage: React.FC = () => {
     
+    const [activeLoyaltyTier, setActiveLoyaltyTier] = useState<string | null>(null);
+
+    const loyaltyTiers = [
+      {
+        id: 'single',
+        label: 'Разовые',
+        visits: '1 визит',
+        className: 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-300',
+        definition: 'Клиенты, совершившие только один успешный визит. Это начальный уровень лояльности.'
+      },
+      {
+        id: 'repeat_2_4',
+        label: 'Повторные (2-4 раза)',
+        visits: '2-4 визита',
+        className: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300',
+        definition: 'Клиенты, совершившие от двух до четырех успешных визитов. Демонстрируют интерес к повторным посещениям.'
+      },
+      {
+        id: 'repeat_5_plus',
+        label: 'Повторные (5+)',
+        visits: '≥ 5 визитов',
+        className: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
+        definition: 'Наиболее лояльные клиенты, совершившие пять и более визитов. Являются ядром постоянной аудитории.'
+      }
+    ];
+
     const glossary = {
         send_date: "Ключевое поле в системе; расчетная дата, когда клиенту должно быть отправлено сообщение. Если `null`, сообщение не отправляется.",
         idFirst: "Архитектурный принцип, согласно которому все ключевые категории (например, тип клиента) хранятся и обрабатываются как числовые ID, а не как строки. Это значительно повышает производительность и надежность скриптов в Google Sheets.",
         segment: "Группа клиентов, объединенная по одному или нескольким признакам (например, 'Активные', 'Повторные'). Сегментация позволяет делать более точные и релевантные предложения.",
         minInterval: "Самый короткий промежуток времени между двумя последовательными визитами конкретного клиента. Используется для прогнозирования следующего визита у 'повторных' клиентов.",
         avgInterval: "Среднестатистический промежуток времени между визитами для всех клиентов в определенном сегменте. Используется для прогнозирования следующего визита у 'разовых' клиентов.",
-        permanent_clients: "Клиенты, совершившие два или более визита за последние 90 дней. Являются ядром активной аудитории.",
-        former_permanent_clients: "Клиенты, которые ранее проявляли высокую активность (2+ визита за 3 месяца), но не посещали сервис в последние 90 дней. Ключевой сегмент для реактивации.",
+        permanent_clients: "Клиенты, совершившие два или более визита за последние 90 дней (3 месяца). Являются ядром активной аудитории.",
+        former_permanent_clients: "Клиенты, которые ранее проявляли высокую активность (2+ визита в любые 3 месяца в прошлом), но не посещали сервис в последние 90 дней. Ключевой сегмент для реактивации.",
         visitor: "Клиент, у которого есть хотя бы один визит со статусом 'пришел' за всё время наблюдений. Это ключевой тип клиента, совершившего целевое действие.",
         buyer: "Клиент, который совершил покупку (например, товара или сертификата), но еще не совершил ни одного визита. Часто это дарители сертификатов.",
         lead: "Потенциальный клиент, который проявил интерес (записался), но не пришел на визит. У него нет ни успешных визитов, ни покупок.",
@@ -121,7 +221,7 @@ const ClientSegmentationDocPage: React.FC = () => {
     };
 
     return (
-    <DocPageLayout title="AI-маркетолог">
+    <DocumentationPageLayout title="AI-маркетолог">
         <div className="space-y-16">
             
             <section id="intro">
@@ -239,40 +339,28 @@ const ClientSegmentationDocPage: React.FC = () => {
                         </div>
                         <p className="text-sm text-gray-500 dark:text-slate-400">Логика выполняется по приоритету сверху вниз:</p>
                         <div className="space-y-3">
-                            <div className="p-3 bg-white dark:bg-slate-800 rounded-md border border-indigo-500 dark:border-indigo-600 shadow-sm">
-                                <div className="flex items-start gap-3">
+                            <div className="p-4 bg-white dark:bg-slate-800 rounded-md border border-indigo-500 dark:border-indigo-600 shadow-sm">
+                                <div className="flex items-center gap-3">
                                     <div className="flex-shrink-0 w-6 h-6 bg-indigo-500 text-white font-bold rounded-full flex items-center justify-center text-sm">1</div>
-                                    <div>
-                                        <h4 className="font-semibold text-gray-900 dark:text-slate-100"><TooltipTerm definition={glossary.visitor}>Посетитель</TooltipTerm> <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400">(высший приоритет)</span></h4>
-                                        <p className="text-sm text-gray-600 dark:text-slate-400">Есть хотя бы один визит со статусом "пришел" за всё время.</p>
-                                    </div>
+                                    <h4 className="font-semibold text-base text-gray-900 dark:text-slate-100"><TooltipTerm definition={glossary.visitor}>Посетитель</TooltipTerm> <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400">(высший приоритет)</span></h4>
                                 </div>
                             </div>
-                            <div className="p-3 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
-                                <div className="flex items-start gap-3">
+                            <div className="p-4 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
+                                <div className="flex items-center gap-3">
                                     <div className="flex-shrink-0 w-6 h-6 bg-gray-400 dark:bg-slate-600 text-white font-bold rounded-full flex items-center justify-center text-sm">2</div>
-                                    <div>
-                                        <h4 className="font-semibold text-gray-900 dark:text-slate-100"><TooltipTerm definition={glossary.buyer}>Покупатель</TooltipTerm></h4>
-                                        <p className="text-sm text-gray-600 dark:text-slate-400">Нет визитов, но есть покупка.</p>
-                                    </div>
+                                    <h4 className="font-semibold text-base text-gray-900 dark:text-slate-100"><TooltipTerm definition={glossary.buyer}>Покупатель</TooltipTerm></h4>
                                 </div>
                             </div>
-                             <div className="p-3 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
-                                <div className="flex items-start gap-3">
+                             <div className="p-4 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
+                                <div className="flex items-center gap-3">
                                     <div className="flex-shrink-0 w-6 h-6 bg-gray-400 dark:bg-slate-600 text-white font-bold rounded-full flex items-center justify-center text-sm">3</div>
-                                    <div>
-                                        <h4 className="font-semibold text-gray-900 dark:text-slate-100"><TooltipTerm definition={glossary.lead}>Лид</TooltipTerm></h4>
-                                        <p className="text-sm text-gray-600 dark:text-slate-400">Нет визитов и покупок, но есть визит со статусом "не пришел".</p>
-                                    </div>
+                                    <h4 className="font-semibold text-base text-gray-900 dark:text-slate-100"><TooltipTerm definition={glossary.lead}>Лид</TooltipTerm></h4>
                                 </div>
                             </div>
-                             <div className="p-3 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
-                                <div className="flex items-start gap-3">
+                             <div className="p-4 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
+                                <div className="flex items-center gap-3">
                                     <div className="flex-shrink-0 w-6 h-6 bg-gray-400 dark:bg-slate-600 text-white font-bold rounded-full flex items-center justify-center text-sm">4</div>
-                                    <div>
-                                        <h4 className="font-semibold text-gray-900 dark:text-slate-100">Неизвестно</h4>
-                                        <p className="text-sm text-gray-600 dark:text-slate-400">Во всех остальных случаях.</p>
-                                    </div>
+                                    <h4 className="font-semibold text-base text-gray-900 dark:text-slate-100">Неизвестно</h4>
                                 </div>
                             </div>
                         </div>
@@ -286,113 +374,212 @@ const ClientSegmentationDocPage: React.FC = () => {
                         </div>
                         <p className="text-sm text-gray-500 dark:text-slate-400">Ключевые метрики для прогнозирования следующего визита клиента. Рассчитываются только для <TooltipTerm definition={glossary.visitor}>Посетителей</TooltipTerm>.</p>
                         <div className="space-y-3 pt-2">
-                            <div className="p-3 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
-                                <h4 className="font-semibold text-gray-900 dark:text-slate-100">Минимальный интервал (<TooltipTerm definition={glossary.minInterval}>minInterval</TooltipTerm>)</h4>
-                                <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">Вычисляется для каждого клиента индивидуально. Это наименьший промежуток (в днях) между двумя его последовательными визитами. Используется для прогноза возвращения <TooltipTerm definition={glossary.loyalty}>"повторных"</TooltipTerm> клиентов.</p>
+                            <div className="p-4 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
+                                <h4 className="font-semibold text-base text-gray-900 dark:text-slate-100">Минимальный интервал (<TooltipTerm definition={glossary.minInterval}>minInterval</TooltipTerm>)</h4>
                             </div>
-                            <div className="p-3 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
-                                <h4 className="font-semibold text-gray-900 dark:text-slate-100">Средний интервал (<TooltipTerm definition={glossary.avgInterval}>avgInterval</TooltipTerm>)</h4>
-                                <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">Рассчитывается как среднее арифметическое всех интервалов между визитами по всей клиентской базе. Используется для прогноза возвращения <TooltipTerm definition={glossary.loyalty}>"разовых"</TooltipTerm> клиентов, у которых еще нет своей истории визитов.</p>
+                            <div className="p-4 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
+                                <h4 className="font-semibold text-base text-gray-900 dark:text-slate-100">Средний интервал (<TooltipTerm definition={glossary.avgInterval}>avgInterval</TooltipTerm>)</h4>
                             </div>
                         </div>
                     </div>
                     
-                    {/* 1.3: Consumption Type */}
-                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 space-y-4">
-                        <div className="flex items-center gap-3">
-                            <FunnelIcon className="w-7 h-7 text-indigo-500 dark:text-indigo-400"/>
-                            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-200 mt-0">1.3: Определение типа потребления</h3>
-                        </div>
-                        <p className="text-sm text-gray-500 dark:text-slate-400">Анализирует все услуги из визитов клиента.</p>
-                        <div className="mt-2 p-4 bg-gray-900 dark:bg-black/30 rounded-md border border-gray-200 dark:border-slate-700 font-mono text-sm leading-relaxed text-gray-300">
-                            <span className="text-sky-400">ЕСЛИ</span> <span className="text-gray-400">доля 'Массаж' ≥ 80%</span> <span className="text-emerald-400">→</span> <span className="text-yellow-300">"Массажник"</span>
-                            <br />
-                            <span className="text-sky-400">ИНАЧЕ ЕСЛИ</span> <span className="text-gray-400">доля 'СПА' ≥ 80%</span> <span className="text-emerald-400">→</span> <span className="text-yellow-300">"Спашник"</span>
-                            <br />
-                            <span className="text-sky-400">ИНАЧЕ</span> <span className="text-emerald-400">→</span> <span className="text-yellow-300">"Универсал"</span>
-                        </div>
-                        <p className="text-sm text-gray-500 dark:text-slate-400 pt-2 flex items-center gap-2"><LightBulbIcon className="w-5 h-5" /> <span>Это правило определяет <TooltipTerm definition={glossary.consumption_type}>тип потребления</TooltipTerm>.</span></p>
-                    </div>
-
-                    {/* 1.4: Loyalty */}
-                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 space-y-4">
-                        <div className="flex items-center gap-3">
-                            <CheckBadgeIcon className="w-7 h-7 text-indigo-500 dark:text-indigo-400"/>
-                            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-200 mt-0">1.4: Определение лояльности</h3>
-                        </div>
-                        <ul className="space-y-3 pt-2">
-                            <li className="flex items-center gap-4">
-                                <span className="font-mono text-sm w-28 text-right text-gray-600 dark:text-slate-400">1 визит</span>
-                                <span className="text-2xl text-gray-300 dark:text-slate-600">→</span>
-                                <span className="bg-sky-100 text-sky-800 text-sm font-semibold px-3 py-1 rounded-full dark:bg-sky-900 dark:text-sky-300">Разовые</span>
-                            </li>
-                            <li className="flex items-center gap-4">
-                                <span className="font-mono text-sm w-28 text-right text-gray-600 dark:text-slate-400">2-4 визита</span>
-                                <span className="text-2xl text-gray-300 dark:text-slate-600">→</span>
-                                <span className="bg-cyan-100 text-cyan-800 text-sm font-semibold px-3 py-1 rounded-full dark:bg-cyan-900 dark:text-cyan-300">Повторные (2-4 раза)</span>
-                            </li>
-                             <li className="flex items-center gap-4">
-                                <span className="font-mono text-sm w-28 text-right text-gray-600 dark:text-slate-400">≥ 5 визитов</span>
-                                <span className="text-2xl text-gray-300 dark:text-slate-600">→</span>
-                                <span className="bg-indigo-100 text-indigo-800 text-sm font-semibold px-3 py-1 rounded-full dark:bg-indigo-900 dark:text-indigo-300">Повторные (5+)</span>
-                            </li>
-                        </ul>
-                        <p className="text-sm text-gray-500 dark:text-slate-400 pt-4 border-t border-gray-200 dark:border-slate-700 flex items-center gap-2"><LightBulbIcon className="w-5 h-5" /> <span>Это правило определяет <TooltipTerm definition={glossary.loyalty}>лояльность</TooltipTerm>.</span></p>
-                    </div>
-
-                    {/* 1.5: Activity */}
-                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 space-y-4">
-                        <div className="flex items-center gap-3">
-                            <ChartBarIcon className="w-7 h-7 text-indigo-500 dark:text-indigo-400"/>
-                            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-200 mt-0">1.5: Определение активности</h3>
-                        </div>
-                        <p className="text-sm text-gray-500 dark:text-slate-400">Рассчитывается: <code>(сегодня - дата последнего контакта)</code>, где контакт = визит ИЛИ покупка.</p>
-                        <ul className="pt-2 space-y-3">
-                            <li className="flex items-center gap-3">
-                                <div className="flex-shrink-0 h-2.5 w-2.5 rounded-full bg-green-500" title="Активный"></div>
-                                <div>
-                                    <span className="font-semibold text-green-700 dark:text-green-400">Активный</span>
-                                    <p className="text-sm text-gray-500 dark:text-slate-400">≤ 90 дней</p>
+                    {/* Combined block for 1.3-1.7 */}
+                    <div className="md:col-span-2 bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                        <h3 className="text-2xl font-bold text-gray-800 dark:text-slate-200 mt-0 mb-8 text-center">Компоненты профиля клиента</h3>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            
+                            {/* 1.3: Consumption Type */}
+                            <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col h-full shadow-sm">
+                                <div className="flex items-center gap-4 mb-5">
+                                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-indigo-100 dark:bg-slate-700 rounded-lg">
+                                        <FunnelIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400"/>
+                                    </div>
+                                    <h4 className="text-xl font-bold text-gray-800 dark:text-slate-200 mt-0">1.3: Тип потребления</h4>
                                 </div>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <div className="flex-shrink-0 h-2.5 w-2.5 rounded-full bg-yellow-500" title="Пассивный"></div>
-                                <div>
-                                    <span className="font-semibold text-yellow-700 dark:text-yellow-400">Пассивный</span>
-                                    <p className="text-sm text-gray-500 dark:text-slate-400">&gt; 90 и ≤ 270 дней</p>
-                                </div>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <div className="flex-shrink-0 h-2.5 w-2.5 rounded-full bg-red-500" title="Потерянный"></div>
-                                <div>
-                                    <span className="font-semibold text-red-700 dark:text-red-400">Потерянный</span>
-                                    <p className="text-sm text-gray-500 dark:text-slate-400">&gt; 270 дней</p>
-                                </div>
-                            </li>
-                        </ul>
-                         <p className="text-sm text-gray-500 dark:text-slate-400 pt-2 border-t border-gray-200 dark:border-slate-700 flex items-center gap-2"><LightBulbIcon className="w-5 h-5" /> <span>Это правило определяет <TooltipTerm definition={glossary.activity}>активность</TooltipTerm>.</span></p>
-                    </div>
+                                <div className="flex-grow flex flex-col justify-center space-y-4 text-lg p-4 bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-700">
+                                    {/* IF */}
+                                    <div className="flex items-start gap-4">
+                                        <span className="font-bold text-sky-600 dark:text-sky-400 flex-shrink-0 pt-1">ЕСЛИ</span>
+                                        <div className="flex-grow">
+                                            <p className="font-medium text-gray-800 dark:text-slate-200">Доля 'Массаж' ≥ 80%</p>
+                                            <div className="flex items-center gap-3 mt-2">
+                                                <ArrowLongRightIcon className="w-6 h-6 text-gray-400 dark:text-slate-500" />
+                                                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/50">
+                                                    <CheckCircleIcon className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                                                    <span className="text-xl font-semibold text-emerald-800 dark:text-emerald-300">
+                                                        <TooltipTerm definition={glossary.massazhnik}>Массажник</TooltipTerm>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-gray-300 dark:border-slate-600 my-3"></div>
 
-                    {/* 1.6 & 1.7 */}
-                    <div className="md:col-span-2 grid md:grid-cols-2 gap-6">
-                        <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 space-y-3">
-                           <div className="flex items-center gap-3">
-                                <TableCellsIcon className="w-7 h-7 text-indigo-500 dark:text-indigo-400"/>
-                                <h3 className="text-lg font-bold text-gray-800 dark:text-slate-200 mt-0">1.6: Ценовой сегмент</h3>
+                                    {/* ELSE IF */}
+                                    <div className="flex items-start gap-4">
+                                        <span className="font-bold text-sky-600 dark:text-sky-400 flex-shrink-0 pt-1">ИНАЧЕ ЕСЛИ</span>
+                                        <div className="flex-grow">
+                                            <p className="font-medium text-gray-800 dark:text-slate-200">Доля 'СПА' ≥ 80%</p>
+                                            <div className="flex items-center gap-3 mt-2">
+                                                <ArrowLongRightIcon className="w-6 h-6 text-gray-400 dark:text-slate-500" />
+                                                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/50">
+                                                    <CheckCircleIcon className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                                                    <span className="text-xl font-semibold text-emerald-800 dark:text-emerald-300">
+                                                         <TooltipTerm definition={glossary.spashnik}>Спашник</TooltipTerm>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="border-t border-dashed border-gray-300 dark:border-slate-600 my-3"></div>
+
+                                    {/* ELSE */}
+                                    <div className="flex items-start gap-4">
+                                        <span className="font-bold text-gray-500 dark:text-gray-400 flex-shrink-0 pt-1">ИНАЧЕ</span>
+                                        <div className="flex-grow">
+                                            <div className="flex items-center gap-3 mt-1">
+                                                <ArrowLongRightIcon className="w-6 h-6 text-gray-400 dark:text-slate-500" />
+                                                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-100 dark:bg-slate-700">
+                                                    <span className="text-xl font-semibold text-gray-800 dark:text-slate-200">
+                                                        <TooltipTerm definition={glossary.universal}>Универсал</TooltipTerm>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                           <p className="text-sm">Присваивается доминирующий <TooltipTerm definition={glossary.segment}>ценовой сегмент</TooltipTerm> ("Дорогой", "Средний", "Недорогой") на основе истории посещенных программ.</p>
-                       </div>
-                       <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 space-y-3">
-                           <div className="flex items-center gap-3">
-                                <ArrowPathIcon className="w-7 h-7 text-indigo-500 dark:text-indigo-400"/>
-                                <h3 className="text-lg font-bold text-gray-800 dark:text-slate-200 mt-0">1.7: Частота посещения</h3>
+                            
+                            {/* 1.4: Loyalty */}
+                            <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col h-full shadow-sm">
+                                <div className="flex items-center gap-4 mb-5">
+                                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-indigo-100 dark:bg-slate-700 rounded-lg">
+                                        <CheckBadgeIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400"/>
+                                    </div>
+                                    <h4 className="text-xl font-bold text-gray-800 dark:text-slate-200 mt-0">1.4: Лояльность</h4>
+                                </div>
+                                <div className="space-y-4 flex-grow flex flex-col justify-center">
+                                    {loyaltyTiers.map((tier) => (
+                                        <div key={tier.id}>
+                                            <button
+                                                onClick={() => setActiveLoyaltyTier(activeLoyaltyTier === tier.id ? null : tier.id)}
+                                                className={`w-full p-4 rounded-lg border-2 text-left transition-all duration-300 transform hover:-translate-y-1 ${
+                                                    activeLoyaltyTier === tier.id 
+                                                    ? 'border-indigo-500 bg-indigo-50 dark:bg-slate-900/50 shadow-lg scale-105' 
+                                                    : 'border-transparent bg-gray-50 dark:bg-slate-900/50 hover:bg-gray-100 dark:hover:bg-slate-700'
+                                                }`}
+                                                aria-expanded={activeLoyaltyTier === tier.id}
+                                            >
+                                                <div className="flex items-center justify-between gap-4">
+                                                    <span className="font-mono text-xl w-32 text-gray-600 dark:text-slate-400">{tier.visits}</span>
+                                                    <span className={`text-lg font-semibold px-4 py-2 rounded-full ${tier.className}`}>{tier.label}</span>
+                                                </div>
+                                            </button>
+                                            {activeLoyaltyTier === tier.id && (
+                                                <div className="p-4 mt-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200 rounded-lg text-base animate-fade-in" role="alert">
+                                                    {tier.definition}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                           <ul className="list-disc list-inside space-y-1.5 text-sm">
-                               <li><strong><TooltipTerm definition={glossary.permanent_clients}>Постоянные</TooltipTerm>:</strong> 2+ визита за последние 3 месяца.</li>
-                               <li><strong><TooltipTerm definition={glossary.former_permanent_clients}>Бывшие постоянные</TooltipTerm>:</strong> Были 2+ визита в прошлом, но не в последние 3 месяца.</li>
-                               <li><strong>Редкие/Разовые:</strong> Все остальные.</li>
-                           </ul>
-                       </div>
+                            
+                            {/* 1.5: Activity */}
+                            <div className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col h-full shadow-sm">
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-indigo-100 dark:bg-slate-700 rounded-lg">
+                                        <ChartBarIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400"/>
+                                    </div>
+                                    <h4 className="text-xl font-bold text-gray-800 dark:text-slate-200 mt-0">1.5: Активность</h4>
+                                </div>
+                                <p className="text-lg text-gray-600 dark:text-slate-400 mb-6">Рассчитывается по давности последнего контакта (визит или покупка).</p>
+                                <div className="w-full mt-auto">
+                                    <div className="w-full flex rounded-full h-5 overflow-hidden border border-gray-200 dark:border-slate-700">
+                                        <div className="flex-1 bg-green-500"></div>
+                                        <div className="flex-1 bg-yellow-500"></div>
+                                        <div className="flex-1 bg-red-500"></div>
+                                    </div>
+                                    <div className="grid grid-cols-3 text-center text-base text-gray-700 dark:text-slate-300 mt-4 font-semibold">
+                                        <TooltipTerm definition="Клиент, контактировавший с сервисом (визит или покупка) в течение последних 90 дней.">Активный</TooltipTerm>
+                                        <TooltipTerm definition="Клиент, чей последний контакт (визит или покупка) был от 91 до 270 дней назад. Требует мер по реактивации.">Пассивный</TooltipTerm>
+                                        <TooltipTerm definition="Клиент, который не контактировал с сервисом (визит или покупка) более 270 дней. Считается ушедшим.">Потерянный</TooltipTerm>
+                                    </div>
+                                    <div className="grid grid-cols-3 text-center text-sm text-gray-500 dark:text-slate-400 mt-1">
+                                        <span>≤ 90 дн.</span>
+                                        <span>≤ 270 дн.</span>
+                                        <span>&gt; 270 дн.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 1.6: Price Segment */}
+                            <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col h-full shadow-sm">
+                               <div className="flex items-center gap-4 mb-4">
+                                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-indigo-100 dark:bg-slate-700 rounded-lg">
+                                        <TableCellsIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400"/>
+                                    </div>
+                                    <h4 className="text-xl font-bold text-gray-800 dark:text-slate-200 mt-0">1.6: Ценовой сегмент</h4>
+                                </div>
+                               <p className="text-lg text-gray-600 dark:text-slate-400 mb-5">Присваивается доминирующий <TooltipTerm definition={glossary.segment}>ценовой сегмент</TooltipTerm> на основе истории посещенных программ.</p>
+                               <div className="flex-grow flex items-center justify-center not-prose">
+                                    <div className="w-full max-w-xs space-y-4">
+                                        {/* Дорогой */}
+                                        <div className="flex items-center gap-4 p-2 pl-4 rounded-full bg-emerald-50 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-700 shadow-sm transition-transform hover:scale-105">
+                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-xl">↑</div>
+                                            <span className="text-lg font-semibold text-emerald-800 dark:text-emerald-300">Дорогой</span>
+                                        </div>
+                                        
+                                        {/* Средний */}
+                                        <div className="flex items-center gap-4 p-2 pl-4 rounded-full bg-sky-50 dark:bg-sky-900/50 border border-sky-200 dark:border-sky-700 shadow-sm transition-transform hover:scale-105">
+                                             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center text-white font-bold text-xl">~</div>
+                                            <span className="text-lg font-semibold text-sky-800 dark:text-sky-300">Средний</span>
+                                        </div>
+                                        
+                                        {/* Недорогой */}
+                                        <div className="flex items-center gap-4 p-2 pl-4 rounded-full bg-amber-50 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-700 shadow-sm transition-transform hover:scale-105">
+                                             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-xl">↓</div>
+                                            <span className="text-lg font-semibold text-amber-800 dark:text-amber-300">Недорогой</span>
+                                        </div>
+                                    </div>
+                               </div>
+                           </div>
+                           
+                           {/* 1.7: Visit Frequency */}
+                           <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col h-full shadow-sm">
+                               <div className="flex items-center gap-4 mb-4">
+                                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-indigo-100 dark:bg-slate-700 rounded-lg">
+                                        <ArrowPathIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400"/>
+                                    </div>
+                                    <h4 className="text-xl font-bold text-gray-800 dark:text-slate-200 mt-0">1.7: Частота</h4>
+                                </div>
+                               <div className="space-y-4 flex-grow flex flex-col justify-center">
+                                    <div className="p-4 bg-gray-50 dark:bg-slate-900/50 rounded-lg">
+                                        <div className="flex items-center gap-3">
+                                            <StarIcon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
+                                            <h5 className="font-bold text-lg text-gray-800 dark:text-slate-200"><TooltipTerm definition={glossary.permanent_clients}>Постоянные</TooltipTerm></h5>
+                                        </div>
+                                        <p className="text-base text-gray-600 dark:text-slate-400 mt-1 pl-9">2+ визита за последние 3 месяца.</p>
+                                    </div>
+                                    <div className="p-4 bg-gray-50 dark:bg-slate-900/50 rounded-lg">
+                                        <div className="flex items-center gap-3">
+                                            <ClockIcon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
+                                            <h5 className="font-bold text-lg text-gray-800 dark:text-slate-200"><TooltipTerm definition={glossary.former_permanent_clients}>Бывшие постоянные</TooltipTerm></h5>
+                                        </div>
+                                         <p className="text-base text-gray-600 dark:text-slate-400 mt-1 pl-9">Были активны в прошлом, но не в последние 3 месяца.</p>
+                                    </div>
+                                    <div className="p-4 bg-gray-50 dark:bg-slate-900/50 rounded-lg">
+                                        <div className="flex items-center gap-3">
+                                            <ArrowPathRoundedSquareIcon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
+                                            <h5 className="font-bold text-lg text-gray-800 dark:text-slate-200">Редкие/Разовые</h5>
+                                        </div>
+                                         <p className="text-base text-gray-600 dark:text-slate-400 mt-1 pl-9">Все остальные случаи.</p>
+                                    </div>
+                               </div>
+                           </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -400,67 +587,103 @@ const ClientSegmentationDocPage: React.FC = () => {
             <section id="templates-promo">
                 <SectionHeader 
                     icon={<TagIcon className="w-8 h-8" />}
-                    title="2. Шаблоны, промо и плейсхолдеры"
+                    title="2. Сборка сообщения: от промо до текста"
                     subtitle="Здесь пошагово разбирается конвейер, который превращает сырые данные и сегменты в готовое к отправке, персонализированное сообщение. Описывается логика выбора наиболее релевантной промо-акции и текстового шаблона, а также механизм подстановки персональных данных клиента (плейсхолдеров)."
                 />
-                <div className="space-y-8 mt-8">
-                    {/* Step 1: Promo Selection */}
-                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="flex-shrink-0 w-10 h-10 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-lg">1</div>
-                            <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0">ШАГ 1: Выбор промо-акции</h3>
-                        </div>
-                        <p className="text-gray-700 dark:text-slate-300 mb-6 pl-14 text-base">Функция <code>selectPromo</code> выбирает промо‑акцию, отдавая приоритет персональным предложениям.</p>
-                        <div className="space-y-4 max-w-2xl mx-auto pl-14">
-                            <div className="bg-white dark:bg-slate-800 rounded-lg p-5 border-2 border-indigo-500 shadow-lg">
-                                <h4 className="font-bold text-base text-gray-800 dark:text-slate-200 mt-0">Приоритетный поиск</h4>
-                                <p className="text-base text-gray-700 dark:text-slate-300">Ищутся персональные предложения в листе <TooltipTerm definition={glossary.promo_personalization}>«Персонализация»</TooltipTerm>.</p>
-                            </div>
-                            <div className="flex justify-center items-center text-gray-400 dark:text-slate-500">
-                                <ArrowLongDownIcon className="w-8 h-8"/>
-                                <span className="text-sm font-semibold ml-2">Если не найдено...</span>
-                            </div>
-                            <div className="bg-white dark:bg-slate-800 rounded-lg p-5 border border-gray-200 dark:border-slate-700 shadow-sm">
-                                <h4 className="font-bold text-base text-gray-800 dark:text-slate-200 mt-0">Резервный поиск</h4>
-                                <p className="text-base text-gray-700 dark:text-slate-300">Ищутся общие предложения в листе <TooltipTerm definition={glossary.promo_actions}>«Акции»</TooltipTerm>.</p>
-                            </div>
-                        </div>
-                    </div>
+                <div className="mt-8 relative not-prose">
+                    <div className="absolute left-9 top-4 bottom-4 w-0.5 bg-gray-200 dark:bg-slate-700"></div>
+                    <div className="space-y-12">
+                        {/* Step 1: Promo Selection */}
+                        <div className="relative pl-20">
+                            <div className="absolute left-0 top-0 flex-shrink-0 w-16 h-16 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-2xl border-4 border-white dark:border-slate-800">1</div>
+                            <h3 className="font-bold text-2xl text-gray-800 dark:text-slate-200 mt-3 mb-2">ШАГ 1: Выбор промо-акции</h3>
+                            <p className="text-gray-700 dark:text-slate-300 mb-6 text-base">Функция <code>selectPromo</code> выбирает промо‑акцию, используя многоуровневый алгоритм для максимальной персонализации.</p>
+                             <div className="border-l-2 border-dashed border-gray-300 dark:border-slate-600 space-y-8 relative p-6 bg-white dark:bg-slate-800/50 rounded-lg border border-gray-200 dark:border-slate-700">
+                                {/* Entry Point */}
+                                <div className="relative pl-10">
+                                    <div className="absolute -left-4 top-1 w-8 h-8 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-slate-600">
+                                        <UserCircleIcon className="w-5 h-5 text-gray-500 dark:text-slate-400" />
+                                    </div>
+                                    <h4 className="font-bold text-base text-gray-800 dark:text-slate-200 mt-0">Входные данные: Профиль клиента</h4>
+                                    <p className="text-base text-gray-700 dark:text-slate-300">Используется полный набор сегментов (Тип, Лояльность, Активность и т.д.) для поиска наиболее точного предложения.</p>
+                                </div>
+                                
+                                {/* Stage 1: Personalization */}
+                                <div className="relative pl-10">
+                                    <div className="absolute -left-4 top-1 w-8 h-8 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center border-2 border-indigo-500">
+                                        <SparklesIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                    </div>
+                                    <h4 className="font-bold text-base text-gray-800 dark:text-slate-200 mt-0">Приоритетный поиск в <TooltipTerm definition={glossary.promo_personalization}>«Персонализации»</TooltipTerm></h4>
+                                    <p className="text-base text-gray-700 dark:text-slate-300">Система пытается найти уникальное предложение, которое соответствует ВСЕМ параметрам клиента. <strong>Это первый и главный источник.</strong></p>
+                                </div>
 
-                    {/* Step 2: Template Selection */}
-                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="flex-shrink-0 w-10 h-10 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-lg">2</div>
-                            <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0">ШАГ 2: Выбор шаблона</h3>
-                        </div>
-                        <p className="text-gray-700 dark:text-slate-300 pl-14 text-base">Функция <code>selectTemplate</code> ищет наиболее подходящий шаблон в листе <TooltipTerm definition={glossary.templates}>«Шаблоны»</TooltipTerm>, фильтруя по параметрам клиента.</p>
-                         <p className="text-sm text-gray-500 dark:text-slate-400 mt-2 pl-14 flex items-center gap-2"><LightBulbIcon className="w-5 h-5" /> <span>Чем больше параметров совпало, тем выше приоритет шаблона.</span></p>
-                    </div>
+                                {/* Intermediate Step */}
+                                <div className="relative pl-10">
+                                     <div className="absolute -left-4 top-1 w-8 h-8 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-slate-600">
+                                        <ArrowLongDownIcon className="w-5 h-5 text-gray-500 dark:text-slate-400" />
+                                    </div>
+                                    <p className="text-base text-gray-500 dark:text-slate-400 italic">Если персональная акция не найдена...</p>
+                                </div>
 
-                     {/* Step 3: Placeholder Replacement */}
-                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="flex-shrink-0 w-10 h-10 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-lg">3</div>
-                            <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0">ШАГ 3: Замена плейсхолдеров</h3>
+                                 {/* Stage 2: Actions */}
+                                <div className="relative pl-10">
+                                    <div className="absolute -left-4 top-1 w-8 h-8 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center border-2 border-indigo-500">
+                                        <TagIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                    </div>
+                                    <h4 className="font-bold text-base text-gray-800 dark:text-slate-200 mt-0">Резервный поиск в <TooltipTerm definition={glossary.promo_actions}>«Акциях»</TooltipTerm></h4>
+                                    <p className="text-base text-gray-700 dark:text-slate-300">Система ищет общие, групповые акции, которые подходят для ключевых сегментов клиента.</p>
+                                </div>
+                            </div>
                         </div>
-                        <p className="text-gray-700 dark:text-slate-300 mb-6 pl-14 text-base">Функция <code>replacePlaceholders</code> заменяет переменные в тексте на реальные данные, превращая шаблон в интерактивное персонализированное сообщение.</p>
-                        <div className="pl-14">
-                            <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-md max-w-2xl mx-auto">
-                                <p className="text-base text-gray-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
-                                    {"Здравствуйте, "}
-                                    <TooltipTerm definition="Например: Иван">
-                                        {"{{NAME}}"}
-                                    </TooltipTerm>
-                                    {"} 🤗 Это София, администратор "}
-                                    <TooltipTerm definition="Например: вашего салона">
-                                        {"{{COMPANY}}"}
-                                    </TooltipTerm>
-                                    {".\n Рады видеть вас снова с нами!\n\n 🎁 - "}
-                                    <TooltipTerm definition="Например: Скидка 15% на массаж">
-                                        {"{{TEXT_PROMO}}"}
-                                    </TooltipTerm>
-                                    {"\n\n ❗Чтобы получить подарок, покажите это сообщение администратору во время визита.\n\n Подобрать вам удобный день и время для записи? 😊"}
-                                </p>
+
+                        {/* Step 2: Template Selection */}
+                        <div className="relative pl-20">
+                           <div className="absolute left-0 top-0 flex-shrink-0 w-16 h-16 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-2xl border-4 border-white dark:border-slate-800">2</div>
+                            <h3 className="font-bold text-2xl text-gray-800 dark:text-slate-200 mt-3 mb-2">ШАГ 2: Выбор шаблона</h3>
+                            <p className="text-gray-700 dark:text-slate-300 text-base">Функция <code>selectTemplate</code> ищет наиболее подходящий шаблон в листе <TooltipTerm definition={glossary.templates}>«Шаблоны»</TooltipTerm>, фильтруя по параметрам клиента. Чем больше параметров совпало, тем выше приоритет шаблона.</p>
+                        </div>
+
+                        {/* Step 3: Placeholder Replacement */}
+                        <div className="relative pl-20">
+                            <div className="absolute left-0 top-0 flex-shrink-0 w-16 h-16 bg-indigo-600 text-white font-bold rounded-full flex items-center justify-center text-2xl border-4 border-white dark:border-slate-800">3</div>
+                            <h3 className="font-bold text-2xl text-gray-800 dark:text-slate-200 mt-3 mb-2">ШАГ 3: Сборка и финальное решение</h3>
+                            <p className="text-gray-700 dark:text-slate-300 mb-6 text-base">На последнем этапе система заменяет переменные (плейсхолдеры) в тексте и принимает решение об отправке на основе результата предыдущих шагов.</p>
+                             <div className="grid md:grid-cols-2 gap-6">
+                                {/* Scenario 1: Success */}
+                                <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-5 border-2 border-green-300 dark:border-green-800">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <CheckBadgeIcon className="w-8 h-8 text-green-600 dark:text-green-400"/>
+                                        <h5 className="font-bold text-lg text-green-800 dark:text-green-300 mt-0">СЦЕНАРИЙ: УСПЕХ</h5>
+                                    </div>
+                                    <p className="text-base text-green-800 dark:text-green-300 mb-4"><strong>Условие:</strong> Промо-акция и шаблон успешно найдены.</p>
+                                    <p className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-2">Действие:</p>
+                                    <p className="text-sm text-gray-700 dark:text-slate-300 mb-4">Плейсхолдеры <code>{`{{NAME}}`}</code> и <code>{`{{TEXT_PROMO}}`}</code> заменяются реальными данными.</p>
+                                    <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-gray-200 dark:border-slate-700 shadow-sm">
+                                        <p className="text-xs text-gray-500 dark:text-slate-400 mb-2 font-semibold uppercase">Результат: Сообщение готово к отправке</p>
+                                        <p className="text-sm text-gray-700 dark:text-slate-300 leading-relaxed">
+                                            {"Здравствуйте, Иван! ... 🎁 - "}
+                                            <span className="font-semibold bg-green-100 dark:bg-green-900/50 p-1 rounded">Скидка 15% на массаж</span>
+                                            {" ..."}
+                                        </p>
+                                    </div>
+                                </div>
+                                 {/* Scenario 2: Cancellation */}
+                                <div className="bg-red-50 dark:bg-red-900/30 rounded-lg p-5 border-2 border-red-300 dark:border-red-800">
+                                     <div className="flex items-center gap-3 mb-3">
+                                        <ExclamationTriangleIcon className="w-8 h-8 text-red-600 dark:text-red-400"/>
+                                        <h5 className="font-bold text-lg text-red-800 dark:text-red-300 mt-0">СЦЕНАРИЙ: ОТМЕНА</h5>
+                                    </div>
+                                    <p className="text-base text-red-800 dark:text-red-300 mb-4"><strong>Условие:</strong> Подходящая промо-акция не найдена.</p>
+                                    <p className="text-base font-semibold text-gray-800 dark:text-slate-200 mb-2">Действие:</p>
+                                    <p className="text-sm text-gray-700 dark:text-slate-300 mb-4">Система присваивает статус «Шаблон не найден», чтобы избежать отправки неполноценного сообщения.</p>
+                                    <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-gray-200 dark:border-slate-700 shadow-sm">
+                                        <p className="text-xs text-gray-500 dark:text-slate-400 mb-2 font-semibold uppercase">Результат: Отправка отменяется</p>
+                                         <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+                                            <NoSymbolIcon className="w-6 h-6"/>
+                                            <p className="text-sm font-semibold">Сообщение не будет отправлено</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -481,52 +704,86 @@ const ClientSegmentationDocPage: React.FC = () => {
 
                     <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                         <h3 className="font-bold text-xl text-gray-800 dark:text-slate-200 mt-0 mb-4">Детальная логика расчета</h3>
-                        <div className="relative border-l-2 border-gray-200 dark:border-slate-700 ml-4">
-                            {/* Timeline Item 1 */}
-                            <div className="mb-8 ml-12">
-                                <div className="absolute -left-[22px] flex items-center justify-center w-10 h-10 bg-amber-100 dark:bg-amber-900 rounded-full ring-8 ring-gray-50 dark:ring-slate-900/50">
-                                    <StarIcon className="w-6 h-6 text-amber-500 dark:text-amber-400" />
-                                </div>
-                                <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 mt-0">Приоритет 1: Клиенты с активным абонементом</h4>
-                                    <p className="mt-1 text-gray-600 dark:text-slate-400 text-base">Это самая ценная группа. Чтобы поддерживать их вовлеченность, система планирует отправку ровно через 30 дней после их последнего визита, мягко напоминая о себе. <br/><strong>Формула:</strong> <code>Дата последнего визита + 30 дней</code></p>
-                                </div>
-                            </div>
-                            {/* Timeline Item 2 */}
-                             <div className="mb-8 ml-12">
-                                <div className="absolute -left-[22px] flex items-center justify-center w-10 h-10 bg-indigo-100 dark:bg-slate-700 rounded-full ring-8 ring-gray-50 dark:ring-slate-900/50">
-                                    <UsersIcon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
-                                </div>
-                                <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 mt-0">Приоритет 2: Посетители (без абонемента)</h4>
-                                    <p className="mt-1 text-gray-600 dark:text-slate-400 text-base">Для этой группы используется предиктивная модель, основанная на их поведении:</p>
-                                    <ul className="list-disc list-inside space-y-1 mt-2 text-sm text-gray-600 dark:text-slate-400">
-                                        <li><strong>Для "Повторных":</strong> Система берет их персональный <TooltipTerm definition={glossary.minInterval}>minInterval</TooltipTerm> и предлагает вернуться за 3 дня до его истечения, работая на опережение. <br/><strong>Формула:</strong> <code>Дата последнего визита + minInterval - 3 дня</code></li>
-                                        <li><strong>Для "Разовых":</strong> Так как персональной истории нет, используется общий <TooltipTerm definition={glossary.avgInterval}>avgInterval</TooltipTerm> по всей базе. <br/><strong>Формула:</strong> <code>Дата визита + avgInterval - 3 дня</code></li>
-                                    </ul>
+                        <div className="space-y-6">
+                            {/* Priority 1 */}
+                            <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border-2 border-amber-400 dark:border-amber-500 shadow-lg transition-transform hover:scale-[1.02]">
+                                <div className="flex items-start gap-4">
+                                    <div className="flex-shrink-0 flex flex-col items-center">
+                                        <div className="flex items-center justify-center w-12 h-12 bg-amber-100 dark:bg-amber-900 rounded-full">
+                                            <StarIcon className="w-7 h-7 text-amber-500 dark:text-amber-400" />
+                                        </div>
+                                        <span className="mt-2 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Приоритет 1</span>
+                                    </div>
+                                    <div className="flex-grow">
+                                        <h4 className="font-bold text-lg text-gray-900 dark:text-slate-100 mt-0">Клиенты с активным абонементом</h4>
+                                        <p className="mt-1 text-gray-600 dark:text-slate-400 text-base">Это самая ценная группа. Чтобы поддерживать их вовлеченность, система планирует отправку ровно через 30 дней после их последнего визита, мягко напоминая о себе.</p>
+                                        <div className="mt-4 p-3 bg-gray-100 dark:bg-slate-700/50 rounded-lg">
+                                            <p className="text-sm font-semibold text-gray-700 dark:text-slate-300">Формула:</p>
+                                            <code className="block text-base text-indigo-600 dark:text-indigo-400 font-medium">Дата последнего визита + 30 дней</code>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            {/* Timeline Item 3 */}
-                            <div className="mb-8 ml-12">
-                                <div className="absolute -left-[22px] flex items-center justify-center w-10 h-10 bg-indigo-100 dark:bg-slate-700 rounded-full ring-8 ring-gray-50 dark:ring-slate-900/50">
-                                    <LifebuoyIcon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
-                                </div>
-                                <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 mt-0">Приоритет 3: Покупатели</h4>
-                                    <p className="mt-1 text-gray-600 dark:text-slate-400 text-base">Сообщение отправляется немедленно (<code>сегодня</code>), если для них находится подходящий по времени шаблон в листе «Шаблоны». Это позволяет, например, сразу отправить инструкцию после покупки сертификата.</p>
+
+                            {/* Priority 2 */}
+                            <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700 shadow-md transition-shadow hover:shadow-lg">
+                                <div className="flex items-start gap-4">
+                                     <div className="flex-shrink-0 flex flex-col items-center">
+                                        <div className="flex items-center justify-center w-12 h-12 bg-indigo-100 dark:bg-slate-700 rounded-full">
+                                            <UsersIcon className="w-7 h-7 text-indigo-500 dark:text-indigo-400" />
+                                        </div>
+                                        <span className="mt-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Приоритет 2</span>
+                                    </div>
+                                    <div className="flex-grow">
+                                        <h4 className="font-bold text-lg text-gray-900 dark:text-slate-100 mt-0">Посетители (без абонемента)</h4>
+                                        <p className="mt-1 text-gray-600 dark:text-slate-400 text-base">Для этой группы используется предиктивная модель, основанная на их поведении.</p>
+                                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700 grid sm:grid-cols-2 gap-4">
+                                            <div className="p-3 bg-gray-50 dark:bg-slate-900/50 rounded-lg">
+                                                 <h5 className="font-semibold text-gray-800 dark:text-slate-200">Для "Повторных"</h5>
+                                                 <p className="text-sm text-gray-600 dark:text-slate-400 mt-1 mb-2">Система берет их персональный <TooltipTerm definition={glossary.minInterval}>minInterval</TooltipTerm> и предлагает вернуться за 3 дня до его истечения, работая на опережение.</p>
+                                                 <code className="block text-sm text-indigo-600 dark:text-indigo-400 font-medium">Дата посл. визита + minInterval - 3 дня</code>
+                                            </div>
+                                            <div className="p-3 bg-gray-50 dark:bg-slate-900/50 rounded-lg">
+                                                <h5 className="font-semibold text-gray-800 dark:text-slate-200">Для "Разовых"</h5>
+                                                <p className="text-sm text-gray-600 dark:text-slate-400 mt-1 mb-2">Так как персональной истории нет, используется общий <TooltipTerm definition={glossary.avgInterval}>avgInterval</TooltipTerm> по всей базе.</p>
+                                                <code className="block text-sm text-indigo-600 dark:text-indigo-400 font-medium">Дата визита + avgInterval - 3 дня</code>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                             {/* Timeline Item 4 */}
-                            <div className="ml-12">
-                                <div className="absolute -left-[22px] flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-slate-700 rounded-full ring-8 ring-gray-50 dark:ring-slate-900/50">
-                                    <ExclamationTriangleIcon className="w-6 h-6 text-gray-500 dark:text-slate-400" />
+
+                            {/* Priority 3 */}
+                            <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700 shadow-md transition-shadow hover:shadow-lg">
+                                <div className="flex items-start gap-4">
+                                     <div className="flex-shrink-0 flex flex-col items-center">
+                                        <div className="flex items-center justify-center w-12 h-12 bg-indigo-100 dark:bg-slate-700 rounded-full">
+                                            <LifebuoyIcon className="w-7 h-7 text-indigo-500 dark:text-indigo-400" />
+                                        </div>
+                                         <span className="mt-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Приоритет 3</span>
+                                    </div>
+                                    <div className="flex-grow">
+                                        <h4 className="font-bold text-lg text-gray-900 dark:text-slate-100 mt-0">Покупатели</h4>
+                                        <p className="mt-1 text-gray-600 dark:text-slate-400 text-base">Сообщение отправляется немедленно (<code className="text-sm">сегодня</code>), если для них находится подходящий по времени шаблон в листе «Шаблоны». Это позволяет, например, сразу отправить инструкцию после покупки сертификата.</p>
+                                    </div>
                                 </div>
-                                <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 mt-0">Исключения (не отправлять)</h4>
-                                     <ul className="list-disc list-inside space-y-1 mt-2 text-sm text-gray-600 dark:text-slate-400">
-                                        <li>Если с клиентом уже общались менее 14 дней назад (чтобы избежать спама).</li>
-                                        <li>Если тип клиента — <TooltipTerm definition={glossary.lead}>"Лид"</TooltipTerm> или "Неизвестно".</li>
-                                    </ul>
+                            </div>
+
+                            {/* Exclusions */}
+                            <div className="bg-red-50 dark:bg-red-900/30 rounded-xl p-6 border border-red-200 dark:border-red-800/50 shadow-md">
+                                 <div className="flex items-start gap-4">
+                                    <div className="flex-shrink-0 flex flex-col items-center">
+                                        <div className="flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/50 rounded-full">
+                                            <ExclamationTriangleIcon className="w-7 h-7 text-red-500 dark:text-red-400" />
+                                        </div>
+                                    </div>
+                                    <div className="flex-grow">
+                                        <h4 className="font-bold text-lg text-red-800 dark:text-red-300 mt-0">Исключения (не отправлять)</h4>
+                                        <ul className="list-disc list-inside space-y-2 mt-2 text-base text-red-700 dark:text-red-300">
+                                            <li>Если с клиентом уже общались менее 14 дней назад (чтобы избежать спама).</li>
+                                            <li>Если тип клиента — <TooltipTerm definition={glossary.lead}>"Лид"</TooltipTerm> или "Неизвестно".</li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -618,8 +875,8 @@ const ClientSegmentationDocPage: React.FC = () => {
                 </div>
             </section>
         </div>
-    </DocPageLayout>
+    </DocumentationPageLayout>
     );
 };
 
-export default ClientSegmentationDocPage;
+export default ClientSegmentationDocumentationPage;

@@ -1,14 +1,11 @@
-
-
-
 import React from 'react';
-import DocPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CodeBlockWithCopy } from '../components/DocumentationUIComponents';
+import DocumentationPageLayout from '../components/DocPageLayout';
+import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm } from '../components/DocumentationUIComponents';
 import { CubeTransparentIcon, CodeBracketIcon, BoltIcon,CommandLineIcon, QuestionMarkCircleIcon, TableCellsIcon, DocumentTextIcon, ArchiveBoxIcon, ExclamationTriangleIcon, PlayIcon } from '@heroicons/react/24/outline';
 
-const InterfaceGenDocPage: React.FC = () => {
+const InterfaceGeneratorDocumentationPage: React.FC = () => {
   return (
-    <DocPageLayout title="AI-генератор UI">
+    <DocumentationPageLayout title="AI-генератор UI">
         <div className="space-y-12">
             
             <section id="s1">
@@ -18,14 +15,14 @@ const InterfaceGenDocPage: React.FC = () => {
                     subtitle="Промт‑система, которая по текстовому запросу автоматически генерирует код."
                 />
                 <p>
-                    Система автоматически выбирает и выполняет один из трёх режимов генерации на основе вашего запроса:
+                    <TooltipTerm definition="Автоматизированная система, которая принимает текстовый запрос (промт) и на его основе выполняет определенную задачу, в данном случае — генерацию кода.">Промт‑система</TooltipTerm> автоматически выбирает и выполняет один из трёх режимов генерации на основе вашего запроса:
                 </p>
                 <div className="flex flex-wrap gap-3 mt-4 not-prose">
-                    <span className="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">CSS</span>
-                    <span className="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">HTML + vanilla JS</span>
-                    <span className="bg-yellow-100 text-yellow-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">JSON с системными кодами</span>
+                    <span className="bg-blue-100 text-blue-800 text-base font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"><TooltipTerm definition="Каскадные таблицы стилей — это язык, используемый для описания внешнего вида документа, написанного на языке разметки, таком как HTML.">CSS</TooltipTerm></span>
+                    <span className="bg-green-100 text-green-800 text-base font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300"><TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm> + vanilla JS</span>
+                    <span className="bg-yellow-100 text-yellow-800 text-base font-medium me-2 px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300"><TooltipTerm definition="Текстовый формат обмена данными, основанный на синтаксисе JavaScript. Он легко читается людьми и легко парсится машинами.">JSON</TooltipTerm> с системными кодами</span>
                 </div>
-                 <p className="text-sm text-gray-500 dark:text-slate-400 mt-4">
+                 <p className="text-base text-gray-500 dark:text-slate-400 mt-4">
                     «vanilla JS» — чистый JavaScript без библиотек. Решение о режиме принимает промт‑роутер на основе текста запроса и (при наличии) полей <code>module</code>, <code>template</code>, <code>filename</code>.
                  </p>
             </section>
@@ -44,13 +41,13 @@ const InterfaceGenDocPage: React.FC = () => {
                         <p>Очищает упоминания путей/файлов, внешние ссылки и нормализует финальный ответ.</p>
                     </InfoCard>
                      <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="CSS‑режим (/des/cssOnlyHandler.md)">
-                        <p>Возвращает только CSS. При неясном селекторе допускается один уточняющий вопрос.</p>
+                        <p>Возвращает только <TooltipTerm definition="Каскадные таблицы стилей — это язык, используемый для описания внешнего вида документа, написанного на языке разметки, таком как HTML.">CSS</TooltipTerm>. При неясном селекторе допускается один уточняющий вопрос.</p>
                     </InfoCard>
                      <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="HTML + JS (/des/generateHTMLJS.md)">
-                        <p>Генерирует HTML‑фрагмент/страницу и скрипт на чистом JS. Серверная логика не генерируется; помечается <code>// TODO</code>.</p>
+                        <p>Генерирует <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm>‑фрагмент/страницу и скрипт на чистом JS. Серверная логика не генерируется; помечается <code>// TODO</code>.</p>
                     </InfoCard>
                      <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="Парсер кодов (/des/system_code_parser.md)">
-                        <p>По фильтрам <code>module</code>/<code>template</code>/<code>filename</code> извлекает токены вида <code>$CODE$</code> из корпуса и возвращает строгий JSON.</p>
+                        <p>По фильтрам <code>module</code>/<code>template</code>/<code>filename</code> извлекает токены вида <code>$CODE$</code> из корпуса и возвращает строгий <TooltipTerm definition="Текстовый формат обмена данными, основанный на синтаксисе JavaScript. Он легко читается людьми и легко парсится машинами.">JSON</TooltipTerm>.</p>
                     </InfoCard>
                      <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="Корпус контекста (/des/parser/context/V01…V08)">
                         <p>Набор строк единого формата: <code>&lt;Module&gt;|&lt;Template&gt;|&lt;$SYSTEM_CODE$&gt;|&lt;Description&gt;;;</code></p>
@@ -65,7 +62,7 @@ const InterfaceGenDocPage: React.FC = () => {
                     subtitle="Выбор режима в зависимости от задачи."
                 />
                 <div className="overflow-x-auto not-prose">
-                    <table className="w-full text-sm text-left text-gray-500 dark:text-slate-400">
+                    <table className="w-full text-base text-left text-gray-500 dark:text-slate-400">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-slate-400">
                             <tr>
                                 <th scope="col" className="px-6 py-3">Задача</th>
@@ -75,19 +72,19 @@ const InterfaceGenDocPage: React.FC = () => {
                         </thead>
                         <tbody>
                             <tr className="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
-                                <td className="px-6 py-4">Стилизация элементов (без изменения HTML)</td>
-                                <td className="px-6 py-4">Свободный текст, при необходимости — селектор/область</td>
-                                <td className="px-6 py-4">Чистый <strong>CSS</strong> или один уточняющий вопрос</td>
+                                <td className="px-6 py-4">Стилизация элементов (без изменения <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm>)</td>
+                                <td className="px-6 py-4">Свободный текст, при необходимости — <TooltipTerm definition="В CSS селектор — это шаблон для выбора HTML-элементов, к которым будут применены стили. Например, `.product-card`.">селектор</TooltipTerm>/область</td>
+                                <td className="px-6 py-4">Чистый <strong><TooltipTerm definition="Каскадные таблицы стилей — это язык, используемый для описания внешнего вида документа, написанного на языке разметки, таком как HTML.">CSS</TooltipTerm></strong> или один уточняющий вопрос</td>
                             </tr>
                             <tr className="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
                                 <td className="px-6 py-4">Интерфейс и поведение на клиенте</td>
                                 <td className="px-6 py-4">Свободный текст с описанием блока/страницы</td>
-                                <td className="px-6 py-4"><strong>HTML</strong> + <strong>&lt;script&gt;</strong> (vanilla JS)</td>
+                                <td className="px-6 py-4"><strong><TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm></strong> + <strong>&lt;script&gt;</strong> (<TooltipTerm definition="Чистый JavaScript без каких-либо внешних библиотек или фреймворков.">vanilla JS</TooltipTerm>)</td>
                             </tr>
                             <tr className="bg-white dark:bg-slate-800">
                                 <td className="px-6 py-4">Нужны коды для шаблона</td>
-                                <td className="px-6 py-4">JSON с <code>module</code>, <code>template</code>, (опц.) <code>filename</code>, (опц.) <code>question</code></td>
-                                <td className="px-6 py-4"><strong>JSON</strong> с ключами <code>system_codes</code> и <code>descriptions</code></td>
+                                <td className="px-6 py-4"><TooltipTerm definition="Текстовый формат обмена данными, основанный на синтаксисе JavaScript. Он легко читается людьми и легко парсится машинами.">JSON</TooltipTerm> с <code>module</code>, <code>template</code>, (опц.) <code>filename</code>, (опц.) <code>question</code></td>
+                                <td className="px-6 py-4"><strong><TooltipTerm definition="Текстовый формат обмена данными, основанный на синтаксисе JavaScript. Он легко читается людьми и легко парсится машинами.">JSON</TooltipTerm></strong> с ключами <code><TooltipTerm definition="Массив строк, содержащий системные коды, например, '$GLOBAL_PROMO$'.">system_codes</TooltipTerm></code> и <code>descriptions</code></td>
                             </tr>
                         </tbody>
                     </table>
@@ -104,7 +101,7 @@ const InterfaceGenDocPage: React.FC = () => {
                     <div>
                         <h3 className="text-xl font-semibold mb-2">Входные поля</h3>
                          <div className="overflow-x-auto not-prose">
-                            <table className="w-full text-sm text-left text-gray-500 dark:text-slate-400">
+                            <table className="w-full text-base text-left text-gray-500 dark:text-slate-400">
                                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-slate-400">
                                     <tr>
                                         <th scope="col" className="px-6 py-3">Поле</th>
@@ -145,7 +142,7 @@ const InterfaceGenDocPage: React.FC = () => {
                      <div>
                         <h3 className="text-xl font-semibold mb-2">Выходные форматы</h3>
                         <div className="overflow-x-auto not-prose">
-                           <table className="w-full text-sm text-left text-gray-500 dark:text-slate-400">
+                           <table className="w-full text-base text-left text-gray-500 dark:text-slate-400">
                                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-slate-400">
                                     <tr>
                                         <th scope="col" className="px-6 py-3">Режим</th>
@@ -155,12 +152,12 @@ const InterfaceGenDocPage: React.FC = () => {
                                 </thead>
                                 <tbody>
                                     <tr className="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
-                                        <td className="px-6 py-4">CSS</td>
+                                        <td className="px-6 py-4"><TooltipTerm definition="Каскадные таблицы стилей — это язык, используемый для описания внешнего вида документа, написанного на языке разметки, таком как HTML.">CSS</TooltipTerm></td>
                                         <td className="px-6 py-4"><code>text/css</code></td>
-                                        <td className="px-6 py-4">Готовые правила без изменения HTML.</td>
+                                        <td className="px-6 py-4">Готовые правила без изменения <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm>.</td>
                                     </tr>
                                     <tr className="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
-                                        <td className="px-6 py-4">HTML + JS</td>
+                                        <td className="px-6 py-4"><TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm> + JS</td>
                                         <td className="px-6 py-4">HTML + <code>&lt;script&gt;</code></td>
                                         <td className="px-6 py-4">Разметка и поведение на клиенте (чистый JS).</td>
                                     </tr>
@@ -183,7 +180,7 @@ const InterfaceGenDocPage: React.FC = () => {
                     subtitle="Практические примеры для каждого режима."
                 />
                 <div className="space-y-6">
-                    <CodeBlockWithCopy title="Пример для CSS" code={`Вход: "У карточек товара сделать скругление 12px и жирную цену"
+                    <CodeBlockWithCopy title="Пример для CSS" code={`Вход: "У карточек товара (селектор .product-card) сделать скругление 12px и жирную цену"
 Выход (CSS):
 .product-card {
   border-radius: 12px;
@@ -223,7 +220,7 @@ const InterfaceGenDocPage: React.FC = () => {
                 />
                  <ol className="list-decimal list-inside space-y-2 text-base">
                     <li><strong>Роутер</strong> читает текст и (если есть) поля <code>module</code>/<code>template</code>/<code>filename</code>.</li>
-                    <li>Определяет режим: <em>CSS</em>, <em>HTML + JS</em> или <em>Системные коды</em>.</li>
+                    <li>Определяет режим: <em><TooltipTerm definition="Каскадные таблицы стилей — это язык, используемый для описания внешнего вида документа, написанного на языке разметки, таком как HTML.">CSS</TooltipTerm></em>, <em><TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm> + JS</em> или <em>Системные коды</em>.</li>
                     <li>Передаёт управление соответствующему модулю промта.</li>
                     <li><strong>Пост‑обработка</strong> очищает служебные следы и нормализует ответ.</li>
                 </ol>
@@ -259,7 +256,7 @@ const InterfaceGenDocPage: React.FC = () => {
                 />
                 <ul className="list-disc list-inside space-y-2">
                     <li>Серверный код не генерируется; такие места помечаются <code>// TODO</code>.</li>
-                    <li>В CSS‑режиме HTML не изменяется; допускается один уточняющий вопрос.</li>
+                    <li>В <TooltipTerm definition="Каскадные таблицы стилей — это язык, используемый для описания внешнего вида документа, написанного на языке разметки, таком как HTML.">CSS</TooltipTerm>‑режиме <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm> не изменяется; допускается один уточняющий вопрос.</li>
                     <li>Спецификация парсера присутствует в двух местах: <code>/des/system_code_parser.md</code> и <code>/des/parser/system_code_parser.md</code>.</li>
                 </ul>
             </section>
@@ -271,7 +268,7 @@ const InterfaceGenDocPage: React.FC = () => {
                     subtitle="Карта расположения файлов проекта."
                 />
                  <div className="overflow-x-auto not-prose">
-                    <table className="w-full text-sm text-left text-gray-500 dark:text-slate-400">
+                    <table className="w-full text-base text-left text-gray-500 dark:text-slate-400">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-slate-400">
                             <tr>
                                 <th scope="col" className="px-6 py-3">Путь</th>
@@ -289,11 +286,11 @@ const InterfaceGenDocPage: React.FC = () => {
                             </tr>
                             <tr className="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
                                 <td className="px-6 py-4"><code>/des/cssOnlyHandler.md</code></td>
-                                <td className="px-6 py-4">Правила генерации CSS.</td>
+                                <td className="px-6 py-4">Правила генерации <TooltipTerm definition="Каскадные таблицы стилей — это язык, используемый для описания внешнего вида документа, написанного на языке разметки, таком как HTML.">CSS</TooltipTerm>.</td>
                             </tr>
                             <tr className="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
                                 <td className="px-6 py-4"><code>/des/generateHTMLJS.md</code></td>
-                                <td className="px-6 py-4">Правила генерации HTML и JS.</td>
+                                <td className="px-6 py-4">Правила генерации <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm> и JS.</td>
                             </tr>
                              <tr className="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
                                 <td className="px-6 py-4"><code>/des/system_code_parser.md</code></td>
@@ -317,8 +314,8 @@ const InterfaceGenDocPage: React.FC = () => {
             </section>
 
         </div>
-    </DocPageLayout>
+    </DocumentationPageLayout>
   );
 };
 
-export default InterfaceGenDocPage;
+export default InterfaceGeneratorDocumentationPage;

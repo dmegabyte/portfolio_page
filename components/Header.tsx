@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon, SunIcon, MoonIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline';
@@ -108,7 +107,7 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <NavLink to="/" className="text-white font-bold text-xl">
-              Портфолио
+              Мои проекты
             </NavLink>
           </div>
           
@@ -131,7 +130,7 @@ const Header: React.FC = () => {
                 <div className="hidden md:block">
                   <div className="ml-4 flex items-baseline space-x-4">
                     <NavLink to="/" className={navLinkClasses}>
-                      Проекты
+                      Главная
                     </NavLink>
                     <NavLink to="/about" className={navLinkClasses}>
                       Обо мне
@@ -147,7 +146,7 @@ const Header: React.FC = () => {
                     type="button"
                     className="bg-slate-800 dark:bg-slate-900 inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white"
                     aria-controls="mobile-menu"
-                    aria-expanded="false"
+                    aria-expanded={isOpen}
                   >
                     <span className="sr-only">Open main menu</span>
                     {isOpen ? (
@@ -163,21 +162,26 @@ const Header: React.FC = () => {
         </div>
       </nav>
 
-      {isOpen && !isProjectOrDocPage && (
-        <div className="md:hidden" id="mobile-menu" aria-label="Мобильное меню">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <NavLink to="/" className={({ isActive }) => `${navLinkClasses({isActive})} block`} onClick={() => setIsOpen(false)}>
-              Проекты
-            </NavLink>
-            <NavLink to="/about" className={({ isActive }) => `${navLinkClasses({isActive})} block`} onClick={() => setIsOpen(false)}>
-              Обо мне
-            </NavLink>
-            <NavLink to="/contact" className={({ isActive }) => `${navLinkClasses({isActive})} block`} onClick={() => setIsOpen(false)}>
-              Контакты
-            </NavLink>
-          </div>
+      <div
+        className={`
+          md:hidden overflow-hidden transition-all duration-300 ease-in-out
+          ${isOpen && !isProjectOrDocPage ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}
+        `}
+        id="mobile-menu"
+        aria-label="Мобильное меню"
+      >
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <NavLink to="/" className={({ isActive }) => `${navLinkClasses({isActive})} block`} onClick={() => setIsOpen(false)}>
+            Главная
+          </NavLink>
+          <NavLink to="/about" className={({ isActive }) => `${navLinkClasses({isActive})} block`} onClick={() => setIsOpen(false)}>
+            Обо мне
+          </NavLink>
+          <NavLink to="/contact" className={({ isActive }) => `${navLinkClasses({isActive})} block`} onClick={() => setIsOpen(false)}>
+            Контакты
+          </NavLink>
         </div>
-      )}
+      </div>
     </header>
   );
 };

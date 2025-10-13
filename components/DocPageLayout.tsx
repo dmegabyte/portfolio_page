@@ -1,12 +1,12 @@
-import React, { ReactNode, useEffect, useState, useRef } from 'react';
-import ScrollToTopButton from './ScrollToTopButton';
 
-interface DocPageLayoutProps {
+import React, { ReactNode, useEffect, useState, useRef } from 'react';
+
+interface DocumentationPageLayoutProps {
     children: ReactNode;
     title: string;
 }
 
-const DocPageLayout: React.FC<DocPageLayoutProps> = ({ children, title }) => {
+const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ children, title }) => {
     const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
     const [activeId, setActiveId] = useState<string>('');
     const contentRef = useRef<HTMLDivElement>(null);
@@ -41,10 +41,11 @@ const DocPageLayout: React.FC<DocPageLayoutProps> = ({ children, title }) => {
         // 1. Scan for headings and populate the TOC state
         const headingElements = Array.from(contentRef.current.querySelectorAll('section[id]')) as HTMLElement[];
         const mappedHeadings = headingElements.map(h => {
-            const h2 = h.querySelector('h2');
-            const textContent = h2?.textContent || h.id.replace(/-/g, ' ');
-            // Establish hierarchy based on title content
-            const level = textContent.startsWith('БЛОК') || textContent.match(/^\d+\./) ? 3 : 2;
+            const headingEl = h.querySelector('h2, h3, h4, h5, h6'); // Find the first heading element regardless of its level.
+            const textContent = headingEl?.textContent || h.id.replace(/-/g, ' ');
+            // To ensure a flat TOC structure, all sections are treated as top-level items.
+            // This meets the requirement to have all primary sections appear at the same level.
+            const level = 2;
             return {
                 id: h.id,
                 text: textContent,
@@ -118,51 +119,48 @@ const DocPageLayout: React.FC<DocPageLayoutProps> = ({ children, title }) => {
             <div className="lg:flex">
                  {/* Sidebar */}
                 <aside className="hidden lg:block w-72 flex-shrink-0 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
-                    <div className="flex flex-col h-full">
-                        <nav aria-labelledby="document-navigation" className="flex-grow">
-                            <h2 id="document-navigation" className="font-bold text-gray-800 dark:text-slate-200 mb-4 text-lg">Оглавление</h2>
-                            <ul className="space-y-1">
-                                {headings.map((heading) => {
-                                    const isActive = activeId === heading.id;
-                                    const isSubheading = heading.level > 2;
-                                    
-                                    const linkClasses = `
-                                        block w-full text-left transition-colors duration-200
-                                        border-l-2 py-1.5 pr-3
-                                        ${isSubheading ? 'pl-7' : 'pl-3 font-semibold'}
-                                        ${isActive
-                                            ? 'text-slate-900 dark:text-slate-50 font-bold border-indigo-500 dark:border-indigo-400'
-                                            : 'text-gray-600 dark:text-slate-400 border-transparent hover:text-gray-900 dark:hover:text-slate-100 hover:border-gray-300 dark:hover:border-slate-600'
-                                        }
-                                    `;
+                    <nav aria-labelledby="document-navigation">
+                        <h2 id="document-navigation" className="font-bold text-slate-900 dark:text-slate-200 mb-4 text-lg">Оглавление</h2>
+                        <ul className="space-y-1">
+                            {headings.map((heading) => {
+                                const isActive = activeId === heading.id;
+                                const isSubheading = heading.level > 2;
+                                
+                                const linkClasses = `
+                                    block w-full text-left transition-colors duration-200
+                                    border-l-2 py-1.5 pr-3
+                                    ${isSubheading ? 'pl-7' : 'pl-3 font-semibold'}
+                                    ${isActive
+                                        ? 'text-slate-900 dark:text-slate-200 font-bold border-indigo-500 dark:border-indigo-400'
+                                        : 'text-gray-600 dark:text-slate-400 border-transparent hover:text-gray-900 dark:hover:text-slate-100 hover:border-gray-300 dark:hover:border-slate-600'
+                                    }
+                                `;
 
-                                    return (
-                                        <li key={heading.id}>
-                                            <a
-                                                href={`#${heading.id}`}
-                                                onClick={(e) => handleTocLinkClick(e, heading.id)}
-                                                className={linkClasses.trim().replace(/\s+/g, ' ')}
-                                                aria-current={isActive ? 'page' : undefined}
-                                            >
-                                                {heading.text}
-                                            </a>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </nav>
-                        <ScrollToTopButton />
-                    </div>
+                                return (
+                                    <li key={heading.id}>
+                                        <a
+                                            href={`#${heading.id}`}
+                                            onClick={(e) => handleTocLinkClick(e, heading.id)}
+                                            className={linkClasses.trim().replace(/\s+/g, ' ')}
+                                            aria-current={isActive ? 'page' : undefined}
+                                        >
+                                            {heading.text}
+                                        </a>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </nav>
                 </aside>
 
                  {/* Main Content */}
                 <div className="flex-grow p-6 sm:p-8 lg:p-12 min-w-0">
                     <header className="mb-12 not-prose">
-                        <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-slate-50 leading-tight">
+                        <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-slate-200 leading-tight">
                             {title}
                         </h1>
                     </header>
-                    <article ref={contentRef} className="prose prose-lg max-w-none text-gray-700 dark:text-slate-300 dark:prose-headings:text-slate-100 dark:prose-strong:text-slate-100 dark:prose-a:text-indigo-600 dark:prose-a:hover:text-indigo-500 dark:prose-invert">
+                    <article ref={contentRef} className="prose prose-lg max-w-none text-gray-700 dark:text-slate-300 dark:prose-headings:text-slate-200 dark:prose-strong:text-slate-200 dark:prose-a:text-indigo-600 dark:prose-a:hover:text-indigo-500 dark:prose-invert">
                         {children}
                     </article>
                 </div>
@@ -171,4 +169,4 @@ const DocPageLayout: React.FC<DocPageLayoutProps> = ({ children, title }) => {
     );
 };
 
-export default DocPageLayout;
+export default DocumentationPageLayout;
