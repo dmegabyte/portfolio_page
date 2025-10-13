@@ -148,38 +148,6 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                         <li><b>Гибкость:</b> Поддерживает как простые текстовые запросы на естественном языке, так и структурированные JSON-запросы для извлечения данных.</li>
                     </ul>
                 </InfoCard>
-                 <div className="mt-12">
-                    <SectionHeader 
-                        icon={<WrenchScrewdriverIcon className="w-8 h-8" />}
-                        title="Проблема и Решение"
-                        subtitle="Как AI-генератор решает повседневные задачи разработчика."
-                    />
-                    <div className="grid md:grid-cols-2 gap-8 items-start not-prose">
-                        {/* Before Card */}
-                        <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 h-full">
-                            <h4 className="text-xl font-bold text-slate-800 dark:text-slate-200">До: Ручной процесс</h4>
-                            <p className="mt-2 text-base text-gray-600 dark:text-slate-400">Разработчик тратит значительное время на повторяющиеся задачи, которые отвлекают от основной бизнес-логики.</p>
-                            <ul className="list-decimal list-inside space-y-2 mt-4 text-base text-gray-700 dark:text-slate-300">
-                                <li>Написание стандартной HTML-разметки для компонентов (карточки, кнопки, формы).</li>
-                                <li>Ручной подбор и применение десятков CSS-классов для стилизации.</li>
-                                <li>Создание boilerplate-кода на JavaScript для базовой интерактивности (например, аккордеоны, табы).</li>
-                                <li>Многократная отладка и мелкие правки для достижения нужного вида и поведения.</li>
-                            </ul>
-                        </div>
-                        
-                        {/* After Card */}
-                        <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-6 border border-green-300 dark:border-green-700 h-full">
-                            <h4 className="text-xl font-bold text-slate-800 dark:text-slate-200">После: Делегирование AI-ассистенту</h4>
-                            <p className="mt-2 text-base text-gray-600 dark:text-slate-400">AI-генератор берет на себя рутину, позволяя разработчику сфокусироваться на высокоуровневых задачах.</p>
-                             <ul className="list-decimal list-inside space-y-2 mt-4 text-base text-gray-700 dark:text-slate-300">
-                                <li>Описание желаемого результата на естественном, человеческом языке.</li>
-                                <li>Мгновенное получение готового, чистого и рабочего фрагмента кода.</li>
-                                <li>Фокус смещается на архитектуру, интеграцию и сложную бизнес-логику.</li>
-                                <li>Процесс прототипирования и создания UI ускоряется в несколько раз.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
             </section>
             
             <section id="problem-solution">
@@ -314,46 +282,113 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                     </div>
                 </div>
             </section>
-
-             <section id="modes">
+            
+            <section id="modes">
                 <SectionHeader 
                     icon={<QuestionMarkCircleIcon className="w-8 h-8" />}
                     title="5. Детальное руководство по режимам работы"
                     subtitle="Какой режим выбрать для вашей задачи, как правильно составить запрос и какие результаты ожидать."
                 />
-                <div className="space-y-8">
-                    <div>
-                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Режим 1: Стилизация (CSS)</h3>
-                        <p className="mt-2 text-base">Используйте этот режим, когда вам нужно изменить внешний вид существующего элемента, не меняя его HTML-структуру.</p>
-                        <h4 className="font-semibold text-lg mt-4">Лучшие практики для запросов:</h4>
+
+                <div className="not-prose overflow-x-auto my-6">
+                    <table className="w-full text-left border-collapse">
+                        <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
+                            <tr>
+                                <th className="p-4 border border-gray-200 dark:border-slate-700">Тип задачи</th>
+                                <th className="p-4 border border-gray-200 dark:border-slate-700">Рекомендуемый режим</th>
+                                <th className="p-4 border border-gray-200 dark:border-slate-700">Ответственный промт</th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
+                            <tr className="border-b dark:border-slate-700">
+                                <td className="p-4 border-x border-gray-200 dark:border-slate-700">Изменить внешний вид существующего элемента (цвет, тень, размер).</td>
+                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-semibold text-sky-700 dark:text-sky-400">Стилизация (CSS)</td>
+                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-mono">cssOnlyHandler</td>
+                            </tr>
+                            <tr className="border-b dark:border-slate-700">
+                                <td className="p-4 border-x border-gray-200 dark:border-slate-700">Создать новый компонент, блок или интерактивный элемент.</td>
+                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-semibold text-emerald-700 dark:text-emerald-400">Создание интерфейса (HTML + JS)</td>
+                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-mono">generateHTMLJS</td>
+                            </tr>
+                             <tr className="border-b dark:border-slate-700">
+                                <td className="p-4 border-x border-gray-200 dark:border-slate-700">Получить данные или системные коды из внутренней базы знаний.</td>
+                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-semibold text-amber-700 dark:text-amber-400">Извлечение данных (JSON)</td>
+                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-mono">system_code_parser</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div className="space-y-12">
+                    {/* Mode 1: CSS */}
+                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 1: Стилизация (CSS)</h3>
+                        <p className="mt-2 text-base"><b>Что это?</b> Используйте этот режим, когда вам нужно изменить внешний вид существующего элемента, не меняя его HTML-структуру.</p>
+                        <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `cssOnlyHandler`</i></p>
+
+                        <h4 className="font-bold text-lg mt-6 mb-2">Как это работает?</h4>
+                        <ol className="list-decimal list-inside space-y-1 text-base">
+                           <li>Анализирует ваш запрос, чтобы найти CSS-селектор (например, `.card` или `#header`).</li>
+                           <li>Определяет, какие CSS-свойства нужно изменить.</li>
+                           <li>Генерирует чистый CSS-код.</li>
+                        </ol>
+
+                        <h4 className="font-bold text-lg mt-6 mb-2">Лучшие практики для запросов</h4>
                         <ul className="list-disc list-inside space-y-1 mt-2 text-base">
-                            <li><strong>Всегда указывайте селектор:</strong> Четко определите, к какому элементу применяются стили (например, `.btn-primary`, `#header nav`, `div.card > h2`).</li>
-                            <li><strong>Будьте конкретны:</strong> Вместо "сделай кнопку красивой" используйте "сделай кнопку синей (#3b82f6) с белым текстом и скруглением 8px".</li>
-                            <li><strong>Описывайте состояния:</strong> Не забывайте про состояния `:hover`, `:focus` для интерактивных элементов.</li>
+                            <li><b>Всегда указывайте селектор:</b> Четко определите, к какому элементу применяются стили (`.btn-primary`, `#header nav`, `div.card > h2`).</li>
+                            <li><b>Будьте конкретны:</b> Вместо "сделай кнопку красивой" используйте "сделай кнопку синей (#3b82f6) с белым текстом и скруглением 8px".</li>
+                            <li><b>Описывайте состояния:</b> Не забывайте про состояния `:hover`, `:focus` для интерактивных элементов.</li>
                         </ul>
-                        <CodeBlockWithCopy title="Пример для CSS-режима" code={`Вход: "Для ссылок в футере (footer a) убери подчеркивание, а при наведении делай его синим."
-Выход (CSS):
+                        
+                        <h4 className="font-bold text-lg mt-6 mb-2">Ограничения</h4>
+                        <p className="text-base">Этот режим **не изменяет** HTML-структуру. Он может только добавлять или изменять CSS-правила.</p>
+
+                        <CollapsibleSection title="Показать пример ввода/вывода для CSS-режима">
+                            <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС:
+// "Для ссылок в футере (footer a) убери подчеркивание, а при наведении делай его синим."
+
+// РЕЗУЛЬТАТ (чистый CSS):
 footer a {
   text-decoration: none;
   color: inherit;
   transition: color 0.2s;
 }
+
 footer a:hover {
   text-decoration: underline;
   color: #3b82f6; /* blue-500 */
 }`} />
+                        </CollapsibleSection>
                     </div>
-                     <div>
-                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Режим 2: Создание интерфейса (HTML + JS)</h3>
-                        <p className="mt-2 text-base">Основной режим для генерации новых компонентов, блоков или целых страниц.</p>
-                        <h4 className="font-semibold text-lg mt-4">Лучшие практики для запросов:</h4>
+
+                    {/* Mode 2: HTML + JS */}
+                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 2: Создание интерфейса (HTML + JS)</h3>
+                        <p className="mt-2 text-base"><b>Что это?</b> Основной режим для генерации новых компонентов, блоков или целых страниц.</p>
+                        <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `generateHTMLJS`</i></p>
+                        
+                        <h4 className="font-bold text-lg mt-6 mb-2">Как это работает?</h4>
+                        <ol className="list-decimal list-inside space-y-1 text-base">
+                           <li>Анализирует описание требуемой структуры и поведения.</li>
+                           <li>Генерирует семантически корректную HTML-разметку.</li>
+                           <li>Добавляет тег `<script>` с `vanilla JS` для реализации интерактивности.</li>
+                        </ol>
+                        
+                        <h4 className="font-bold text-lg mt-6 mb-2">Лучшие практики для запросов</h4>
                         <ul className="list-disc list-inside space-y-1 mt-2 text-base">
-                            <li><strong>Описывайте структуру:</strong> Перечисляйте элементы, которые должны быть внутри компонента ("карточка с картинкой сверху, заголовком и текстом под ней").</li>
-                            <li><strong>Описывайте интерактивность:</strong> Если требуется поведение, опишите его ("при клике на заголовок должен открываться/скрываться текст под ним").</li>
-                             <li><strong>Запрашивайте стили:</strong> Упомяните, что нужны стили (например, "используй темную тему" или "сделай карточки в виде сетки").</li>
+                            <li><b>Описывайте структуру:</b> Перечисляйте элементы, которые должны быть внутри компонента ("карточка с картинкой сверху, заголовком и текстом под ней").</li>
+                            <li><b>Описывайте интерактивность:</b> Если требуется поведение, опишите его ("при клике на заголовок должен открываться/скрываться текст под ним").</li>
+                            <li><b>Запрашивайте стили:</b> Упомяните, что нужны стили (например, "используй темную тему" или "сделай карточки в виде сетки").</li>
                         </ul>
-                        <CodeBlockWithCopy title="Пример для HTML + JS режима" code={`Вход: "Создай вкладки (tabs) 'Профиль' и 'Настройки'. При клике на вкладку должен показываться соответствующий контент."
-Выход:
+                        
+                        <h4 className="font-bold text-lg mt-6 mb-2">Ограничения</h4>
+                        <p className="text-base">Режим работает **только на стороне клиента**. Он не генерирует серверную логику (PHP, Python, Node.js). Места, где она может понадобиться, помечаются комментарием `// TODO`.</p>
+
+                        <CollapsibleSection title="Показать пример ввода/вывода для HTML + JS режима">
+                             <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС:
+// "Создай вкладки (tabs) 'Профиль' и 'Настройки'. При клике на вкладку должен показываться соответствующий контент."
+
+// РЕЗУЛЬТАТ (HTML + JS):
 <div class="tabs">
   <button class="tab-button active" data-tab="profile">Профиль</button>
   <button class="tab-button" data-tab="settings">Настройки</button>
@@ -367,26 +402,50 @@ footer a:hover {
     tab.addEventListener('click', () => { /* ... логика переключения ... */ });
   });
 <\/script>`} />
+                        </CollapsibleSection>
                     </div>
-                    <div>
-                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Режим 3: Извлечение данных (JSON)</h3>
-                        <p className="mt-2 text-base">Используется для получения информации (системных кодов и их описаний) из внутренней базы знаний.</p>
-                         <h4 className="font-semibold text-lg mt-4">Правила использования:</h4>
-                        <ul className="list-disc list-inside space-y-1 mt-2 text-base">
-                            <li><strong>Строгий формат:</strong> Запрос должен быть в формате JSON.</li>
-                            <li><strong>Обязательные поля:</strong> Необходимо передать ключи `module` и `template` для точной фильтрации.</li>
-                        </ul>
-                        <CodeBlockWithCopy title="Пример для JSON-режима (системные коды)" code={`Вход:
+                    
+                    {/* Mode 3: JSON */}
+                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 3: Извлечение данных (JSON)</h3>
+                        <p className="mt-2 text-base"><b>Что это?</b> Используется для получения информации (системных кодов и их описаний) из внутренней базы знаний.</p>
+                        <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `system_code_parser`</i></p>
+
+                        <h4 className="font-bold text-lg mt-6 mb-2">Как это работает?</h4>
+                         <ol className="list-decimal list-inside space-y-1 text-base">
+                           <li>Получает строго структурированный JSON-запрос.</li>
+                           <li>Ищет совпадения в «Корпусе контекста» на основе полей `module` и `template`.</li>
+                           <li>Возвращает JSON-объект с найденными кодами и их описаниями.</li>
+                        </ol>
+
+                        <h4 className="font-bold text-lg mt-6 mb-2">Формат ввода</h4>
+                        <p className="text-base">Запрос должен быть в строгом JSON-формате и содержать следующие поля:</p>
+                        <div className="text-sm my-2 not-prose">
+                            <ul className="list-disc list-inside bg-white dark:bg-slate-800 p-4 rounded-md border dark:border-slate-700">
+                                <li>`module` (string): Имя модуля (например, "E-commerce Store").</li>
+                                <li>`template` (string): Контекст или имя шаблона (например, "Product page").</li>
+                                <li>`question` (string): Уточняющий вопрос на естественном языке.</li>
+                                <li>`filename` (string, опционально): Имя файла для трассировки.</li>
+                            </ul>
+                        </div>
+                        
+                        <h4 className="font-bold text-lg mt-6 mb-2">Ограничения</h4>
+                        <p className="text-base">Система возвращает **не более 3** наиболее релевантных системных кодов за один запрос.</p>
+
+                        <CollapsibleSection title="Показать пример ввода/вывода для JSON-режима">
+                            <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС (в виде JSON):
 {
   "module": "E-commerce Store",
   "template": "Product page",
   "question": "Нужны глобальные блоки"
 }
-Выход:
+
+// РЕЗУЛЬТАТ (в виде JSON):
 {
   "system_codes": ["$GLOBAL_PROMO$", "$GLOBAL_FAQ$"],
   "descriptions": ["Глобальный промо-блок", "Глобальный блок FAQ"]
 }`} />
+                        </CollapsibleSection>
                     </div>
                 </div>
             </section>
@@ -398,8 +457,9 @@ footer a:hover {
                     subtitle="Как система ведет себя в нестандартных ситуациях."
                 />
                  <div className="space-y-4">
-                    <InfoCard icon={<QuestionMarkCircleIcon className="w-6 h-6"/>} title="Неоднозначные запросы">
-                        <p>Если запрос недостаточно конкретен, особенно в CSS-режиме (например, "измени цвет кнопки" без указания селектора), система может вернуть уточняющий вопрос. <strong>Пример:</strong> «Не удалось определить, к какой кнопке применить стили. Пожалуйста, укажите CSS-селектор (например, `.btn-submit` или `#main-button`).» Это предотвращает генерацию бесполезного или неверного кода.</p>
+                    <InfoCard icon={<QuestionMarkCircleIcon className="w-6 h-6"/>} title="Неоднозначные запросы (Fallback-поведение)">
+                        <p>Если запрос недостаточно конкретен, особенно в CSS-режиме (например, "измени цвет кнопки" без указания селектора), система не будет "додумывать" и вернет уточняющий вопрос. Это поведение обеспечивается промтом `askUserIntent`.</p>
+                        <p className="mt-2"><strong>Пример ответа системы:</strong> «Не удалось определить, к какой кнопке применить стили. Пожалуйста, укажите CSS-селектор (например, `.btn-submit` или `#main-button`).»</p>
                     </InfoCard>
                     <InfoCard icon={<ExclamationTriangleIcon className="w-6 h-6"/>} title="Некорректные запросы">
                         <p>Если запрос совершенно не связан с генерацией кода или является бессмысленным набором символов, система вернет стандартный ответ об ошибке, указывая на невозможность обработки. Она не будет пытаться "угадать" намерение пользователя, чтобы избежать непредсказуемых результатов.</p>
