@@ -14,6 +14,7 @@ import GptAssistantDocumentationPage from './pages/GptAssistantDocPage';
 import BotAutoTestDocumentationPage from './pages/BotAutoTestDocPage';
 import EmailSafetyPipelineDocumentationPage from './pages/EmailSafetyPipelineDocPage';
 import ScrollToTopButton from './components/ScrollToTopButton';
+import DocUIComponentsPage from './pages/DocUIComponentsPage';
 
 const App: React.FC = () => {
   const mainContentRef = useRef<HTMLElement>(null);
@@ -36,6 +37,7 @@ const App: React.FC = () => {
             <Route path="/documentation/gpt-assistant" element={<GptAssistantDocumentationPage />} />
             <Route path="/documentation/bot-autotest" element={<BotAutoTestDocumentationPage />} />
             <Route path="/documentation/email-safety-pipeline" element={<EmailSafetyPipelineDocumentationPage />} />
+            <Route path="/documentation/ui-components" element={<DocUIComponentsPage />} />
           </Routes>
         </main>
         <Footer mainContentRef={mainContentRef} />
