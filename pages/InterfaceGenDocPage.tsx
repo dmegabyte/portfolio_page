@@ -248,86 +248,70 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                     title="4. Архитектурная философия и компоненты"
                     subtitle="Как устроена система «под капотом» и какие принципы лежат в её основе."
                 />
-                 <CollapsibleSection title="Ключевые архитектурные принципы" defaultOpen>
-                    <ul className="list-disc list-inside space-y-3 mt-4">
+                <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 not-prose mb-12">
+                    <h3 className="font-bold text-2xl text-gray-800 dark:text-slate-200 mt-0 mb-4">Ключевые архитектурные принципы</h3>
+                    <ul className="list-disc list-inside space-y-4 text-base text-gray-700 dark:text-slate-300">
                         <li><strong>Stateless (Отсутствие состояния):</strong> Каждый запрос обрабатывается независимо. Система не помнит предыдущие взаимодействия, что делает ее предсказуемой и легко масштабируемой.</li>
                         <li><strong>Фокус на клиентской части:</strong> Генератор намеренно избегает создания серверной логики (PHP, Python, Node.js). Его задача — производить код для фронтенда. Места, где требуется бэкенд-логика, явно помечаются комментарием `// TODO`, передавая ответственность разработчику.</li>
                         <li><strong>Детерминированный роутинг:</strong> Решение о выборе режима работы принимается на основе четких правил (см. компонент "Роутер"), а не случайным образом, что обеспечивает стабильность и предсказуемость результата.</li>
                     </ul>
-                </CollapsibleSection>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 not-prose mt-6">
-                    <InfoCard icon={<ArrowsRightLeftIcon className="w-6 h-6"/>} title="Роутер">
-                        <div className="space-y-3">
-                            <p>Это «мозг» или диспетчер системы. Его главная задача — проанализировать входящий запрос и направить его на обработку наиболее подходящему специализированному генератору.</p>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Принцип работы:</h4>
-                            <p>Роутер работает по строгому, детерминированному алгоритму с четкими приоритетами:</p>
-                            <ol className="list-decimal list-inside space-y-1 text-sm">
-                                <li><strong>JSON-запрос (Высший приоритет):</strong> Если запрос имеет структуру JSON и содержит обязательные ключи `module` и `template`, он немедленно направляется в «Парсер системных кодов».</li>
-                                <li><strong>CSS-запрос:</strong> Если запрос является обычным текстом и содержит комбинацию CSS-селектора (например, `.card h2`) и ключевых слов, связанных со стилями («цвет», «тень», «анимация»), он передается в «CSS-режим».</li>
-                                <li><strong>HTML+JS (По умолчанию):</strong> Если ни одно из вышеуказанных условий не выполнено, запрос по умолчанию отправляется в «HTML + JS генератор».</li>
-                            </ol>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Лучшие практики:</h4>
-                            <p>Для предсказуемого результата помогайте роутеру, формулируя запросы четко. Если нужны стили — укажите селектор, если нужны данные — используйте JSON.</p>
+                </div>
+
+                <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-8 not-prose">Компоненты системы: Пошаговый разбор</h3>
+                <div className="space-y-12 relative not-prose">
+                    {/* Vertical line for the pipeline */}
+                    <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-slate-700" aria-hidden="true"></div>
+
+                    {/* Stage 1: Router */}
+                    <div className="relative pl-20">
+                        <div className="absolute left-0 top-0 flex-shrink-0 w-16 h-16 bg-white dark:bg-slate-900 border-4 border-gray-200 dark:border-slate-700 rounded-full flex items-center justify-center">
+                             <ArrowsRightLeftIcon className="w-8 h-8 text-indigo-500 dark:text-indigo-400"/>
                         </div>
-                    </InfoCard>
-                    <InfoCard icon={<SparklesIcon className="w-6 h-6"/>} title="Пост‑обработка">
-                         <div className="space-y-3">
-                            <p>Финальный «фильтр чистоты» и гарант качества. Этот компонент отвечает за очистку и нормализацию сырого ответа от AI-модели перед тем, как он будет возвращен пользователю.</p>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Принцип работы:</h4>
-                            <p>Применяет последовательность фильтров для удаления всех посторонних артефактов:</p>
-                             <ul className="list-disc list-inside space-y-1 text-sm">
-                                <li><strong>Удаление «болтовни»:</strong> Вырезает фразы вроде «Вот ваш код:» или «Конечно, я могу помочь».</li>
-                                <li><strong>Очистка от служебной информации:</strong> Стирает любые упоминания внутренних файловых путей, которые модель могла случайно включить в ответ.</li>
-                                <li><strong>Нормализация кода:</strong> Приводит в порядок форматирование, обеспечивая единообразный и читаемый вид.</li>
-                            </ul>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Лучшие практики:</h4>
-                            <p>Не пытайтесь в промпте заставить модель быть «молчаливой». Положитесь на этот компонент, который гарантирует, что на выходе вы получите только чистый, готовый к использованию код.</p>
+                        <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm">
+                            <h4 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">Этап 1: Роутер (Диспетчер)</h4>
+                            <p className="mt-2 text-base">Это «мозг» системы. Его главная задача — проанализировать входящий запрос и направить его на обработку наиболее подходящему исполнителю. Роутер работает по строгому алгоритму с четкими приоритетами: сначала проверяет на JSON, затем на CSS-ключевые слова, и в последнюю очередь отправляет в HTML+JS.</p>
                         </div>
-                    </InfoCard>
-                     <InfoCard icon={<CodeBracketIcon className="w-6 h-6"/>} title="CSS‑режим">
-                        <div className="space-y-3">
-                            <p>Специализированный генератор, который работает как «художник по стилям». Его единственная задача — изменять внешний вид существующих элементов, не затрагивая их структуру.</p>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Принцип работы:</h4>
-                            <p>Этот режим ограничен генерацией исключительно кода <TooltipTerm definition="Каскадные таблицы стилей — это язык, используемый для описания внешнего вида документа, написанного на языке разметки, таком как HTML.">CSS</TooltipTerm>. Он не будет создавать <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm> или JavaScript.</p>
-                            <p>Если селектор в запросе пользователя указан нечетко, система не будет гадать, а задаст один уточняющий вопрос. Например: «Пожалуйста, укажите селектор для кнопки, которую нужно стилизовать».</p>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Лучшие практики:</h4>
-                             <ul className="list-disc list-inside space-y-1 text-sm">
-                                <li>Всегда указывайте точный CSS-селектор.</li>
-                                <li>Используйте его для тонкой настройки стилей, а не для создания новых блоков с нуля.</li>
-                            </ul>
+                    </div>
+
+                    {/* Stage 2: Engines */}
+                    <div className="relative pl-20">
+                        <div className="absolute left-0 top-0 flex-shrink-0 w-16 h-16 bg-white dark:bg-slate-900 border-4 border-gray-200 dark:border-slate-700 rounded-full flex items-center justify-center">
+                            <CodeBracketIcon className="w-8 h-8 text-indigo-500 dark:text-indigo-400"/>
                         </div>
-                    </InfoCard>
-                     <InfoCard icon={<CodeBracketIcon className="w-6 h-6"/>} title="HTML + JS генератор">
-                         <div className="space-y-3">
-                            <p>Основной «строитель» интерфейсов. Этот режим создает как структуру (скелет) компонента, так и его интерактивное поведение.</p>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Принцип работы:</h4>
-                            <p>Генерирует семантически корректный <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm> и, при необходимости, дополняет его чистым JavaScript (vanilla JS) без каких-либо фреймворков. Это обеспечивает максимальную совместимость. Генератор намеренно избегает создания серверной логики; вместо этого он оставляет комментарии-заглушки `// TODO` в тех местах, где требуется участие бэкенд-разработчика.</p>
-                             <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Лучшие практики:</h4>
-                             <ul className="list-disc list-inside space-y-1 text-sm">
-                                <li>Четко описывайте и структуру, и поведение.</li>
-                                <li>Запрашивайте стилизацию (например, "используй темную тему").</li>
-                                <li>Не ожидайте готового серверного кода — система сфокусирована на фронтенде.</li>
-                            </ul>
+                        <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm">
+                            <h4 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">Этап 2: Движки генерации (Исполнители)</h4>
+                            <p className="mt-2 text-base">В зависимости от решения Роутера, в дело вступает один из трех специализированных движков. Каждый из них оптимизирован для своей задачи.</p>
+                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                                <div className="bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
+                                    <h5 className="font-bold">CSS-режим</h5>
+                                    <p className="text-sm">Генерирует только стили. Не меняет структуру. Запросит уточнение, если селектор неясен.</p>
+                                </div>
+                                <div className="bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
+                                    <h5 className="font-bold">HTML + JS</h5>
+                                    <p className="text-sm">Создает структуру и поведение. Оставляет `// TODO` для серверной логики.</p>
+                                </div>
+                                <div className="bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
+                                    <h5 className="font-bold">Парсер кодов</h5>
+                                    <p className="text-sm">Извлекает данные из «Корпуса контекста» по точному JSON-запросу.</p>
+                                </div>
+                            </div>
+                             <div className="bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700 mt-4">
+                                <h5 className="font-bold flex items-center gap-2"><ArchiveBoxIcon className="w-5 h-5"/>Корпус контекста (База знаний)</h5>
+                                <p className="text-sm">Это «библиотека» для Парсера кодов. Представляет собой набор текстовых файлов со строками в формате <code>Module|Template|$CODE$|Description;;</code>, что обеспечивает простой и быстрый доступ к данным.</p>
+                            </div>
                         </div>
-                    </InfoCard>
-                     <InfoCard icon={<CodeBracketIcon className="w-6 h-6"/>} title="Парсер системных кодов">
-                        <div className="space-y-3">
-                            <p>Это не генератор, а скорее поисковый движок по базе знаний. Его задача — извлекать предопределенные фрагменты данных по точному запросу.</p>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Принцип работы:</h4>
-                            <p>Работает исключительно со структурированными <TooltipTerm definition="Текстовый формат обмена данными, основанный на синтаксисе JavaScript. Он легко читается людьми и легко парсится машинами.">JSON</TooltipTerm> запросами, которые должны содержать ключи `module` и `template`. Парсер использует эти ключи для фильтрации «Корпуса контекста», находит строки с токенами вида `$CODE$` и возвращает их вместе с описаниями в строго определенном JSON-формате.</p>
-                             <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Лучшие практики:</h4>
-                            <p>Используйте этот режим для динамической подстановки контента в шаблоны, а не для создания нового кода. Всегда передавайте оба ключа для точного поиска.</p>
+                    </div>
+
+                    {/* Stage 3: Post-processing */}
+                    <div className="relative pl-20">
+                        <div className="absolute left-0 top-0 flex-shrink-0 w-16 h-16 bg-white dark:bg-slate-900 border-4 border-gray-200 dark:border-slate-700 rounded-full flex items-center justify-center">
+                            <SparklesIcon className="w-8 h-8 text-indigo-500 dark:text-indigo-400"/>
                         </div>
-                    </InfoCard>
-                     <InfoCard icon={<ArchiveBoxIcon className="w-6 h-6"/>} title="Корпус контекста">
-                        <div className="space-y-3">
-                            <p>Это «библиотека» или база знаний для «Парсера системных кодов». Представляет собой набор текстовых файлов, которые служат единым источником правды для системных данных.</p>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Принцип работы:</h4>
-                            <p>Каждая строка в корпусе имеет строгий, неизменный формат: <code>&lt;Module&gt;|&lt;Template&gt;|&lt;$SYSTEM_CODE$&gt;|&lt;Description&gt;;;</code>. Разделитель `|` и терминатор `;;` позволяют парсеру быстро и надежно читать данные без необходимости в сложной базе данных. Эта простота обеспечивает высокую производительность и легкость в обслуживании.</p>
-                             <h4 className="font-bold text-slate-800 dark:text-slate-200 !mt-4">Лучшие практики:</h4>
-                            <p>При добавлении новых данных в корпус, неукоснительно соблюдайте установленный формат. Думайте об этом как о простом словаре (key-value), где ключ — это пара `Module` и `Template`.</p>
+                        <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm">
+                            <h4 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">Этап 3: Пост-обработка (Фильтр качества)</h4>
+                            <p className="mt-2 text-base">Финальный «фильтр чистоты». Этот компонент берет сырой ответ от AI-модели и применяет к нему ряд очищающих фильтров: удаляет "болтовню" («Вот ваш код...»), стирает упоминания внутренних путей и нормализует форматирование. На выходе всегда получается только чистый, готовый к использованию код.</p>
                         </div>
-                    </InfoCard>
+                    </div>
                 </div>
             </section>
 
