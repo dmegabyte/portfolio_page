@@ -1,4 +1,3 @@
-
 import React, { ReactNode, useEffect, useState, useRef } from 'react';
 
 interface DocumentationPageLayoutProps {
@@ -12,8 +11,11 @@ const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ child
     const contentRef = useRef<HTMLDivElement>(null);
     const observerRef = useRef<IntersectionObserver | null>(null);
 
-    // Principle 9: This handler ensures smooth scrolling without conflicting with HashRouter.
-    // It prevents the default anchor link behavior and uses JavaScript for navigation.
+    // FIX: The `history.pushState` call was fundamentally incompatible with HashRouter,
+    // causing unpredictable navigation behavior and crashes. According to Principle 9,
+    // we must handle in-page navigation via JavaScript to avoid router conflicts.
+    // This updated handler performs a smooth scroll without manipulating the URL,
+    // ensuring stability and full compliance with the project's guiding principles.
     const handleTocLinkClick = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
         event.preventDefault(); 
         const element = document.getElementById(id);
@@ -22,9 +24,6 @@ const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ child
                 behavior: 'smooth',
                 block: 'start'
             });
-            if(history.pushState) {
-                history.pushState(null, '', `#${id}`);
-            }
         }
     };
 
