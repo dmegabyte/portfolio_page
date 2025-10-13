@@ -264,7 +264,7 @@ const TicketWorkflowDiagram: React.FC = () => {
                     </div>
 
                     {/* Branching Visual with Interactive Tooltip */}
-                    <div className="flex w-full flex-col items-center mt-4 lg:mt-8">
+                     <div className="flex w-full flex-col items-center mt-4 lg:mt-8">
                         <InteractiveIcon
                             className="workflow-stage hover:bg-gray-100 dark:hover:bg-slate-700/50"
                             style={{ transitionDelay: '750ms' }}
@@ -273,15 +273,22 @@ const TicketWorkflowDiagram: React.FC = () => {
                         />
                     </div>
 
+                    {/* Desktop Branching Lines */}
+                    <div className="hidden md:flex justify-center items-start w-full max-w-3xl mt-4 workflow-stage" style={{ transitionDelay: '900ms' }}>
+                        <div className="w-1/2 h-4 border-b border-r border-gray-300 dark:border-slate-600"></div>
+                        <div className="w-1/2 h-4 border-b border-l border-gray-300 dark:border-slate-600"></div>
+                    </div>
+
                     {/* Decision Outcomes */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl mt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 md:gap-y-0 w-full max-w-3xl md:mt-0 mt-4">
                         {outcomes.map((outcome, index) => (
-                             <div key={outcome.title} className="flex flex-col items-center text-center workflow-stage" style={{ transitionDelay: `${900 + index * 150}ms` }}>
-                                 <span className={`font-mono px-2 py-1 rounded-md border text-xs ${outcome.labelClasses}`}>
+                            <div key={outcome.title} className="flex flex-col items-center text-center workflow-stage" style={{ transitionDelay: `${1050 + index * 150}ms` }}>
+                                {/* Mobile connector */}
+                                <div className="md:hidden w-px h-4 bg-gray-300 dark:bg-slate-600 mb-4"></div>
+                                <span className={`font-mono px-2 py-1 rounded-md border text-xs ${outcome.labelClasses}`}>
                                     {outcome.label}
-                                 </span>
-                                 <div className="w-px h-4 bg-gray-300 dark:bg-slate-600 my-2"></div>
-                                <div className={`flex flex-col items-center p-4 rounded-lg bg-white dark:bg-slate-800 border-2 shadow-lg hover:shadow-xl transition-shadow duration-300 w-full ${outcome.borderColor}`}>
+                                </span>
+                                <div className={`mt-4 flex flex-col items-center p-4 rounded-lg bg-white dark:bg-slate-800 border-2 shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xs ${outcome.borderColor}`}>
                                     {outcome.icon}
                                     <h4 className={`font-semibold mt-3 ${outcome.textColor}`}>{outcome.title}</h4>
                                     <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{outcome.description}</p>
