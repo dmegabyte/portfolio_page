@@ -28,24 +28,25 @@ const TicketWorkflowDiagram: React.FC = () => {
             <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                 <h3 className="text-xl font-bold text-center text-gray-800 dark:text-slate-200 mb-8">Жизненный цикл обработки тикета</h3>
                 <div className="flex flex-col items-center">
-                    {/* Main Pipeline: Adaptive Layout */}
-                    <div className="flex flex-col lg:flex-row items-stretch justify-center gap-2">
-                        {stages.map((stage, index) => (
-                            <React.Fragment key={stage.title}>
-                                <div className="flex-1 flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm min-w-[180px]">
-                                    {stage.icon}
-                                    <h4 className="font-semibold mt-3 text-gray-800 dark:text-slate-200">{stage.title}</h4>
-                                    <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{stage.description}</p>
-                                </div>
-                                {index < stages.length - 1 && <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 self-center hidden lg:block mx-2" />}
-                                {index < stages.length - 1 && <ArrowDownCircleIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 self-center lg:hidden my-2" />}
-                            </React.Fragment>
-                        ))}
+                    {/* Main Pipeline: Reverted to Horizontal Scroll for stability */}
+                    <div className="w-full overflow-x-auto pb-4">
+                        <div className="inline-flex items-stretch justify-start gap-2 min-w-full lg:justify-center">
+                            {stages.map((stage, index) => (
+                                <React.Fragment key={stage.title}>
+                                    <div className="flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm w-[180px] flex-shrink-0">
+                                        {stage.icon}
+                                        <h4 className="font-semibold mt-3 text-gray-800 dark:text-slate-200">{stage.title}</h4>
+                                        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{stage.description}</p>
+                                    </div>
+                                    {index < stages.length - 1 && <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 self-center mx-2 flex-shrink-0" />}
+                                </React.Fragment>
+                            ))}
+                        </div>
                     </div>
 
                     <ArrowDownCircleIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 my-4" />
 
-                    {/* Decision Outcomes */}
+                    {/* Decision Outcomes (remains responsive) */}
                     <div className="relative flex flex-col md:flex-row items-stretch justify-center gap-8 w-full max-w-3xl">
                         {/* Connecting Lines */}
                         <div className="hidden md:block absolute top-[-2.5rem] left-1/2 h-10 w-px bg-gray-300 dark:bg-slate-600"></div>
