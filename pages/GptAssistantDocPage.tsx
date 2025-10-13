@@ -302,66 +302,142 @@ const TicketWorkflowDiagram: React.FC = () => {
     );
 };
 
-const ArchitectureDiagram: React.FC = () => (
-    <div className="not-prose my-8">
-        <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-6 text-center">Визуальная схема архитектурных связей</h3>
-        <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 text-center">
-            <div className="inline-block bg-white dark:bg-slate-800 p-3 rounded-lg shadow-md border border-gray-200 dark:border-slate-700 font-mono text-indigo-600 dark:text-indigo-400">
-                CONFIG.js
-            </div>
-            <div className="flex justify-center my-4">
-                <div className="w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 relative">
-                {/* Connecting Lines */}
-                <div className="absolute top-[-2rem] left-1/2 -translate-x-1/2 h-8 w-px bg-gray-300 dark:bg-slate-600"></div>
-                <div className="absolute top-[-2rem] left-[12.5%] lg:left-[12.5%] right-[12.5%] lg:right-[12.5%] h-px bg-gray-300 dark:bg-slate-600"></div>
-                
-                {/* Vertical lines to each node */}
-                <div className="absolute top-[-2rem] left-[12.5%] w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
-                <div className="absolute top-[-2rem] left-[37.5%] w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
-                <div className="absolute top-[-2rem] left-[62.5%] w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
-                <div className="absolute top-[-2rem] left-[87.5%] w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
+const ArchitectureDiagram: React.FC = () => {
+    const diagramRef = useRef<HTMLDivElement>(null);
 
-                {/* Modules */}
-                <div className="space-y-2">
-                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border border-gray-200 dark:border-slate-700">01_ErrorHandler.js</div>
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px',
+            }
+        );
+
+        const elements = diagramRef.current?.querySelectorAll('.diagram-element');
+        if (elements) {
+            elements.forEach((el) => observer.observe(el));
+        }
+
+        return () => {
+            if (elements) {
+                elements.forEach((el) => observer.unobserve(el));
+            }
+        };
+    }, []);
+    
+    const DiagramNode: React.FC<{ children: ReactNode, className?: string, style?: React.CSSProperties }> = ({ children, className, style }) => (
+        <div style={style} className={`font-mono bg-white dark:bg-slate-800 p-2 rounded-md border border-gray-200 dark:border-slate-700 shadow-sm ${className}`}>
+            {children}
+        </div>
+    );
+
+    // FIX: Add `className` prop to allow passing CSS classes for animations and styling.
+    const KeyModuleNode: React.FC<{ children: ReactNode, tooltip: string, className?: string, style?: React.CSSProperties }> = ({ children, tooltip, className, style }) => (
+         <div style={style} className={`border-2 border-indigo-500 rounded-md shadow-lg ${className}`}>
+             <TooltipTerm definition={tooltip}>
+                <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-sm cursor-help">
+                    {children}
                 </div>
-                <div className="space-y-2">
-                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border border-gray-200 dark:border-slate-700">02_Utils.js</div>
-                </div>
-                <div className="space-y-2">
-                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border border-gray-200 dark:border-slate-700">04_Omnidesk.js</div>
-                </div>
-                 <div className="space-y-2">
-                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border border-gray-200 dark:border-slate-700">12_PlaygroundTester.js</div>
-                </div>
-                
-                {/* Module with dependencies */}
-                <div className="lg:col-span-2 space-y-2 relative pt-8">
-                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
-                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border-2 border-indigo-500 shadow-lg">03_GptApi.js</div>
-                     <div className="w-px h-4 bg-gray-300 dark:bg-slate-600 mx-auto"></div>
-                     <div className="flex justify-center gap-4">
-                        <div className="font-mono text-sm bg-gray-100 dark:bg-slate-700 p-2 rounded-md">06_History.js</div>
-                        <div className="font-mono text-sm bg-gray-100 dark:bg-slate-700 p-2 rounded-md">08_UrlValidator.js</div>
-                        <div className="font-mono text-sm bg-gray-100 dark:bg-slate-700 p-2 rounded-md">10_AdvancedSpamFilter.js</div>
+            </TooltipTerm>
+        </div>
+    );
+    
+    return (
+        <div 
+            ref={diagramRef}
+            className="not-prose my-12"
+            role="group"
+            aria-label="Визуальная схема архитектуры. Показывает, как центральный файл CONFIG.js передает настройки основным модулям. Ключевые модули GptApi и Triggers, в свою очередь, имеют собственные зависимости."
+        >
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-6 text-center">Визуальная схема архитектурных связей</h3>
+            <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 text-center">
+                {/* Desktop/Tablet View */}
+                <div className="hidden md:flex flex-col items-center space-y-4">
+                    <DiagramNode style={{ transitionDelay: '0ms' }} className="text-indigo-600 dark:text-indigo-400 diagram-element">CONFIG.js</DiagramNode>
+                    
+                    {/* Main Connectors */}
+                    <div style={{ transitionDelay: '100ms' }} className="diagram-element h-6 w-px bg-gray-300 dark:bg-slate-600 relative after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
+                    <div style={{ transitionDelay: '200ms' }} className="diagram-element w-full max-w-4xl h-px bg-gray-300 dark:bg-slate-600 relative">
+                        {/* Vertical droplines */}
+                        <div className="absolute top-0 left-[12.5%] h-6 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
+                        <div className="absolute top-0 left-[37.5%] h-6 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
+                        <div className="absolute top-0 left-[62.5%] h-6 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
+                        <div className="absolute top-0 left-[87.5%] h-6 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
+                    </div>
+                    
+                    {/* Top Level Modules */}
+                    <div className="w-full max-w-4xl grid grid-cols-4 gap-4 mt-2">
+                        <DiagramNode style={{ transitionDelay: '300ms' }} className="diagram-element">01_ErrorHandler.js</DiagramNode>
+                        <DiagramNode style={{ transitionDelay: '350ms' }} className="diagram-element">02_Utils.js</DiagramNode>
+                        <DiagramNode style={{ transitionDelay: '400ms' }} className="diagram-element">04_Omnidesk.js</DiagramNode>
+                        <DiagramNode style={{ transitionDelay: '450ms' }} className="diagram-element">12_PlaygroundTester.js</DiagramNode>
+                    </div>
+
+                    {/* Connectors to Key Modules */}
+                    <div style={{ transitionDelay: '500ms' }} className="diagram-element w-full max-w-xl h-px bg-gray-300 dark:bg-slate-600 relative mt-8">
+                         <div className="absolute top-[-2rem] left-1/4 h-8 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
+                         <div className="absolute top-[-2rem] left-3/4 h-8 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
+                    </div>
+
+                     {/* Key Modules & Dependencies */}
+                    <div className="w-full max-w-xl grid grid-cols-2 gap-8 mt-2">
+                        <div className="flex flex-col items-center space-y-4">
+                            <KeyModuleNode style={{ transitionDelay: '600ms' }} tooltip="Ключевой модуль, управляющий всеми взаимодействиями с AI-моделями." className="diagram-element">03_GptApi.js</KeyModuleNode>
+                            <div style={{ transitionDelay: '700ms' }} className="diagram-element h-6 w-px bg-gray-300 dark:bg-slate-600 relative after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
+                            <div className="flex flex-col lg:flex-row gap-2">
+                                <DiagramNode style={{ transitionDelay: '800ms' }} className="diagram-element text-sm">06_History.js</DiagramNode>
+                                <DiagramNode style={{ transitionDelay: '850ms' }} className="diagram-element text-sm">08_UrlValidator.js</DiagramNode>
+                                <DiagramNode style={{ transitionDelay: '900ms' }} className="diagram-element text-sm">10_AdvancedSpamFilter.js</DiagramNode>
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-center space-y-4">
+                            <KeyModuleNode style={{ transitionDelay: '600ms' }} tooltip="Оркестратор, который запускает действия (например, вызов GptApi) на основе событий или расписания." className="diagram-element">05_Triggers.js</KeyModuleNode>
+                             <div style={{ transitionDelay: '700ms' }} className="diagram-element h-6 w-px bg-gray-300 dark:bg-slate-600 relative after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
+                            <DiagramNode style={{ transitionDelay: '800ms' }} className="diagram-element text-sm">07_ReportGenerator.js</DiagramNode>
+                        </div>
                     </div>
                 </div>
-                
-                 {/* Another module with dependencies */}
-                 <div className="lg:col-span-2 space-y-2 relative pt-8">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-8 bg-gray-300 dark:bg-slate-600"></div>
-                    <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-md border-2 border-indigo-500 shadow-lg">05_Triggers.js</div>
-                    <div className="w-px h-4 bg-gray-300 dark:bg-slate-600 mx-auto"></div>
-                     <div className="flex justify-center">
-                        <div className="font-mono text-sm bg-gray-100 dark:bg-slate-700 p-2 rounded-md">07_ReportGenerator.js</div>
+
+                {/* Mobile View */}
+                <div className="md:hidden flex flex-col items-start space-y-2 p-4 font-mono text-sm text-left">
+                    <div style={{ transitionDelay: '0ms' }} className="diagram-element font-bold text-base text-indigo-600 dark:text-indigo-400">CONFIG.js</div>
+                    <div style={{ transitionDelay: '100ms' }} className="diagram-element pl-4 border-l border-gray-300 dark:border-slate-600">
+                        <div><span className="text-gray-400 dark:text-slate-500">└─&gt;</span> 01_ErrorHandler.js</div>
+                        <div><span className="text-gray-400 dark:text-slate-500">└─&gt;</span> 02_Utils.js</div>
+                        <div><span className="text-gray-400 dark:text-slate-500">└─&gt;</span> 04_Omnidesk.js</div>
+                        <div><span className="text-gray-400 dark:text-slate-500">└─&gt;</span> 12_PlaygroundTester.js</div>
+                    </div>
+                     <div style={{ transitionDelay: '200ms' }} className="diagram-element pl-4 pt-4 border-l border-transparent">
+                        <div className="font-semibold border-2 border-indigo-500 rounded-md p-1 inline-block">
+                             <TooltipTerm definition="Ключевой модуль, управляющий всеми взаимодействиями с AI-моделями.">03_GptApi.js</TooltipTerm>
+                        </div>
+                        <div className="pl-4 border-l border-gray-300 dark:border-slate-600">
+                            <div><span className="text-gray-400 dark:text-slate-500">└─&gt;</span> 06_History.js</div>
+                            <div><span className="text-gray-400 dark:text-slate-500">└─&gt;</span> 08_UrlValidator.js</div>
+                            <div><span className="text-gray-400 dark:text-slate-500">└─&gt;</span> 10_AdvancedSpamFilter.js</div>
+                        </div>
+                    </div>
+                    <div style={{ transitionDelay: '300ms' }} className="diagram-element pl-4 pt-4 border-l border-transparent">
+                         <div className="font-semibold border-2 border-indigo-500 rounded-md p-1 inline-block">
+                            <TooltipTerm definition="Оркестратор, который запускает действия (например, вызов GptApi) на основе событий или расписания.">05_Triggers.js</TooltipTerm>
+                        </div>
+                        <div className="pl-4 border-l border-gray-300 dark:border-slate-600">
+                            <div><span className="text-gray-400 dark:text-slate-500">└─&gt;</span> 07_ReportGenerator.js</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 
 const GptAssistantDocumentationPage: React.FC = () => {
