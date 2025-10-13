@@ -339,9 +339,8 @@ const ArchitectureDiagram: React.FC = () => {
         </div>
     );
 
-    // FIX: Add `className` prop to allow passing CSS classes for animations and styling.
     const KeyModuleNode: React.FC<{ children: ReactNode, tooltip: string, className?: string, style?: React.CSSProperties }> = ({ children, tooltip, className, style }) => (
-         <div style={style} className={`border-2 border-indigo-500 rounded-md shadow-lg ${className}`}>
+         <div className={`border-2 border-indigo-500 rounded-md shadow-lg ${className}`} style={style}>
              <TooltipTerm definition={tooltip}>
                 <div className="font-mono bg-white dark:bg-slate-800 p-2 rounded-sm cursor-help">
                     {children}
@@ -358,50 +357,59 @@ const ArchitectureDiagram: React.FC = () => {
             aria-label="Визуальная схема архитектуры. Показывает, как центральный файл CONFIG.js передает настройки основным модулям. Ключевые модули GptApi и Triggers, в свою очередь, имеют собственные зависимости."
         >
             <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-6 text-center">Визуальная схема архитектурных связей</h3>
-            <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 text-center">
+            <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 text-center text-sm">
                 {/* Desktop/Tablet View */}
-                <div className="hidden md:flex flex-col items-center space-y-4">
-                    <DiagramNode style={{ transitionDelay: '0ms' }} className="text-indigo-600 dark:text-indigo-400 diagram-element">CONFIG.js</DiagramNode>
-                    
-                    {/* Main Connectors */}
-                    <div style={{ transitionDelay: '100ms' }} className="diagram-element h-6 w-px bg-gray-300 dark:bg-slate-600 relative after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
-                    <div style={{ transitionDelay: '200ms' }} className="diagram-element w-full max-w-4xl h-px bg-gray-300 dark:bg-slate-600 relative">
-                        {/* Vertical droplines */}
-                        <div className="absolute top-0 left-[12.5%] h-6 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
-                        <div className="absolute top-0 left-[37.5%] h-6 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
-                        <div className="absolute top-0 left-[62.5%] h-6 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
-                        <div className="absolute top-0 left-[87.5%] h-6 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
+                <div className="hidden md:flex flex-col items-center">
+                    {/* Level 0 -> 1 */}
+                    <div className="flex flex-col items-center">
+                        <DiagramNode style={{ transitionDelay: '0ms' }} className="diagram-element text-indigo-600 dark:text-indigo-400">CONFIG.js</DiagramNode>
+                        <div style={{ transitionDelay: '100ms' }} className="diagram-element h-8 w-px bg-gray-300 dark:bg-slate-600 relative after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600" />
                     </div>
-                    
-                    {/* Top Level Modules */}
-                    <div className="w-full max-w-4xl grid grid-cols-4 gap-4 mt-2">
-                        <DiagramNode style={{ transitionDelay: '300ms' }} className="diagram-element">01_ErrorHandler.js</DiagramNode>
-                        <DiagramNode style={{ transitionDelay: '350ms' }} className="diagram-element">02_Utils.js</DiagramNode>
-                        <DiagramNode style={{ transitionDelay: '400ms' }} className="diagram-element">04_Omnidesk.js</DiagramNode>
-                        <DiagramNode style={{ transitionDelay: '450ms' }} className="diagram-element">12_PlaygroundTester.js</DiagramNode>
+                    {/* Level 1 Nodes */}
+                    <div className="w-full max-w-4xl relative">
+                         <div style={{ transitionDelay: '200ms' }} className="absolute top-0 h-px bg-gray-300 dark:bg-slate-600 diagram-element" />
+                         <div className="flex justify-around">
+                            {['01_ErrorHandler.js', '02_Utils.js', '04_Omnidesk.js', '12_PlaygroundTester.js'].map((name, i) => (
+                                <div key={name} className="flex-1 flex justify-center relative pt-8 diagram-element" style={{ transitionDelay: `${300 + i * 50}ms` }}>
+                                    <div className="absolute top-0 h-8 w-px bg-gray-300 dark:bg-slate-600" />
+                                    <DiagramNode>{name}</DiagramNode>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* Connectors to Key Modules */}
-                    <div style={{ transitionDelay: '500ms' }} className="diagram-element w-full max-w-xl h-px bg-gray-300 dark:bg-slate-600 relative mt-8">
-                         <div className="absolute top-[-2rem] left-1/4 h-8 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
-                         <div className="absolute top-[-2rem] left-3/4 h-8 w-px bg-gray-300 dark:bg-slate-600 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
+                    {/* Connectors to Level 2 */}
+                     <div className="w-full max-w-2xl h-8 mt-8 flex justify-around">
+                        <div style={{ transitionDelay: '500ms' }} className="flex-1 diagram-element relative after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600 before:content-[''] before:absolute before:h-full before:w-px before:bg-gray-300 dark:before:bg-slate-600 before:left-1/2 before:-translate-x-1/2" />
+                        <div style={{ transitionDelay: '550ms' }} className="flex-1 diagram-element relative after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600 before:content-[''] before:absolute before:h-full before:w-px before:bg-gray-300 dark:before:bg-slate-600 before:left-1/2 before:-translate-x-1/2" />
                     </div>
 
-                     {/* Key Modules & Dependencies */}
-                    <div className="w-full max-w-xl grid grid-cols-2 gap-8 mt-2">
-                        <div className="flex flex-col items-center space-y-4">
-                            <KeyModuleNode style={{ transitionDelay: '600ms' }} tooltip="Ключевой модуль, управляющий всеми взаимодействиями с AI-моделями." className="diagram-element">03_GptApi.js</KeyModuleNode>
-                            <div style={{ transitionDelay: '700ms' }} className="diagram-element h-6 w-px bg-gray-300 dark:bg-slate-600 relative after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
-                            <div className="flex flex-col lg:flex-row gap-2">
-                                <DiagramNode style={{ transitionDelay: '800ms' }} className="diagram-element text-sm">06_History.js</DiagramNode>
-                                <DiagramNode style={{ transitionDelay: '850ms' }} className="diagram-element text-sm">08_UrlValidator.js</DiagramNode>
-                                <DiagramNode style={{ transitionDelay: '900ms' }} className="diagram-element text-sm">10_AdvancedSpamFilter.js</DiagramNode>
+
+                    {/* Level 2 & 3 */}
+                    <div className="w-full max-w-2xl flex justify-around">
+                        {/* GptApi Branch */}
+                        <div className="flex flex-col items-center flex-1">
+                            <KeyModuleNode tooltip="Ключевой модуль, управляющий всеми взаимодействиями с AI-моделями." className="diagram-element" style={{ transitionDelay: '600ms' }}>03_GptApi.js</KeyModuleNode>
+                            <div style={{ transitionDelay: '700ms' }} className="diagram-element h-8 w-px bg-gray-300 dark:bg-slate-600 relative after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600" />
+                            <div className="w-full relative">
+                                <div style={{ transitionDelay: '800ms' }} className="absolute top-0 h-px bg-gray-300 dark:bg-slate-600 diagram-element" />
+                                <div className="flex justify-around">
+                                    {['06_History.js', '08_UrlValidator.js', '10_AdvancedSpamFilter.js'].map((name, i) => (
+                                        <div key={name} className="flex-1 flex justify-center relative pt-8 diagram-element" style={{ transitionDelay: `${900 + i * 50}ms` }}>
+                                            <div className="absolute top-0 h-8 w-px bg-gray-300 dark:bg-slate-600" />
+                                            <DiagramNode>{name}</DiagramNode>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                        <div className="flex flex-col items-center space-y-4">
-                            <KeyModuleNode style={{ transitionDelay: '600ms' }} tooltip="Оркестратор, который запускает действия (например, вызов GptApi) на основе событий или расписания." className="diagram-element">05_Triggers.js</KeyModuleNode>
-                             <div style={{ transitionDelay: '700ms' }} className="diagram-element h-6 w-px bg-gray-300 dark:bg-slate-600 relative after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-0 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600"></div>
-                            <DiagramNode style={{ transitionDelay: '800ms' }} className="diagram-element text-sm">07_ReportGenerator.js</DiagramNode>
+                        {/* Triggers Branch */}
+                        <div className="flex flex-col items-center flex-1">
+                            <KeyModuleNode tooltip="Оркестратор, который запускает действия (например, вызов GptApi) на основе событий или расписания." className="diagram-element" style={{ transitionDelay: '650ms' }}>05_Triggers.js</KeyModuleNode>
+                            <div style={{ transitionDelay: '750ms' }} className="diagram-element h-8 w-px bg-gray-300 dark:bg-slate-600 relative after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0 after:border-l-4 after:border-l-transparent after:border-r-4 after:border-r-transparent after:border-t-4 after:border-t-gray-300 dark:after:border-t-slate-600" />
+                            <div className="diagram-element" style={{ transitionDelay: '850ms' }}>
+                                <DiagramNode>07_ReportGenerator.js</DiagramNode>
+                            </div>
                         </div>
                     </div>
                 </div>

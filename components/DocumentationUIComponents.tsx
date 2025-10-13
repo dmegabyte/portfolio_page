@@ -115,17 +115,19 @@ interface TooltipTermProps {
 // It now uses a React Portal to render the tooltip at the document root, ensuring it
 // is never obscured by parent elements with `overflow: hidden` or `z-index` stacking.
 // This change directly upholds "Principle 4: Flawless UI Quality" from the README.md.
+// Additionally, it's now fully keyboard-accessible, adhering to Principle #6.
 export const TooltipTerm: React.FC<TooltipTermProps> = ({ children, definition }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [position, setPosition] = useState({ top: 0, left: 0 });
     const triggerRef = useRef<HTMLSpanElement>(null);
     const [isMounted, setIsMounted] = useState(false);
+    const tooltipId = React.useId();
 
     useEffect(() => {
         setIsMounted(true);
     }, []);
     
-    const handleMouseEnter = () => {
+    const handleShow = () => {
         if (triggerRef.current) {
             const rect = triggerRef.current.getBoundingClientRect();
             setPosition({
@@ -136,12 +138,13 @@ export const TooltipTerm: React.FC<TooltipTermProps> = ({ children, definition }
         }
     };
 
-    const handleMouseLeave = () => {
+    const handleHide = () => {
         setIsVisible(false);
     };
 
     const tooltipContent = (
         <div
+            id={tooltipId}
             className="fixed p-4 bg-slate-800 dark:bg-slate-900 text-slate-100 dark:text-slate-200 text-base leading-relaxed font-sans rounded-lg shadow-lg z-[60] w-max max-w-sm transition-opacity duration-200 ease-in-out"
             style={{
                 top: `${position.top}px`,
@@ -163,9 +166,13 @@ export const TooltipTerm: React.FC<TooltipTermProps> = ({ children, definition }
         <>
             <span
                 ref={triggerRef}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                className="text-indigo-500 dark:text-indigo-400 font-semibold underline decoration-indigo-300 dark:decoration-indigo-500 decoration-dashed underline-offset-4 hover:text-indigo-600 dark:hover:text-indigo-300 hover:decoration-solid hover:decoration-indigo-500 dark:hover:decoration-indigo-400 transition-all cursor-help"
+                onMouseEnter={handleShow}
+                onMouseLeave={handleHide}
+                onFocus={handleShow}
+                onBlur={handleHide}
+                tabIndex={0}
+                aria-describedby={isVisible ? tooltipId : undefined}
+                className="text-indigo-500 dark:text-indigo-400 font-semibold underline decoration-indigo-300 dark:decoration-indigo-500 decoration-dashed underline-offset-4 hover:text-indigo-600 dark:hover:text-indigo-300 hover:decoration-solid hover:decoration-indigo-500 dark:hover:decoration-indigo-400 transition-all cursor-help focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800 rounded-sm"
             >
                 {children}
             </span>
