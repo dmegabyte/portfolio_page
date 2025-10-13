@@ -1,11 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
+// FIX: In react-router-dom v6, `useHistory` is replaced by `useNavigate`.
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  // FIX: In react-router-dom v6, `useHistory` is replaced by `useNavigate`.
   const navigate = useNavigate();
   const isProjectOrDocPage = location.pathname.startsWith('/project/') || location.pathname.startsWith('/documentation/');
 
@@ -34,16 +36,16 @@ const Header: React.FC = () => {
     setIsOpen(false);
   }, [location.pathname]);
 
-  const navLinkClassName = ({ isActive }: { isActive: boolean }): string => {
-    const baseClasses = "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300";
-    const activeClasses = "bg-slate-900 dark:bg-slate-700 text-white";
-    const inactiveClasses = "text-gray-300 hover:bg-slate-700 dark:hover:bg-slate-700 hover:text-white";
-    return `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
-  };
-
-  const mobileNavLinkClassName = ({ isActive }: { isActive: boolean }): string => {
-    return `${navLinkClassName({ isActive })} block`;
-  };
+  const baseClasses = "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300";
+  const activeClasses = "bg-slate-900 dark:bg-slate-700 text-white";
+  const inactiveClasses = "text-gray-300 hover:bg-slate-700 dark:hover:bg-slate-700 hover:text-white";
+  
+  // FIX: In react-router-dom v6, `activeClassName` is replaced by a function in `className`.
+  const getNavLinkClasses = ({ isActive }: { isActive: boolean }) => 
+    `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
+  
+  const getMobileNavLinkClasses = ({ isActive }: { isActive: boolean }) => 
+    `${baseClasses} ${isActive ? activeClasses : inactiveClasses} block`;
 
   return (
     <header className="bg-slate-800 dark:bg-slate-900 shadow-lg sticky top-0 z-50 border-b border-slate-700 dark:border-slate-800">
@@ -59,6 +61,7 @@ const Header: React.FC = () => {
             {isProjectOrDocPage ? (
               <div>
                 <button
+                  // FIX: In react-router-dom v6, `history.goBack()` is replaced by `navigate(-1)`.
                   onClick={() => navigate(-1)}
                   className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-indigo-700 transition-colors duration-300 flex items-center"
                 >
@@ -72,13 +75,16 @@ const Header: React.FC = () => {
               <>
                 <div className="hidden md:block">
                   <div className="ml-4 flex items-baseline space-x-4">
-                    <NavLink to="/" end className={navLinkClassName}>
+                    {/* FIX: In react-router-dom v6, `exact` is replaced by `end`, and `activeClassName` is replaced by a function in `className`. */}
+                    <NavLink to="/" end className={getNavLinkClasses}>
                       Главная
                     </NavLink>
-                    <NavLink to="/about" className={navLinkClassName}>
+                    {/* FIX: In react-router-dom v6, `activeClassName` is replaced by a function in `className`. */}
+                    <NavLink to="/about" className={getNavLinkClasses}>
                       Обо мне
                     </NavLink>
-                    <NavLink to="/contact" className={navLinkClassName}>
+                    {/* FIX: In react-router-dom v6, `activeClassName` is replaced by a function in `className`. */}
+                    <NavLink to="/contact" className={getNavLinkClasses}>
                       Контакты
                     </NavLink>
                   </div>
@@ -114,13 +120,16 @@ const Header: React.FC = () => {
         aria-label="Мобильное меню"
       >
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <NavLink to="/" end className={mobileNavLinkClassName} onClick={() => setIsOpen(false)}>
+          {/* FIX: In react-router-dom v6, `exact` is replaced by `end`, and `activeClassName` is replaced by a function in `className`. */}
+          <NavLink to="/" end className={getMobileNavLinkClasses} onClick={() => setIsOpen(false)}>
             Главная
           </NavLink>
-          <NavLink to="/about" className={mobileNavLinkClassName} onClick={() => setIsOpen(false)}>
+          {/* FIX: In react-router-dom v6, `activeClassName` is replaced by a function in `className`. */}
+          <NavLink to="/about" className={getMobileNavLinkClasses} onClick={() => setIsOpen(false)}>
             Обо мне
           </NavLink>
-          <NavLink to="/contact" className={mobileNavLinkClassName} onClick={() => setIsOpen(false)}>
+          {/* FIX: In react-router-dom v6, `activeClassName` is replaced by a function in `className`. */}
+          <NavLink to="/contact" className={getMobileNavLinkClasses} onClick={() => setIsOpen(false)}>
             Контакты
           </NavLink>
         </div>

@@ -1,5 +1,6 @@
 
 import React, { useRef } from 'react';
+// FIX: In react-router-dom v6, `Switch` is replaced by `Routes`.
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -22,7 +23,9 @@ const App: React.FC = () => {
       <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-slate-900 font-sans">
         <Header />
         <main ref={mainContentRef} className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* FIX: In react-router-dom v6, `Switch` is replaced by `Routes`. */}
           <Routes>
+            {/* FIX: In react-router-dom v6, the `component` prop is replaced by `element`, and `exact` is the default behavior. */}
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />

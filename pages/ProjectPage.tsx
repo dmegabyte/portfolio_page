@@ -1,5 +1,6 @@
 
 import React from 'react';
+// FIX: In react-router-dom v6, `Redirect` is replaced by `Navigate`.
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { projects } from '../data/projects';
 
@@ -9,6 +10,7 @@ const ProjectPage: React.FC = () => {
 
   if (!project) {
     // Or return a 404 component
+    // FIX: In react-router-dom v6, `Redirect` is replaced by `Navigate`.
     return <Navigate to="/" />;
   }
 
