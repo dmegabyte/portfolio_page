@@ -1,4 +1,3 @@
-
 import React, { useState, ReactNode, useRef, useEffect } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
 import { SectionHeader, InfoCard, TooltipTerm, Modal, CollapsibleSection } from '../components/DocumentationUIComponents';
@@ -244,7 +243,7 @@ const ClientSegmentationDocumentationPage: React.FC = () => {
     <DocumentationPageLayout title="AI-маркетолог">
         <div className="space-y-16">
             
-            <section id="intro">
+            <section id="intro" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<RocketLaunchIcon className="w-8 h-8" />}
                     title="Концепция и бизнес-задача"
@@ -261,7 +260,7 @@ const ClientSegmentationDocumentationPage: React.FC = () => {
                 </InfoCard>
             </section>
 
-            <section id="principles">
+            <section id="principles" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<ScaleIcon className="w-8 h-8" />}
                     title="Ключевые принципы системы"
@@ -344,7 +343,7 @@ const ClientSegmentationDocumentationPage: React.FC = () => {
                 </div>
             </section>
 
-            <section id="segmentation">
+            <section id="segmentation" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<UserGroupIcon className="w-8 h-8" />}
                     title="1. Сегментация клиентов"
@@ -554,7 +553,7 @@ const ClientSegmentationDocumentationPage: React.FC = () => {
                 </div>
             </section>
             
-            <section id="templates-promo">
+            <section id="templates-promo" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<TagIcon className="w-8 h-8" />}
                     title="2. Сборка сообщения: от промо до текста"
@@ -660,7 +659,7 @@ const ClientSegmentationDocumentationPage: React.FC = () => {
                 </div>
             </section>
             
-            <section id="send-date-logic">
+            <section id="send-date-logic" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<SparklesIcon className="w-8 h-8" />}
                     title="3. Расчет даты отправки (`send_date`)"

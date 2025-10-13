@@ -7,7 +7,7 @@ const BotAutoTestDocumentationPage: React.FC = () => {
   return (
     <DocumentationPageLayout title="AI-тестировщик чат-ботов">
         <div className="space-y-12">
-            <section id="overview">
+            <section id="overview" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<BugAntIcon className="w-8 h-8" />}
                     title="Общее описание"
@@ -18,7 +18,7 @@ const BotAutoTestDocumentationPage: React.FC = () => {
                 </p>
             </section>
 
-            <section id="scenarios">
+            <section id="scenarios" className="scroll-mt-24">
                  <SectionHeader 
                     icon={<CogIcon className="w-8 h-8" />}
                     title="Гибкая настройка сценариев"
@@ -32,7 +32,7 @@ const BotAutoTestDocumentationPage: React.FC = () => {
                 </ul>
             </section>
             
-            <section id="bot-types">
+            <section id="bot-types" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<ChatBubbleBottomCenterTextIcon className="w-8 h-8" />}
                     title="Поддержка разных типов ботов"
@@ -56,7 +56,7 @@ const BotAutoTestDocumentationPage: React.FC = () => {
                 </div>
             </section>
             
-            <section id="workflow">
+            <section id="workflow" className="scroll-mt-24">
                  <SectionHeader 
                     icon={<PlayCircleIcon className="w-8 h-8" />}
                     title="Механика и флоу работы"
@@ -72,7 +72,7 @@ const BotAutoTestDocumentationPage: React.FC = () => {
                 </ol>
             </section>
 
-            <section id="example">
+            <section id="example" className="scroll-mt-24">
                  <SectionHeader 
                     icon={<CodeBracketIcon className="w-8 h-8" />}
                     title="Пример диалога для LLM-анализа"

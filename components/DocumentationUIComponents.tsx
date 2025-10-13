@@ -15,7 +15,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({ icon, title, subti
             {icon}
         </div>
         <div>
-            <h2 id={title.toLowerCase().replace(/\s+/g, '-')} className="text-3xl font-bold text-slate-900 dark:text-slate-200 mt-0 scroll-mt-24">{title}</h2>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-200 mt-0">{title}</h2>
             <p className="text-gray-600 dark:text-slate-400 text-base mt-1">{subtitle}</p>
         </div>
     </div>

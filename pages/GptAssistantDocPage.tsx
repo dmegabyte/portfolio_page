@@ -32,7 +32,7 @@ const GptAssistantDocumentationPage: React.FC = () => {
         <DocumentationPageLayout title="GPT-ассистент с RAG">
             <div className="space-y-16">
 
-                <section id="overview">
+                <section id="overview" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<CpuChipIcon className="w-8 h-8" />}
                         title="Обзор системы"
@@ -47,7 +47,7 @@ const GptAssistantDocumentationPage: React.FC = () => {
                     </InfoCard>
                 </section>
                 
-                <section id="workflow">
+                <section id="workflow" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<WrenchScrewdriverIcon className="w-8 h-8" />}
                         title="Механика обработки тикета"
@@ -85,7 +85,7 @@ const GptAssistantDocumentationPage: React.FC = () => {
                     </div>
                 </section>
                 
-                <section id="knowledge-base">
+                <section id="knowledge-base" className="scroll-mt-24">
                      <SectionHeader 
                         icon={<CircleStackIcon className="w-8 h-8" />}
                         title="База знаний и RAG"
@@ -96,7 +96,7 @@ const GptAssistantDocumentationPage: React.FC = () => {
                     </p>
                 </section>
 
-                <section id="modules">
+                <section id="modules" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<ShieldCheckIcon className="w-8 h-8" />}
                         title="Модули и их ответственность"
@@ -122,7 +122,7 @@ const GptAssistantDocumentationPage: React.FC = () => {
                     </div>
                 </section>
                 
-                <section id="metrics">
+                <section id="metrics" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<ChartBarIcon className="w-8 h-8" />}
                         title="Метрики и динамика"

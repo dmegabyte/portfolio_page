@@ -7,7 +7,7 @@ const EmailSafetyPipelineDocumentationPage: React.FC = () => {
   return (
     <DocumentationPageLayout title="Пайплайн безопасности email">
         <div className="space-y-12">
-            <section id="overview">
+            <section id="overview" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<ShieldCheckIcon className="w-8 h-8" />}
                     title="Обзор проекта"
@@ -73,7 +73,7 @@ const EmailSafetyPipelineDocumentationPage: React.FC = () => {
                 </div>
             </section>
             
-            <section id="stages">
+            <section id="stages" className="scroll-mt-24">
                  <SectionHeader 
                     icon={<CogIcon className="w-8 h-8" />}
                     title="Этапы анализа"
@@ -92,7 +92,7 @@ const EmailSafetyPipelineDocumentationPage: React.FC = () => {
                 </div>
             </section>
 
-            <section id="report-example">
+            <section id="report-example" className="scroll-mt-24">
                  <SectionHeader 
                     icon={<CodeBracketIcon className="w-8 h-8" />}
                     title="Пример отчёта"

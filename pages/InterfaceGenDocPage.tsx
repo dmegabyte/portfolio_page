@@ -194,7 +194,7 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
     <DocumentationPageLayout title="AI-генератор UI">
         <div className="space-y-16">
             
-            <section id="concept">
+            <section id="concept" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<CubeTransparentIcon className="w-8 h-8" />}
                     title="1. Концепция и ключевые возможности"
@@ -210,7 +210,7 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                 </InfoCard>
             </section>
             
-            <section id="problem-solution">
+            <section id="problem-solution" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<WrenchScrewdriverIcon className="w-8 h-8" />}
                     title="2. Проблема и Решение: Зачем это нужно?"
@@ -261,7 +261,7 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                 </div>
             </section>
 
-            <section id="workflow-diagram">
+            <section id="workflow-diagram" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<PlayIcon className="w-8 h-8" />}
                     title="3. Визуальная схема работы"
@@ -270,7 +270,7 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                 <InteractiveGeneratorWorkflowDiagram />
             </section>
             
-            <section id="architecture">
+            <section id="architecture" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<PuzzlePieceIcon className="w-8 h-8" />}
                     title="4. Архитектурная философия и компоненты"
@@ -343,7 +343,7 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                 </div>
             </section>
             
-            <section id="modes">
+            <section id="modes" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<QuestionMarkCircleIcon className="w-8 h-8" />}
                     title="5. Детальное руководство по режимам работы"
@@ -380,13 +380,19 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-12">
-                    {/* Mode 1: CSS (Reworked) */}
+                    {/* Mode 1: CSS (Reworked based on user feedback) */}
                     <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                         <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 1: Стилизация (CSS)</h3>
                         <p className="mt-2 text-base"><b>Что это?</b> Используйте этот режим, когда вам нужно изменить внешний вид существующего элемента, не меняя его <TooltipTerm definition="Язык гипертекстовой разметки, который определяет структуру веб-страницы.">HTML-структуру</TooltipTerm>.</p>
                         <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `cssOnlyHandler`</i></p>
 
-                        <h4 className="font-bold text-lg mt-6 mb-4">Как это работает?</h4>
+                        <div className="mt-6">
+                            <InfoCard icon={<HandRaisedIcon className="w-6 h-6"/>} title="Ограничения">
+                               <p>Этот режим **не изменяет** <TooltipTerm definition="Язык гипертекстовой разметки, который определяет структуру веб-страницы.">HTML-структуру</TooltipTerm>. Он может только добавлять или изменять CSS-правила.</p>
+                            </InfoCard>
+                        </div>
+
+                        <h4 className="font-bold text-lg mt-8 mb-4">Как это работает?</h4>
                         <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
                             <div className="flex flex-col items-center w-40"><MagnifyingGlassIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>1. Анализ запроса</strong><p className="text-sm text-gray-500 dark:text-slate-400">Поиск CSS-селектора</p></div>
                             <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
@@ -396,27 +402,43 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                         </div>
 
                         <h4 className="font-bold text-lg mt-8 mb-4">Лучшие практики для запросов</h4>
-                        <div className="grid md:grid-cols-2 gap-4 text-base not-prose">
-                            <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
-                                <h5 className="font-semibold flex items-center gap-2 text-green-800 dark:text-green-300"><CheckIcon className="w-5 h-5"/>Рекомендуется</h5>
-                                <ul className="list-disc list-inside mt-2 space-y-1 text-green-900 dark:text-green-200">
-                                    <li><b>Указывайте селектор:</b> `.btn-primary`, `#header nav`</li>
-                                    <li><b>Будьте конкретны:</b> "сделай кнопку синей (#3b82f6)"</li>
-                                    <li><b>Описывайте состояния:</b> `:hover`, `:focus`</li>
-                                </ul>
+                        <div className="space-y-4 text-base not-prose">
+                            <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                                <CheckIcon className="w-6 h-6 mt-1 flex-shrink-0 text-green-600 dark:text-green-400" />
+                                <div>
+                                    <h5 className="font-semibold text-gray-800 dark:text-slate-200">Указывайте селектор</h5>
+                                    <p className="text-gray-600 dark:text-slate-400">Четко определите, к какому элементу применяются стили (например, <TooltipTerm definition="Строка, которая определяет, к какому HTML-элементу или элементам применяются CSS-правила.">CSS-селектор</TooltipTerm> `.btn-primary`, `#header nav`).</p>
+                                </div>
                             </div>
-                             <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg border border-red-200 dark:border-red-800">
-                                <h5 className="font-semibold flex items-center gap-2 text-red-800 dark:text-red-300"><NoSymbolIcon className="w-5 h-5"/>Не рекомендуется</h5>
-                                 <ul className="list-disc list-inside mt-2 space-y-1 text-red-900 dark:text-red-200">
-                                    <li><b>Общие фразы:</b> "сделай красиво"</li>
-                                    <li><b>Запросы на изменение HTML:</b> "добавь иконку"</li>
-                                </ul>
+                            <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                                <CheckIcon className="w-6 h-6 mt-1 flex-shrink-0 text-green-600 dark:text-green-400" />
+                                <div>
+                                    <h5 className="font-semibold text-gray-800 dark:text-slate-200">Будьте конкретны</h5>
+                                    <p className="text-gray-600 dark:text-slate-400">Вместо "сделай кнопку красивой" используйте "сделай кнопку синей (#3b82f6) с белым текстом и скруглением 8px".</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                                <CheckIcon className="w-6 h-6 mt-1 flex-shrink-0 text-green-600 dark:text-green-400" />
+                                <div>
+                                    <h5 className="font-semibold text-gray-800 dark:text-slate-200">Описывайте состояния</h5>
+                                    <p className="text-gray-600 dark:text-slate-400">Не забывайте про интерактивные состояния, такие как <TooltipTerm definition="Псевдокласс CSS, который применяется, когда пользователь наводит курсор на элемент.">:hover</TooltipTerm> или <TooltipTerm definition="Псевдокласс CSS, который применяется, когда элемент получает фокус (например, при клике или навигации с клавиатуры).">:focus</TooltipTerm>.</p>
+                                </div>
+                            </div>
+                             <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                                <NoSymbolIcon className="w-6 h-6 mt-1 flex-shrink-0 text-red-600 dark:text-red-400" />
+                                <div>
+                                    <h5 className="font-semibold text-gray-800 dark:text-slate-200">Избегайте общих фраз</h5>
+                                    <p className="text-gray-600 dark:text-slate-400">Запросы вроде "сделай красиво" или "улучши дизайн" слишком субъективны и не дадут предсказуемого результата.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                                <NoSymbolIcon className="w-6 h-6 mt-1 flex-shrink-0 text-red-600 dark:text-red-400" />
+                                <div>
+                                    <h5 className="font-semibold text-gray-800 dark:text-slate-200">Не запрашивайте изменение HTML</h5>
+                                    <p className="text-gray-600 dark:text-slate-400">Этот режим не может добавлять, удалять или изменять HTML-элементы. Запросы типа "добавь иконку к кнопке" будут проигнорированы.</p>
+                                </div>
                             </div>
                         </div>
-                        
-                        <InfoCard icon={<HandRaisedIcon className="w-6 h-6"/>} title="Ограничения">
-                           <p>Этот режим **не изменяет** <TooltipTerm definition="Язык гипертекстовой разметки, который определяет структуру веб-страницы.">HTML-структуру</TooltipTerm>. Он может только добавлять или изменять CSS-правила.</p>
-                        </InfoCard>
 
                         <CollapsibleSection title="Показать пример ввода/вывода для CSS-режима">
                             <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС:
@@ -543,7 +565,7 @@ footer a:hover {
                 </div>
             </section>
             
-             <section id="error-handling">
+             <section id="error-handling" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<ShieldExclamationIcon className="w-8 h-8" />}
                     title="6. Обработка ошибок и неоднозначностей"
