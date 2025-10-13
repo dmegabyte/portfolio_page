@@ -130,6 +130,66 @@ const InteractiveGeneratorWorkflowDiagram: React.FC = () => {
 
 
 const InterfaceGeneratorDocumentationPage: React.FC = () => {
+    const [modalContent, setModalContent] = useState<{ title: string; content: ReactNode } | null>(null);
+
+    const engineModalDescriptions = {
+        css: {
+            title: "Подробнее о CSS-режиме",
+            content: (
+                <div className="space-y-3 text-base">
+                    <p>Этот режим генерирует исключительно CSS-код для изменения внешнего вида существующих элементов. Он не затрагивает HTML-структуру страницы.</p>
+                    <p><strong>Ключевая логика:</strong></p>
+                    <ul className="list-disc list-inside">
+                        <li>Анализирует запрос на наличие CSS-селектора и ключевых слов, связанных со стилями.</li>
+                        <li>Если селектор неясен, система запросит уточнение у пользователя.</li>
+                    </ul>
+                    <p>Идеально подходит для задач, таких как изменение цветов, размеров, теней или добавление состояний (например, `:hover`). Напрямую связан с промтом <code className="text-sm">cssOnlyHandler</code>.</p>
+                </div>
+            ),
+        },
+        html: {
+            title: "Подробнее о HTML + JS режиме",
+            content: (
+                <div className="space-y-3 text-base">
+                    <p>Это основной режим для создания новых компонентов с нуля. Он генерирует как HTML-структуру, так и JavaScript-код для обеспечения интерактивности.</p>
+                    <p><strong>Ключевая логика:</strong></p>
+                    <ul className="list-disc list-inside">
+                        <li>Создает семантически корректную HTML-разметку на основе описания.</li>
+                        <li>Добавляет тег <code className="text-sm">&lt;script&gt;</code> с `vanilla JS` для реализации поведения.</li>
+                        <li>Места, где предполагается серверная логика, явно помечаются комментарием <code className="text-sm">// TODO</code>.</li>
+                    </ul>
+                    <p>Используйте его для создания карточек, модальных окон, аккордеонов и других интерактивных элементов. Напрямую связан с промтом <code className="text-sm">generateHTMLJS</code>.</p>
+                </div>
+            ),
+        },
+        parser: {
+            title: "Подробнее о Парсере кодов",
+            content: (
+                <div className="space-y-3 text-base">
+                    <p>Этот режим не генерирует новый код, а работает как система извлечения данных. Он ищет и возвращает предопределенные системные коды из внутренней базы знаний.</p>
+                    <p><strong>Ключевая логика:</strong></p>
+                    <ul className="list-disc list-inside">
+                        <li>Принимает на вход строго структурированный JSON-запрос с ключами `module` и `template`.</li>
+                        <li>Ищет совпадения в «Корпусе контекста».</li>
+                        <li>Возвращает JSON-объект с найденными кодами и их описаниями.</li>
+                    </ul>
+                    <p>Используется для интеграции с системой шаблонизации и динамической подстановки контента. Напрямую связан с промтом <code className="text-sm">system_code_parser</code>.</p>
+                </div>
+            ),
+        },
+        context: {
+            title: "Подробнее о Корпусе контекста (Базе знаний)",
+            content: (
+                <div className="space-y-3 text-base">
+                    <p>Это «библиотека» или база знаний для Парсера кодов. Она представляет собой набор текстовых файлов, содержащих строки в строго определенном формате.</p>
+                    <p><strong>Формат строки:</strong></p>
+                    <code className="block text-center p-2 bg-gray-100 dark:bg-slate-800 rounded-md text-sm">Module|Template|$CODE$|Description;;</code>
+                    <p>Такая структура обеспечивает простой, быстрый и детерминированный доступ к данным, позволяя системе находить нужные системные коды для подстановки в шаблоны.</p>
+                </div>
+            ),
+        },
+    };
+
   return (
     <DocumentationPageLayout title="AI-генератор UI">
         <div className="space-y-16">
@@ -237,35 +297,35 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                         </div>
                         <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm">
                             <h4 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">Этап 1: Роутер (Диспетчер)</h4>
-                            <p className="mt-2 text-base">Это «мозг» системы. Его главная задача — проанализировать входящий запрос и направить его на обработку наиболее подходящему исполнителю. Роутер работает по строгому алгоритму с четкими приоритетами: сначала проверяет на JSON, затем на CSS-ключевые слова, и в последнюю очередь отправляет в HTML+JS.</p>
+                            <p className="mt-2 text-base text-gray-700 dark:text-slate-300">Это «мозг» системы. Его главная задача — проанализировать входящий запрос и направить его на обработку наиболее подходящему исполнителю. Роутер работает по строгому алгоритму с четкими приоритетами: сначала проверяет на JSON, затем на CSS-ключевые слова, и в последнюю очередь отправляет в HTML+JS.</p>
                         </div>
                     </div>
 
-                    {/* Stage 2: Engines */}
+                    {/* Stage 2: Engines (Refactored) */}
                     <div className="relative pl-20">
                         <div className="absolute left-0 top-0 flex-shrink-0 w-16 h-16 bg-white dark:bg-slate-900 border-4 border-gray-200 dark:border-slate-700 rounded-full flex items-center justify-center">
                             <CodeBracketIcon className="w-8 h-8 text-indigo-500 dark:text-indigo-400"/>
                         </div>
                         <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm">
                             <h4 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">Этап 2: Движки генерации (Исполнители)</h4>
-                            <p className="mt-2 text-base">В зависимости от решения Роутера, в дело вступает один из трех специализированных движков. Каждый из них оптимизирован для своей задачи.</p>
-                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-                                <div className="bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
-                                    <h5 className="font-bold">CSS-режим</h5>
-                                    <p className="text-sm">Генерирует только стили. Не меняет структуру. Запросит уточнение, если селектор неясен.</p>
-                                </div>
-                                <div className="bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
-                                    <h5 className="font-bold">HTML + JS</h5>
-                                    <p className="text-sm">Создает структуру и поведение. Оставляет `// TODO` для серверной логики.</p>
-                                </div>
-                                <div className="bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
-                                    <h5 className="font-bold">Парсер кодов</h5>
-                                    <p className="text-sm">Извлекает данные из «Корпуса контекста» по точному JSON-запросу.</p>
-                                </div>
-                            </div>
-                             <div className="bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700 mt-4">
-                                <h5 className="font-bold flex items-center gap-2"><ArchiveBoxIcon className="w-5 h-5"/>Корпус контекста (База знаний)</h5>
-                                <p className="text-sm">Это «библиотека» для Парсера кодов. Представляет собой набор текстовых файлов со строками в формате <code>Module|Template|$CODE$|Description;;</code>, что обеспечивает простой и быстрый доступ к данным.</p>
+                            <p className="mt-2 text-base text-gray-700 dark:text-slate-300">В зависимости от решения Роутера, в дело вступает один из трех специализированных движков или используется база знаний. Нажмите на компонент, чтобы узнать подробности.</p>
+                            <div className="grid sm:grid-cols-2 gap-4 mt-6">
+                                <button onClick={() => setModalContent(engineModalDescriptions.css)} className="group text-left bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md">
+                                    <h5 className="font-bold text-slate-800 dark:text-slate-200">CSS-режим</h5>
+                                    <p className="text-sm text-gray-700 dark:text-slate-300">Генерирует только стили.</p>
+                                </button>
+                                <button onClick={() => setModalContent(engineModalDescriptions.html)} className="group text-left bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md">
+                                    <h5 className="font-bold text-slate-800 dark:text-slate-200">HTML + JS</h5>
+                                    <p className="text-sm text-gray-700 dark:text-slate-300">Создает структуру и поведение.</p>
+                                </button>
+                                <button onClick={() => setModalContent(engineModalDescriptions.parser)} className="group text-left bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md">
+                                    <h5 className="font-bold text-slate-800 dark:text-slate-200">Парсер кодов</h5>
+                                    <p className="text-sm text-gray-700 dark:text-slate-300">Извлекает данные по JSON-запросу.</p>
+                                </button>
+                                <button onClick={() => setModalContent(engineModalDescriptions.context)} className="group text-left bg-gray-50 dark:bg-slate-900/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md">
+                                    <h5 className="font-bold flex items-center gap-2 text-slate-800 dark:text-slate-200"><ArchiveBoxIcon className="w-5 h-5"/>Корпус контекста</h5>
+                                    <p className="text-sm text-gray-700 dark:text-slate-300">База знаний для парсера.</p>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -277,7 +337,7 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                         </div>
                         <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm">
                             <h4 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">Этап 3: Пост-обработка (Фильтр качества)</h4>
-                            <p className="mt-2 text-base">Финальный «фильтр чистоты». Этот компонент берет сырой ответ от AI-модели и применяет к нему ряд очищающих фильтров: удаляет "болтовню" («Вот ваш код...»), стирает упоминания внутренних путей и нормализует форматирование. На выходе всегда получается только чистый, готовый к использованию код.</p>
+                            <p className="mt-2 text-base text-gray-700 dark:text-slate-300">Финальный «фильтр чистоты». Этот компонент берет сырой ответ от AI-модели и применяет к нему ряд очищающих фильтров: удаляет "болтовню" («Вот ваш код...»), стирает упоминания внутренних путей и нормализует форматирование. На выходе всегда получается только чистый, готовый к использованию код.</p>
                         </div>
                     </div>
                 </div>
@@ -468,6 +528,15 @@ footer a:hover {
             </section>
 
         </div>
+        {modalContent && (
+            <Modal
+                isOpen={!!modalContent}
+                onClose={() => setModalContent(null)}
+                title={modalContent.title}
+            >
+                {modalContent.content}
+            </Modal>
+        )}
     </DocumentationPageLayout>
   );
 };
