@@ -12,57 +12,54 @@ const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ child
     const contentRef = useRef<HTMLDivElement>(null);
     const observerRef = useRef<IntersectionObserver | null>(null);
 
-    // Custom click handler to manage scrolling without causing router conflicts.
+    // Principle 9: This handler ensures smooth scrolling without conflicting with HashRouter.
+    // It prevents the default anchor link behavior and uses JavaScript for navigation.
     const handleTocLinkClick = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-        event.preventDefault(); // Prevent the browser's default anchor link behavior which can conflict with the router.
+        event.preventDefault(); 
         const element = document.getElementById(id);
         if (element) {
             element.scrollIntoView({
                 behavior: 'smooth',
                 block: 'start'
             });
-            // Manually update URL hash for better user feedback, without a full page reload.
-            // Using history.pushState is safer than window.location.hash to avoid triggering router changes.
             if(history.pushState) {
                 history.pushState(null, '', `#${id}`);
             }
         }
     };
 
-    // Effect to build table of contents and set up scroll spy
+    // Effect 1: Scans the document for section headings and builds the TOC.
+    // This runs whenever the page content (`children`) changes.
     useEffect(() => {
         if (!contentRef.current) return;
 
-        // Disconnect any existing observer before setting up a new one
-        if (observerRef.current) {
-            observerRef.current.disconnect();
-        }
-
-        // 1. Scan for headings and populate the TOC state
         const headingElements = Array.from(contentRef.current.querySelectorAll('section[id]')) as HTMLElement[];
         const mappedHeadings = headingElements.map(h => {
-            const headingEl = h.querySelector('h2, h3, h4, h5, h6'); // Find the first heading element regardless of its level.
+            const headingEl = h.querySelector('h2, h3, h4, h5, h6'); 
             const textContent = headingEl?.textContent || h.id.replace(/-/g, ' ');
-            // To ensure a flat TOC structure, all sections are treated as top-level items.
-            // This meets the requirement to have all primary sections appear at the same level.
-            const level = 2;
+            // All sections are treated as top-level items for a flat, clear TOC structure.
             return {
                 id: h.id,
                 text: textContent,
-                level: level 
+                level: 2 
             }
         });
         setHeadings(mappedHeadings);
 
-        // If no headings are found, there's nothing to observe.
-        if (headingElements.length === 0) return;
+    }, [children]); // Dependency on children ensures TOC is always up-to-date with content.
 
-        // 2. Set up a robust scroll spy observer.
-        // This ref holds the IDs of all sections currently within the observer's rootMargin.
+    // Effect 2: Manages the IntersectionObserver for scroll spying.
+    // This effect runs when the list of headings is updated, setting up the observer.
+    useEffect(() => {
+        // Disconnect any previous observer before creating a new one.
+        if (observerRef.current) {
+            observerRef.current.disconnect();
+        }
+        if (headings.length === 0) return;
+
         const visibleSections = new Set<string>();
 
-        const observerCallback = (entries: IntersectionObserverEntry[]) => {
-            // Update the set of sections currently inside the active viewport margin
+        const observerCallback: IntersectionObserverCallback = (entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     visibleSections.add(entry.target.id);
@@ -71,27 +68,16 @@ const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ child
                 }
             });
 
+            // Find the first heading in the document's order that is currently intersecting.
+            // This reliably identifies the topmost visible section.
             let newActiveId = '';
-            
-            // Find the first visible section by iterating through headings in their document order.
-            // This ensures the topmost visible section is always chosen as active.
-            for (const heading of mappedHeadings) {
+            for (const heading of headings) {
                 if (visibleSections.has(heading.id)) {
                     newActiveId = heading.id;
                     break;
                 }
             }
-
-            // Fallback: If no section is in the active margin (e.g., in the space between sections or at the page bottom),
-            // check if the user has scrolled to the very bottom of the document.
-            if (!newActiveId) {
-                const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50; // 50px buffer
-                if (isAtBottom && mappedHeadings.length > 0) {
-                    newActiveId = mappedHeadings[mappedHeadings.length - 1].id;
-                }
-            }
             
-            // Only update state if the active ID has actually changed to prevent unnecessary re-renders.
             if (newActiveId) {
                 setActiveId(newActiveId);
             }
@@ -103,15 +89,19 @@ const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ child
             threshold: 0, // Fire as soon as a single pixel enters/leaves the margin.
         });
 
-        headingElements.forEach(h => observerRef.current.observe(h));
+        // Start observing all section elements.
+        const elements = contentRef.current?.querySelectorAll('section[id]');
+        if (elements) {
+            elements.forEach(el => observerRef.current!.observe(el));
+        }
 
-        // Cleanup function to disconnect the observer when the component unmounts or content changes
+        // Cleanup function to disconnect the observer on component unmount.
         return () => {
             if (observerRef.current) {
                 observerRef.current.disconnect();
             }
         };
-    }, [children]); // Re-run the entire setup if the page content changes.
+    }, [headings]); // Reruns only when the headings array itself changes.
 
 
     return (
