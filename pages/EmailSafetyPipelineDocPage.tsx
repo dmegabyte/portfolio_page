@@ -11,7 +11,7 @@ const EmailSafetyPipelineDocumentationPage: React.FC = () => {
                 <SectionHeader 
                     icon={<ShieldCheckIcon className="w-8 h-8" />}
                     title="Обзор проекта"
-                    subtitle="Автоматическая проверка email-шаблонов перед отправкой."
+                    subtitle="Автоматическая проверка email-шаблонов перед отправкой ТЕСТ."
                 />
                 <p>
                     Этот проект представляет собой автоматизированный конвейер (пайплайн) для всесторонней проверки <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm>-шаблонов email-сообщений. Система состоит из трёх этапов, каждый из которых анализирует разные аспекты письма — от репутации отправителя до контента, — и выносит итоговое решение: <span className="font-semibold text-green-600 dark:text-green-400">GO</span> (разрешить) или <span className="font-semibold text-red-600 dark:text-red-400">STOP</span> (блокировать).

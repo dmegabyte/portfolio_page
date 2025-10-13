@@ -34,23 +34,23 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                     subtitle="Обзор ключевых компонентов системы."
                 />
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 not-prose">
-                    <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="Роутер (/des/prompt.md)">
-                        <p>Определяет режим. Содержит шаги <code>resolveAndRender</code> и <code>validateVariables</code> (заглушка), подключает генератор HTML/JS.</p>
+                    <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="Роутер">
+                        <p>Центральный компонент, который определяет требуемый режим генерации. Содержит шаги <code>resolveAndRender</code> и <code>validateVariables</code> (заглушка), а также подключает соответствующий генератор HTML/JS.</p>
                     </InfoCard>
-                    <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="Пост‑обработка (/des/prompt v2.ini)">
-                        <p>Очищает упоминания путей/файлов, внешние ссылки и нормализует финальный ответ.</p>
+                    <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="Пост‑обработка">
+                        <p>Финальный этап конвейера, который очищает сгенерированный код от упоминаний внутренних путей/файлов, удаляет внешние ссылки и нормализует итоговый ответ для пользователя.</p>
                     </InfoCard>
-                     <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="CSS‑режим (/des/cssOnlyHandler.md)">
-                        <p>Возвращает только <TooltipTerm definition="Каскадные таблицы стилей — это язык, используемый для описания внешнего вида документа, написанного на языке разметки, таком как HTML.">CSS</TooltipTerm>. При неясном селекторе допускается один уточняющий вопрос.</p>
+                     <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="CSS‑режим">
+                        <p>Специализированный модуль, который возвращает исключительно код <TooltipTerm definition="Каскадные таблицы стилей — это язык, используемый для описания внешнего вида документа, написанного на языке разметки, таком как HTML.">CSS</TooltipTerm>. Если предоставленный селектор является неясным, система может задать один уточняющий вопрос.</p>
                     </InfoCard>
-                     <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="HTML + JS (/des/generateHTMLJS.md)">
-                        <p>Генерирует <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm>‑фрагмент/страницу и скрипт на чистом JS. Серверная логика не генерируется; помечается <code>// TODO</code>.</p>
+                     <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="HTML + JS">
+                        <p>Генерирует готовый <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm>‑фрагмент или целую страницу, включая необходимый скрипт на чистом JavaScript (vanilla JS). Серверная логика намеренно не генерируется и помечается как <code>// TODO</code>.</p>
                     </InfoCard>
-                     <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="Парсер кодов (/des/system_code_parser.md)">
-                        <p>По фильтрам <code>module</code>/<code>template</code>/<code>filename</code> извлекает токены вида <code>$CODE$</code> из корпуса и возвращает строгий <TooltipTerm definition="Текстовый формат обмена данными, основанный на синтаксисе JavaScript. Он легко читается людьми и легко парсится машинами.">JSON</TooltipTerm>.</p>
+                     <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="Парсер кодов">
+                        <p>Отвечает за извлечение системных токенов. На основе фильтров <code>module</code>/<code>template</code>/<code>filename</code> он находит токены вида <code>$CODE$</code> в корпусе и возвращает строго структурированный <TooltipTerm definition="Текстовый формат обмена данными, основанный на синтаксисе JavaScript. Он легко читается людьми и легко парсится машинами.">JSON</TooltipTerm>.</p>
                     </InfoCard>
-                     <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="Корпус контекста (/des/parser/context/V01…V08)">
-                        <p>Набор строк единого формата: <code>&lt;Module&gt;|&lt;Template&gt;|&lt;$SYSTEM_CODE$&gt;|&lt;Description&gt;;;</code></p>
+                     <InfoCard icon={<CommandLineIcon className="w-6 h-6"/>} title="Корпус контекста">
+                        <p>Является источником данных для парсера. Это набор строк строгого единого формата: <code>&lt;Module&gt;|&lt;Template&gt;|&lt;$SYSTEM_CODE$&gt;|&lt;Description&gt;;;</code>, который служит базой знаний.</p>
                     </InfoCard>
                 </div>
             </section>

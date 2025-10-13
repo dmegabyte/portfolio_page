@@ -172,28 +172,26 @@ const InteractiveWorkflowDiagram: React.FC = () => {
 
 const ClientSegmentationDocumentationPage: React.FC = () => {
     
-    const [activeLoyaltyTier, setActiveLoyaltyTier] = useState<string | null>(null);
-
     const loyaltyTiers = [
       {
         id: 'single',
         label: 'Разовые',
         visits: '1 визит',
-        className: 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-300',
+        className: 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300',
         definition: 'Клиенты, совершившие только один успешный визит. Это начальный уровень лояльности.'
       },
       {
         id: 'repeat_2_4',
         label: 'Повторные (2-4 раза)',
         visits: '2-4 визита',
-        className: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300',
+        className: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/50 dark:text-cyan-300',
         definition: 'Клиенты, совершившие от двух до четырех успешных визитов. Демонстрируют интерес к повторным посещениям.'
       },
       {
         id: 'repeat_5_plus',
         label: 'Повторные (5+)',
         visits: '≥ 5 визитов',
-        className: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
+        className: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300',
         definition: 'Наиболее лояльные клиенты, совершившие пять и более визитов. Являются ядром постоянной аудитории.'
       }
     ];
@@ -219,6 +217,28 @@ const ClientSegmentationDocumentationPage: React.FC = () => {
         promo_actions: "Лист «Акции» содержит общие, групповые промо-предложения. Используется как резервный вариант, если для клиента не нашлось персонального предложения.",
         templates: "Лист «Шаблоны» содержит базовые тексты сообщений для разных сегментов клиентов. Система фильтрует этот лист по параметрам клиента, чтобы выбрать наиболее подходящий текст.",
     };
+    
+    // Data for the 'Consumption Type' component. This data-driven approach improves clarity and maintainability.
+    const consumptionTypes = [
+        { 
+            name: 'Массажник',
+            condition: "Доля 'Массаж' ≥ 80%",
+            glossaryKey: 'massazhnik',
+            icon: <CheckCircleIcon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+        },
+        { 
+            name: 'Спашник',
+            condition: "Доля 'СПА' ≥ 80%",
+            glossaryKey: 'spashnik',
+            icon: <CheckCircleIcon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+        },
+        { 
+            name: 'Универсал',
+            condition: 'Остальные случаи',
+            glossaryKey: 'universal',
+            icon: null // The 'Universal' type does not require a special icon.
+        },
+    ];
 
     return (
     <DocumentationPageLayout title="AI-маркетолог">
@@ -396,63 +416,26 @@ const ClientSegmentationDocumentationPage: React.FC = () => {
                                     </div>
                                     <h4 className="text-xl font-bold text-gray-800 dark:text-slate-200 mt-0">1.3: Тип потребления</h4>
                                 </div>
-                                <div className="flex-grow flex flex-col justify-center space-y-4 text-lg p-4 bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-700">
-                                    {/* IF */}
-                                    <div className="flex items-start gap-4">
-                                        <span className="font-bold text-sky-600 dark:text-sky-400 flex-shrink-0 pt-1">ЕСЛИ</span>
-                                        <div className="flex-grow">
-                                            <p className="font-medium text-gray-800 dark:text-slate-200">Доля 'Массаж' ≥ 80%</p>
-                                            <div className="flex items-center gap-3 mt-2">
-                                                <ArrowLongRightIcon className="w-6 h-6 text-gray-400 dark:text-slate-500" />
-                                                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/50">
-                                                    <CheckCircleIcon className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-                                                    <span className="text-xl font-semibold text-emerald-800 dark:text-emerald-300">
-                                                        <TooltipTerm definition={glossary.massazhnik}>Массажник</TooltipTerm>
-                                                    </span>
+                                <div className="flex-grow flex flex-col justify-around space-y-4 p-2 bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-700">
+                                    {consumptionTypes.map((type) => (
+                                        <div key={type.name} className="flex items-center justify-between gap-4 p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:border-indigo-500/50 transition-colors">
+                                            <span className="font-mono text-base text-gray-600 dark:text-slate-400">{type.condition}</span>
+                                            <TooltipTerm definition={glossary[type.glossaryKey as keyof typeof glossary]}>
+                                                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-base font-semibold ${
+                                                    type.name === 'Универсал' 
+                                                        ? 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-200' 
+                                                        : 'bg-emerald-50 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300'
+                                                }`}>
+                                                    {type.icon}
+                                                    <span>{type.name}</span>
                                                 </div>
-                                            </div>
+                                            </TooltipTerm>
                                         </div>
-                                    </div>
-                                    
-                                    <div className="border-t border-dashed border-gray-300 dark:border-slate-600 my-3"></div>
-
-                                    {/* ELSE IF */}
-                                    <div className="flex items-start gap-4">
-                                        <span className="font-bold text-sky-600 dark:text-sky-400 flex-shrink-0 pt-1">ИНАЧЕ ЕСЛИ</span>
-                                        <div className="flex-grow">
-                                            <p className="font-medium text-gray-800 dark:text-slate-200">Доля 'СПА' ≥ 80%</p>
-                                            <div className="flex items-center gap-3 mt-2">
-                                                <ArrowLongRightIcon className="w-6 h-6 text-gray-400 dark:text-slate-500" />
-                                                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/50">
-                                                    <CheckCircleIcon className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-                                                    <span className="text-xl font-semibold text-emerald-800 dark:text-emerald-300">
-                                                         <TooltipTerm definition={glossary.spashnik}>Спашник</TooltipTerm>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="border-t border-dashed border-gray-300 dark:border-slate-600 my-3"></div>
-
-                                    {/* ELSE */}
-                                    <div className="flex items-start gap-4">
-                                        <span className="font-bold text-gray-500 dark:text-gray-400 flex-shrink-0 pt-1">ИНАЧЕ</span>
-                                        <div className="flex-grow">
-                                            <div className="flex items-center gap-3 mt-1">
-                                                <ArrowLongRightIcon className="w-6 h-6 text-gray-400 dark:text-slate-500" />
-                                                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-100 dark:bg-slate-700">
-                                                    <span className="text-xl font-semibold text-gray-800 dark:text-slate-200">
-                                                        <TooltipTerm definition={glossary.universal}>Универсал</TooltipTerm>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
                             
-                            {/* 1.4: Loyalty */}
+                            {/* 1.4: Loyalty - UNIFIED */}
                             <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col h-full shadow-sm">
                                 <div className="flex items-center gap-4 mb-5">
                                     <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-indigo-100 dark:bg-slate-700 rounded-lg">
@@ -460,28 +443,15 @@ const ClientSegmentationDocumentationPage: React.FC = () => {
                                     </div>
                                     <h4 className="text-xl font-bold text-gray-800 dark:text-slate-200 mt-0">1.4: Лояльность</h4>
                                 </div>
-                                <div className="space-y-4 flex-grow flex flex-col justify-center">
+                                <div className="flex-grow flex flex-col justify-around space-y-4 p-2 bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-700">
                                     {loyaltyTiers.map((tier) => (
-                                        <div key={tier.id}>
-                                            <button
-                                                onClick={() => setActiveLoyaltyTier(activeLoyaltyTier === tier.id ? null : tier.id)}
-                                                className={`w-full p-4 rounded-lg border-2 text-left transition-all duration-300 transform hover:-translate-y-1 ${
-                                                    activeLoyaltyTier === tier.id 
-                                                    ? 'border-indigo-500 bg-indigo-50 dark:bg-slate-900/50 shadow-lg scale-105' 
-                                                    : 'border-transparent bg-gray-50 dark:bg-slate-900/50 hover:bg-gray-100 dark:hover:bg-slate-700'
-                                                }`}
-                                                aria-expanded={activeLoyaltyTier === tier.id}
-                                            >
-                                                <div className="flex items-center justify-between gap-4">
-                                                    <span className="font-mono text-xl w-32 text-gray-600 dark:text-slate-400">{tier.visits}</span>
-                                                    <span className={`text-lg font-semibold px-4 py-2 rounded-full ${tier.className}`}>{tier.label}</span>
-                                                </div>
-                                            </button>
-                                            {activeLoyaltyTier === tier.id && (
-                                                <div className="p-4 mt-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200 rounded-lg text-base animate-fade-in" role="alert">
-                                                    {tier.definition}
-                                                </div>
-                                            )}
+                                        <div key={tier.id} className="flex items-center justify-between gap-4 p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:border-indigo-500/50 transition-colors">
+                                            <span className="font-mono text-base text-gray-600 dark:text-slate-400">{tier.visits}</span>
+                                            <TooltipTerm definition={tier.definition}>
+                                                <span className={`text-base font-semibold px-3 py-1.5 rounded-full ${tier.className}`}>
+                                                    {tier.label}
+                                                </span>
+                                            </TooltipTerm>
                                         </div>
                                     ))}
                                 </div>
