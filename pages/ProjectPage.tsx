@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { projects } from '../data/projects';
@@ -8,7 +9,7 @@ const ProjectPage: React.FC = () => {
 
   if (!project) {
     // Or return a 404 component
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" />;
   }
 
   return (

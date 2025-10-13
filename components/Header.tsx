@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -33,12 +34,16 @@ const Header: React.FC = () => {
     setIsOpen(false);
   }, [location.pathname]);
 
-  const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
-    `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300 ${
-      isActive
-        ? 'bg-slate-900 dark:bg-slate-700 text-white'
-        : 'text-gray-300 hover:bg-slate-700 dark:hover:bg-slate-700 hover:text-white'
-    }`;
+  const navLinkClassName = ({ isActive }: { isActive: boolean }): string => {
+    const baseClasses = "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300";
+    const activeClasses = "bg-slate-900 dark:bg-slate-700 text-white";
+    const inactiveClasses = "text-gray-300 hover:bg-slate-700 dark:hover:bg-slate-700 hover:text-white";
+    return `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
+  };
+
+  const mobileNavLinkClassName = ({ isActive }: { isActive: boolean }): string => {
+    return `${navLinkClassName({ isActive })} block`;
+  };
 
   return (
     <header className="bg-slate-800 dark:bg-slate-900 shadow-lg sticky top-0 z-50 border-b border-slate-700 dark:border-slate-800">
@@ -67,13 +72,13 @@ const Header: React.FC = () => {
               <>
                 <div className="hidden md:block">
                   <div className="ml-4 flex items-baseline space-x-4">
-                    <NavLink to="/" className={navLinkClasses}>
+                    <NavLink to="/" end className={navLinkClassName}>
                       Главная
                     </NavLink>
-                    <NavLink to="/about" className={navLinkClasses}>
+                    <NavLink to="/about" className={navLinkClassName}>
                       Обо мне
                     </NavLink>
-                    <NavLink to="/contact" className={navLinkClasses}>
+                    <NavLink to="/contact" className={navLinkClassName}>
                       Контакты
                     </NavLink>
                   </div>
@@ -109,13 +114,13 @@ const Header: React.FC = () => {
         aria-label="Мобильное меню"
       >
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <NavLink to="/" className={({ isActive }) => `${navLinkClasses({isActive})} block`} onClick={() => setIsOpen(false)}>
+          <NavLink to="/" end className={mobileNavLinkClassName} onClick={() => setIsOpen(false)}>
             Главная
           </NavLink>
-          <NavLink to="/about" className={({ isActive }) => `${navLinkClasses({isActive})} block`} onClick={() => setIsOpen(false)}>
+          <NavLink to="/about" className={mobileNavLinkClassName} onClick={() => setIsOpen(false)}>
             Обо мне
           </NavLink>
-          <NavLink to="/contact" className={({ isActive }) => `${navLinkClasses({isActive})} block`} onClick={() => setIsOpen(false)}>
+          <NavLink to="/contact" className={mobileNavLinkClassName} onClick={() => setIsOpen(false)}>
             Контакты
           </NavLink>
         </div>
