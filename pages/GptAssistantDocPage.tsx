@@ -28,17 +28,17 @@ const TicketWorkflowDiagram: React.FC = () => {
             <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                 <h3 className="text-xl font-bold text-center text-gray-800 dark:text-slate-200 mb-8">Жизненный цикл обработки тикета</h3>
                 <div className="flex flex-col items-center">
-                    {/* Main Pipeline */}
-                    <div className="flex flex-col md:flex-row items-stretch justify-center gap-2">
+                    {/* Main Pipeline: Adaptive Layout */}
+                    <div className="flex flex-col lg:flex-row items-stretch justify-center gap-2">
                         {stages.map((stage, index) => (
                             <React.Fragment key={stage.title}>
-                                <div className="flex-1 flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm min-w-[160px]">
+                                <div className="flex-1 flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm min-w-[180px]">
                                     {stage.icon}
                                     <h4 className="font-semibold mt-3 text-gray-800 dark:text-slate-200">{stage.title}</h4>
                                     <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{stage.description}</p>
                                 </div>
-                                {index < stages.length - 1 && <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 self-center hidden md:block mx-2" />}
-                                {index < stages.length - 1 && <ArrowDownCircleIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 self-center md:hidden my-2" />}
+                                {index < stages.length - 1 && <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 self-center hidden lg:block mx-2" />}
+                                {index < stages.length - 1 && <ArrowDownCircleIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 self-center lg:hidden my-2" />}
                             </React.Fragment>
                         ))}
                     </div>
@@ -46,16 +46,29 @@ const TicketWorkflowDiagram: React.FC = () => {
                     <ArrowDownCircleIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 my-4" />
 
                     {/* Decision Outcomes */}
-                    <div className="relative flex flex-col md:flex-row items-stretch justify-center gap-8 w-full max-w-2xl">
+                    <div className="relative flex flex-col md:flex-row items-stretch justify-center gap-8 w-full max-w-3xl">
                         {/* Connecting Lines */}
                         <div className="hidden md:block absolute top-[-2.5rem] left-1/2 h-10 w-px bg-gray-300 dark:bg-slate-600"></div>
-                        <div className="hidden md:block absolute top-[-0.5rem] left-1/4 w-1/2 h-px bg-gray-300 dark:bg-slate-600"></div>
-                        <div className="hidden md:block absolute top-[-0.5rem] left-1/4 w-px h-6 bg-gray-300 dark:bg-slate-600"></div>
-                        <div className="hidden md:block absolute top-[-0.5rem] right-1/4 w-px h-6 bg-gray-300 dark:bg-slate-600"></div>
+                        <div className="hidden md:block absolute top-[-0.5rem] left-[25%] w-1/2 h-px bg-gray-300 dark:bg-slate-600"></div>
+                        <div className="hidden md:block absolute top-[-0.5rem] left-[25%] w-px h-10 bg-gray-300 dark:bg-slate-600"></div>
+                        <div className="hidden md:block absolute top-[-0.5rem] right-[25%] w-px h-10 bg-gray-300 dark:bg-slate-600"></div>
+                        
+                        {/* Condition Labels */}
+                        <div className="hidden md:block absolute top-[-2.5rem] left-[25%] ml-2 text-xs text-center">
+                            <span className="font-mono bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 px-2 py-1 rounded-md border border-green-200 dark:border-green-700">
+                                `score` высокий
+                            </span>
+                        </div>
+                        <div className="hidden md:block absolute top-[-2.5rem] right-[25%] mr-2 text-xs text-center">
+                            <span className="font-mono bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-md border border-yellow-200 dark:border-yellow-700">
+                               `score` низкий
+                            </span>
+                        </div>
+
 
                         {outcomes.map(outcome => (
-                             <div key={outcome.title} className="flex-1 flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border-2 shadow-lg hover:shadow-xl transition-shadow duration-300
-                                ${outcome.title === 'Автоответ' ? 'border-green-300 dark:border-green-700' : 'border-yellow-300 dark:border-yellow-700'}"
+                             <div key={outcome.title} className={`flex-1 flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border-2 shadow-lg hover:shadow-xl transition-shadow duration-300
+                                ${outcome.title === 'Автоответ' ? 'border-green-300 dark:border-green-700' : 'border-yellow-300 dark:border-yellow-700'}`}
                              >
                                 {outcome.icon}
                                 <h4 className={`font-semibold mt-3 ${outcome.title === 'Автоответ' ? 'text-green-800 dark:text-green-300' : 'text-yellow-800 dark:text-yellow-300'}`}>{outcome.title}</h4>
@@ -134,10 +147,10 @@ const GptAssistantDocumentationPage: React.FC = () => {
                             <p>Каждая пара «вопрос-ответ» из базы знаний преобразуется в числовой вектор (<TooltipTerm definition="Процесс преобразования текста в числовой вектор (массив чисел), который отражает семантическое значение этого текста. Близкие по смыслу тексты будут иметь близкие векторы в многомерном пространстве.">embedding</TooltipTerm>). Эти векторы хранятся в специальной векторной базе данных, которая, по сути, является «библиотекой смыслов», оптимизированной для поиска по смысловой близости, а не по ключевым словам.</p>
                         </InfoCard>
                         <InfoCard icon={<MagnifyingGlassIcon className="w-8 h-8"/>} title="Шаг 2: Поиск (Retrieval)">
-                            <p>Когда поступает новый вопрос от клиента, он также векторизуется. Затем система производит <TooltipTerm definition="Поиск, который находит не точные совпадения по словам, а наиболее близкие по смыслу фрагменты текста, сравнивая их числовые векторы.">семантический поиск</TooltipTerm> по векторной базе, чтобы найти наиболее близкие по смыслу и релевантные «факты» (сохраненные Q&A пары), которые помогут ответить на вопрос.</p>
+                            <p>Когда поступает новый вопрос, система векторизует его и производит <TooltipTerm definition="Поиск, который находит не точные совпадения по словам, а наиболее близкие по смыслу фрагменты текста, сравнивая их числовые векторы.">семантический поиск</TooltipTerm> по базе знаний. На этом этапе используется <TooltipTerm definition="Семейство моделей от Google, используемое для анализа контекста, извлечения фактов и саммаризации. Отличается высокой скоростью и эффективностью для задач понимания текста.">gemini-2.5-flash</TooltipTerm> для анализа и ранжирования найденных «фактов», чтобы отобрать только самую релевантную информацию для ответа.</p>
                         </InfoCard>
                         <InfoCard icon={<SparklesIcon className="w-8 h-8"/>} title="Шаг 3: Генерация (Generation)">
-                            <p>Найденные «факты» вместе с исходным вопросом клиента передаются в модель <TooltipTerm definition="Модель от OpenAI, применяемая для генерации финального, стилистически выверенного ответа на основе подготовленного контекста.">GPT-4o</TooltipTerm>. Модель использует этот обогащенный контекст для генерации финального, точного и стилистически правильного ответа, который основан на данных, а не на догадках.</p>
+                            <p>Отобранные «факты» вместе с исходным вопросом клиента передаются в модель <TooltipTerm definition="Модель от OpenAI, применяемая для генерации финального, стилистически выверенного ответа на основе подготовленного контекста.">GPT-4o</TooltipTerm>. Здесь раскрывается сила гибридного подхода: GPT-4o, специализируясь на создании стилистически выверенного текста, использует этот обогащенный контекст для генерации финального ответа, который основан на данных, а не на догадках.</p>
                         </InfoCard>
                     </div>
                 </section>
