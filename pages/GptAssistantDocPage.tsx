@@ -1,12 +1,12 @@
 import React, { useState, ReactNode } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, DefinitionList, Modal } from '../components/DocumentationUIComponents';
+import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, DefinitionList, Modal, AnnotatedCodeBlock } from '../components/DocumentationUIComponents';
 import { 
     ChatBubbleLeftRightIcon, BookOpenIcon, CpuChipIcon, MagnifyingGlassIcon,
     CircleStackIcon, DocumentTextIcon, ArrowDownCircleIcon, Cog6ToothIcon, LightBulbIcon,
     PuzzlePieceIcon, QuestionMarkCircleIcon, ArrowLongRightIcon, SparklesIcon, UserIcon, LinkIcon,
     ArrowDownTrayIcon, ArrowUpTrayIcon, EyeIcon, CubeTransparentIcon, BoltIcon,
-    DocumentDuplicateIcon, CheckCircleIcon, ExclamationCircleIcon, ClockIcon, ArrowPathIcon
+    DocumentDuplicateIcon, CheckCircleIcon, ExclamationCircleIcon, ClockIcon, ArrowPathIcon, ArrowLongDownIcon
 } from '@heroicons/react/24/outline';
 
 const GptAssistantDocumentationPage: React.FC = () => {
@@ -64,6 +64,17 @@ JSON: "{ \\"question\\": \\"...\\", \\"candidates\\": [...] }"`
     const openModal = (data: any) => {
         setModalData(data);
     };
+    
+    const ragFileContent = [
+        { code: '<BEGIN_BLOCK>', annotation: 'Начало уникального блока информации. Служит разделителем для парсера.' },
+        { code: '<Q> Как восстановить пароль?', annotation: 'Канонический, очищенный вопрос, описывающий суть проблемы. Именно этот текст будет векторизован для поиска.', isHighlighted: true },
+        { code: '<A> Чтобы восстановить доступ, перейдите по ссылке...', annotation: 'Эталонный, исчерпывающий и готовый к использованию ответ на вопрос.', isHighlighted: true },
+        { code: '<CATEGORY> Авторизация', annotation: 'Категория верхнего уровня для группировки и фильтрации.' },
+        { code: '<SUBCATEGORY> Восстановление пароля', annotation: 'Уточняющая подкатегория для большей детализации.' },
+        { code: '<KEYWORDS> пароль; доступ; сброс;', annotation: 'Набор ключевых слов через точку с запятой для улучшения поиска по ключевым словам в дополнение к семантическому поиску.' },
+        { code: '<END_BLOCK>', annotation: 'Конец информационного блока.' },
+    ];
+
 
     return (
     <DocumentationPageLayout title="GPT-ассистент с RAG">
@@ -241,60 +252,48 @@ JSON: "{ \\"question\\": \\"...\\", \\"candidates\\": [...] }"`
                 title="5. RAG-файл: Библиотека ассистента"
                 subtitle="Это «библиотека» знаний системы. Структурированный текстовый файл, где каждый блок содержит вопрос, ответ и метаданные, которые преобразуются в векторы для семантического поиска."
             />
-             <figure className="my-8 not-prose" role="group" aria-labelledby="rag-json-diagram-title">
+            <figure className="my-8 not-prose" role="group" aria-labelledby="rag-json-diagram-title">
                 <figcaption id="rag-json-diagram-title" className="text-xl font-bold text-center text-gray-800 dark:text-slate-200 mb-6">
                     Взаимосвязь RAG-файла и JSON-лога
                 </figcaption>
-                <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                    <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
-                        <div className="flex flex-col items-center flex-1">
+                <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-8 border border-gray-200 dark:border-slate-700">
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-x-4 gap-y-6 text-center">
+                        
+                        {/* 1. Client Request */}
+                        <div className="flex flex-col items-center w-40">
+                            <UserIcon className="w-12 h-12 p-2 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-full text-indigo-500 mb-3"/>
                             <h3 className="font-semibold text-gray-800 dark:text-slate-200">Запрос клиента</h3>
-                            <ArrowDownTrayIcon className="w-10 h-10 my-2 text-gray-400 dark:text-slate-500"/>
                         </div>
-                        <div className="flex flex-col items-center p-4 rounded-lg bg-white dark:bg-slate-800 border dark:border-slate-700 flex-1">
-                           <h3 className="font-semibold text-gray-800 dark:text-slate-200">Механизм RAG-поиска (gpttunnel)</h3>
-                           <div className="w-full flex justify-between items-center mt-4">
-                                <div className="text-left">
-                                    <p className="text-sm text-gray-500 dark:text-slate-400">Ищет в...</p>
-                                    <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600" />
-                                </div>
-                               <div className="text-right">
-                                    <p className="text-sm text-gray-500 dark:text-slate-400">Формирует...</p>
-                                    <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600" />
-                                </div>
-                           </div>
+                        
+                        <ArrowLongRightIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block" />
+                        <ArrowLongDownIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 md:hidden" />
+
+                        {/* 2. Processing Core */}
+                        <div className="flex flex-col items-center w-52 p-4 rounded-lg bg-white dark:bg-slate-800 border-2 border-indigo-500 dark:border-indigo-400 shadow-lg">
+                            <CpuChipIcon className="w-12 h-12 text-indigo-500 dark:text-indigo-400 mb-3"/>
+                            <h3 className="font-semibold text-gray-800 dark:text-slate-200">Механизм RAG-поиска</h3>
+                            <p className="text-xs text-gray-500 dark:text-slate-400">(gpttunnel)</p>
+                            <div className="mt-4 pt-3 border-t border-gray-200 dark:border-slate-700 w-full flex items-center justify-center gap-2">
+                                <ArrowDownCircleIcon className="w-5 h-5 text-gray-400 dark:text-slate-500"/>
+                                <p className="text-xs text-gray-500 dark:text-slate-400">Использует <strong className="text-gray-600 dark:text-slate-300">RAG-файл</strong> как источник</p>
+                            </div>
                         </div>
-                         <div className="flex flex-col md:flex-row gap-4 flex-1">
-                            <div className="flex flex-col items-center">
-                                <h3 className="font-semibold text-gray-800 dark:text-slate-200">RAG-файл (Библиотека)</h3>
-                                <p className="text-sm text-gray-500 dark:text-slate-400">Хранит факты и ответы</p>
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <h3 className="font-semibold text-gray-800 dark:text-slate-200">JSON-лог (Дневник)</h3>
-                                <p className="text-sm text-gray-500 dark:text-slate-400">Записывает процесс выбора</p>
-                            </div>
+
+                        <ArrowLongRightIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block" />
+                        <ArrowLongDownIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 md:hidden" />
+
+                        {/* 3. Result */}
+                        <div className="flex flex-col items-center w-40">
+                            <DocumentTextIcon className="w-12 h-12 p-2 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-full text-green-600 dark:text-green-400 mb-3"/>
+                            <h3 className="font-semibold text-gray-800 dark:text-slate-200">JSON-лог</h3>
+                             <p className="text-xs text-gray-500 dark:text-slate-400">(Дневник)</p>
                         </div>
                     </div>
                 </div>
             </figure>
             <div className="bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
-                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">RAG-файл — библиотека ассистента</h3>
-                <p className="mt-2">Это «библиотека» знаний системы. Структурированный текстовый файл, где каждый блок содержит вопрос, ответ и метаданные, которые преобразуются в <TooltipTerm definition="Числовые представления смысла текста.">векторы</TooltipTerm> для семантического поиска.</p>
-                <CodeBlockWithCopy title="Пример записи в RAG-файле" code={`<BEGIN_BLOCK>
-<Q> Как восстановить пароль?
-<A> Чтобы восстановить доступ, перейдите по ссылке...
-<CATEGORY> Авторизация
-<SUBCATEGORY> Восстановление пароля
-<KEYWORDS> пароль; доступ; сброс; личный кабинет
-<END_BLOCK>`} />
-                <h4 className="text-lg font-bold mt-6">Расшифровка тегов</h4>
-                <DefinitionList items={[
-                    { term: '<Q>', definition: 'Канонический, очищенный вопрос, описывающий суть проблемы.' },
-                    { term: '<A>', definition: 'Эталонный, исчерпывающий и готовый к использованию ответ на вопрос.' },
-                    { term: '<CATEGORY>', definition: 'Категория верхнего уровня для группировки (напр., `Авторизация`).' },
-                    { term: '<SUBCATEGORY>', definition: 'Уточняющая подкатегория для большей детализации.' },
-                    { term: '<KEYWORDS>', definition: 'Набор ключевых слов через точку с запятой для улучшения поиска.' },
-                ]} />
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">Анатомия RAG-файла</h3>
+                <AnnotatedCodeBlock title="Пример записи в RAG-файле" items={ragFileContent} />
             </div>
         </section>
 

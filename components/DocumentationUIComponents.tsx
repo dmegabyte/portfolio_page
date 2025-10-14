@@ -1,6 +1,6 @@
 import React, { useState, ReactNode, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, XMarkIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { useModalLogic } from '../hooks/useModalLogic';
 
 // --- Section Header ---
@@ -44,18 +44,11 @@ export const InfoCard: React.FC<InfoCardProps> = ({ icon, title, children }) => 
 
 // --- Collapsible Section (Accordion) ---
 interface CollapsibleSectionProps {
-  // FIX: Changed type from `string` to `ReactNode` to allow complex JSX elements as titles.
   title: ReactNode;
   children: ReactNode;
   defaultOpen?: boolean;
 }
 
-// FIX: Re-implemented CollapsibleSection using React state to manage its open/closed status.
-// The previous implementation relied on the native HTML <details> element, which can cause
-// unpredictable behavior or conflicts within a complex React component tree, potentially
-// leading to the observed hook-related error (#306). This new version uses a standard,
-// controlled component pattern with `useState`, ensuring predictable state management
-// and eliminating potential side effects from native element interactions.
 export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, children, defaultOpen = false }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -127,12 +120,6 @@ interface TooltipTermProps {
     children: ReactNode;
     definition: string;
 }
-
-// This component was completely re-architected to solve a fundamental clipping issue.
-// It now uses a React Portal to render the tooltip at the document root, ensuring it
-// is never obscured by parent elements with `overflow: hidden` or `z-index` stacking.
-// This change directly upholds "Principle 4: Flawless UI Quality" from the README.md.
-// Additionally, it's now fully keyboard-accessible, adhering to Principle #6.
 export const TooltipTerm: React.FC<TooltipTermProps> = ({ children, definition }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [position, setPosition] = useState({ top: 0, left: 0 });
@@ -210,10 +197,6 @@ interface ModalProps {
 export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
     const [isMounted, setIsMounted] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
-
-    // This custom hook now encapsulates all the complex side effects like focus trapping,
-    // keyboard event handling, and body scroll locking. This makes the Modal component
-    // a clean, presentational component, adhering to Principle #8.
     useModalLogic({ isOpen, onClose, modalRef });
 
     useEffect(() => {
@@ -242,7 +225,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
                 ref={modalRef}
                 role="document"
                 className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-3xl w-full m-4 border border-gray-200 dark:border-slate-800 animate-modal-enter"
-                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+                onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-slate-800 sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
                     <h3 id="modal-title" className="text-2xl font-bold text-slate-900 dark:text-slate-200">{title}</h3>
@@ -268,7 +251,6 @@ interface ReadMoreProps {
     children: ReactNode;
     lines: number;
 }
-
 export const ReadMore: React.FC<ReadMoreProps> = ({ children, lines }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [showButton, setShowButton] = useState(false);
@@ -286,13 +268,11 @@ export const ReadMore: React.FC<ReadMoreProps> = ({ children, lines }) => {
         const checkOverflow = () => {
             const element = contentRef.current;
             if (element) {
-                // In a clamped state, scrollHeight is the full height, clientHeight is the visible height.
                 const hasOverflow = element.scrollHeight > element.clientHeight;
                 setShowButton(hasOverflow);
             }
         };
         
-        // Check after a brief moment to let the DOM settle, and on window resize.
         const timer = setTimeout(checkOverflow, 100);
         window.addEventListener('resize', checkOverflow);
 
@@ -325,7 +305,6 @@ export const ReadMore: React.FC<ReadMoreProps> = ({ children, lines }) => {
 interface DefinitionListProps {
   items: { term: string; definition: string }[];
 }
-
 export const DefinitionList: React.FC<DefinitionListProps> = ({ items }) => (
     <dl className="space-y-4">
         {items.map((item, index) => (
@@ -340,3 +319,68 @@ export const DefinitionList: React.FC<DefinitionListProps> = ({ items }) => (
         ))}
     </dl>
 );
+
+// --- Annotated Code Block ---
+interface AnnotatedCodeBlockProps {
+    title: string;
+    items: { code: string; annotation: string; isHighlighted?: boolean }[];
+}
+export const AnnotatedCodeBlock: React.FC<AnnotatedCodeBlockProps> = ({ title, items }) => {
+    const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+    return (
+        <div className="relative not-prose bg-slate-900 rounded-lg border border-slate-700 shadow-lg my-6">
+            <div className="px-4 py-2 border-b border-slate-700">
+                <span className="text-sm font-semibold text-slate-400">{title}</span>
+            </div>
+            <div className="flex flex-col md:flex-row">
+                {/* Code Area */}
+                <div className="md:w-1/2 p-4">
+                    <pre className="text-slate-300 text-base mt-0 bg-transparent">
+                        <code className="flex flex-col">
+                            {items.map((item, index) => (
+                                <span
+                                    key={index}
+                                    onMouseEnter={() => setActiveIndex(index)}
+                                    onMouseLeave={() => setActiveIndex(null)}
+                                    className={`
+                                        block p-1 rounded-md transition-colors duration-200 cursor-pointer
+                                        ${activeIndex === index ? 'bg-indigo-900/50' : 'hover:bg-slate-800/50'}
+                                        ${item.isHighlighted ? 'font-bold text-sky-300' : ''}
+                                    `}
+                                >
+                                    {item.code}
+                                </span>
+                            ))}
+                        </code>
+                    </pre>
+                </div>
+                {/* Annotation Area */}
+                <div className="md:w-1/2 p-4 border-t md:border-t-0 md:border-l border-slate-700 bg-slate-800/50 rounded-b-lg md:rounded-b-none md:rounded-r-lg">
+                    <div className="relative h-full min-h-[150px]">
+                        {items.map((item, index) => (
+                            <div
+                                key={index}
+                                className={`
+                                    absolute inset-0 transition-opacity duration-300
+                                    ${activeIndex === index ? 'opacity-100' : 'opacity-0'}
+                                `}
+                                aria-hidden={activeIndex !== index}
+                            >
+                                <div className="flex items-start gap-3">
+                                    <InformationCircleIcon className="w-5 h-5 mt-0.5 text-sky-400 flex-shrink-0" />
+                                    <p className="text-slate-300 text-sm">{item.annotation}</p>
+                                </div>
+                            </div>
+                        ))}
+                         {activeIndex === null && (
+                            <div className="flex items-center justify-center h-full text-slate-500 text-sm">
+                                Наведите на строку кода, чтобы увидеть описание.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
