@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useId } from 'react';
 import ReactDOM from 'react-dom';
 import DocumentationPageLayout from '../components/DocPageLayout';
 import { SectionHeader, InfoCard, TooltipTerm, CollapsibleSection, CodeBlockWithCopy } from '../components/DocumentationUIComponents';
@@ -21,31 +21,46 @@ const TicketProcessingPipeline: React.FC = () => {
             icon: <InboxArrowDownIcon className="w-8 h-8 text-indigo-500" />,
             title: "Шаг 1: Получение тикета (Вход)",
             description: "Процесс начинается, когда оригинальное сообщение клиента поступает из Omnidesk. Система немедленно фиксирует его в Google Sheet для отслеживания.",
-            columns: ["question", "subject", "case_link"]
+            transformation: {
+                input: { title: "Сообщение клиента", data: `"Не могу войти в личный кабинет..."` },
+                output: { title: "Столбцы: `question`, `subject`...", data: `question: "Не могу войти..."\nsubject: "Вход",\ncase_link: "..."` }
+            }
         },
         {
             icon: <FunnelIcon className="w-8 h-8 text-indigo-500" />,
             title: "Шаг 2: Очистка",
             description: "Из исходного текста запроса убираются все служебные метки, \"шум\" и повторения. Результат — чистый, нормализованный вопрос, готовый для семантического анализа.",
-            columns: ["clean_question"]
+            transformation: {
+                input: { title: "Столбец `question`", data: `"Не могу войти в личный кабинет..."` },
+                output: { title: "Столбец: `clean_question`", data: `"не могу войти личный кабинет"` }
+            }
         },
         {
             icon: <PencilSquareIcon className="w-8 h-8 text-indigo-500" />,
             title: "Шаг 3: Генерация",
             description: "На основе RAG-поиска и очищенного вопроса языковая модель (LLM) создает черновой вариант ответа. Этот текст является предварительным решением задачи клиента.",
-            columns: ["gpt_response"]
+             transformation: {
+                input: { title: "Столбец `clean_question`", data: `"не могу войти личный кабинет"` },
+                output: { title: "Столбец: `gpt_response`", data: `"Чтобы восстановить доступ, перейдите..."` }
+            }
         },
         {
             icon: <CheckCircleIcon className="w-8 h-8 text-indigo-500" />,
             title: "Шаг 4: Контроль",
             description: "Система оценивает уверенность сгенерированного ответа (score) и присваивает тикету статус. На этом этапе принимается решение, предлагать ли ответ оператору.",
-            columns: ["score", "status"]
+            transformation: {
+                input: { title: "Столбец `gpt_response`", data: `"Чтобы восстановить доступ..."` },
+                output: { title: "Столбцы: `score`, `status`", data: `score: 91\nstatus: "Подсказка"` }
+            }
         },
         {
             icon: <DocumentTextIcon className="w-8 h-8 text-indigo-500" />,
             title: "Шаг 5: Диагностика",
             description: "Сохраняются полные внутренние логи, включая \"цепочку рассуждений\" модели. Это позволяет анализировать и отлаживать процесс принятия решений ассистентом.",
-            columns: ["triage_response", "JSON"]
+            transformation: {
+                input: { title: "Результат генерации", data: `{\n  model_score: 91, ...\n}` },
+                output: { title: "Столбцы: `triage_response`, `JSON`", data: `"{ \\"question\\": \\"...\\" }"` }
+            }
         }
     ];
 
@@ -69,17 +84,18 @@ const TicketProcessingPipeline: React.FC = () => {
                         <div className="flex-grow pt-1">
                             <h4 className="font-bold text-xl text-slate-900 dark:text-slate-200 mt-0">{step.title}</h4>
                             <p className="mt-1 text-base text-gray-700 dark:text-slate-300">{step.description}</p>
-                             <div className="mt-3 bg-gray-50 dark:bg-slate-800/50 rounded-md p-3 border border-gray-200 dark:border-slate-700">
-                                <h5 className="text-sm font-semibold text-gray-600 dark:text-slate-400 flex items-center gap-2">
-                                    <TableCellsIcon className="w-4 h-4" />
-                                    Затрагиваемые столбцы в Google Sheets:
-                                </h5>
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                    {step.columns.map(col => (
-                                        <code key={col} className="text-sm font-mono bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-slate-200 px-2 py-1 rounded-md">{col}</code>
-                                    ))}
+                            {step.transformation && (
+                                <div className="mt-4 grid md:grid-cols-2 gap-4">
+                                    <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
+                                        <h5 className="font-semibold text-gray-700 dark:text-slate-300 mb-2">Вход: {step.transformation.input.title}</h5>
+                                        <code className="block text-sm whitespace-pre-wrap bg-white dark:bg-slate-900 p-2 rounded">{step.transformation.input.data}</code>
+                                    </div>
+                                    <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-700">
+                                         <h5 className="font-semibold text-green-800 dark:text-green-300 mb-2">Выход: {step.transformation.output.title}</h5>
+                                        <code className="block text-sm whitespace-pre-wrap bg-green-100/50 dark:bg-green-900/50 p-2 rounded">{step.transformation.output.data}</code>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
                 ))}
@@ -93,6 +109,7 @@ const GptAssistantDocumentationPage: React.FC = () => {
     const scoreExplanation = "Это показатель уверенности модели (от 0.0 до 1.0) в том, что сгенерированный ответ точен и релевантен. Если score ≥ 0.8, система предлагает ответ оператору как готовый к отправке черновик. Если score ниже, тикет помечается для полной ручной обработки. Этот механизм гарантирует, что оператор получает только качественные подсказки, а не сомнительные варианты.";
     const gptTunnelDiagramRef = useRef<HTMLDivElement>(null);
     useAnimateOnScroll(gptTunnelDiagramRef, { targetSelector: '.diagram-element' });
+    const arrowMarkerId = useId();
 
     const cycleSteps = [
         {
@@ -400,12 +417,12 @@ const GptAssistantDocumentationPage: React.FC = () => {
                         <div className="relative mt-2 w-full max-w-2xl mx-auto h-24">
                             <svg width="100%" height="100%" viewBox="0 0 400 100" preserveAspectRatio="xMidYMid meet" className="absolute inset-0">
                                 <defs>
-                                    <marker id="arrowhead-diag" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                    <marker id={arrowMarkerId} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                                         <path d="M 0 0 L 10 5 L 0 10 z" className="fill-current text-gray-400 dark:text-slate-500" />
                                     </marker>
                                 </defs>
-                                <path d="M 200 0 V 20 L 80 80" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-gray-400 dark:text-slate-500" markerEnd="url(#arrowhead-diag)" />
-                                <path d="M 200 20 L 320 80" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-gray-400 dark:text-slate-500" markerEnd="url(#arrowhead-diag)" />
+                                <path d="M 200 0 V 20 L 80 80" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-gray-400 dark:text-slate-500" markerEnd={`url(#${arrowMarkerId})`} />
+                                <path d="M 200 20 L 320 80" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-gray-400 dark:text-slate-500" markerEnd={`url(#${arrowMarkerId})`} />
                             </svg>
                             <div className="absolute top-10 left-[calc(25%+20px)] -translate-x-1/2 text-sm text-gray-500 dark:text-slate-400 italic">Ищет в...</div>
                             <div className="absolute top-10 right-[calc(25%+20px)] translate-x-1/2 text-sm text-gray-500 dark:text-slate-400 italic">Формирует...</div>
