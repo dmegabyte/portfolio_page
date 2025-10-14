@@ -87,14 +87,14 @@ const TicketProcessingPipeline: React.FC = () => {
                                 <div className="mt-4 grid md:grid-cols-2 gap-4">
                                     <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
                                         <h5 className="font-semibold text-gray-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                                            <ArrowDownTrayIcon className="w-5 h-5 text-gray-500 dark:text-slate-400" />
+                                            <ArrowDownTrayIcon className="w-5 h-5 text-gray-500 dark:text-slate-400" aria-hidden="true" />
                                             <span>Вход: {step.transformation.input.title}</span>
                                         </h5>
                                         <code className="block text-sm whitespace-pre-wrap bg-white dark:bg-slate-900 p-2 rounded">{step.transformation.input.data}</code>
                                     </div>
                                     <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-700">
                                          <h5 className="font-semibold text-green-800 dark:text-green-300 mb-2 flex items-center gap-2">
-                                            <ArrowUpTrayIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
+                                            <ArrowUpTrayIcon className="w-5 h-5 text-green-600 dark:text-green-400" aria-hidden="true" />
                                             <span>Выход: {step.transformation.output.title}</span>
                                          </h5>
                                         <code className="block text-sm whitespace-pre-wrap bg-green-100/50 dark:bg-green-900/50 p-2 rounded">{step.transformation.output.data}</code>
@@ -172,6 +172,13 @@ const WorkflowStepsSection: React.FC = () => (
 const GptTunnelMechanicsSection: React.FC = () => {
     const gptTunnelDiagramRef = useRef<HTMLDivElement>(null);
     useAnimateOnScroll(gptTunnelDiagramRef, { targetSelector: '.diagram-element' });
+    
+    const contextPackageFields = [
+        { term: "question", definition: "Очищенный и нормализованный вопрос клиента." },
+        { term: "context", definition: "Массив наиболее релевантных фрагментов, найденных в RAG-базе знаний." },
+        { term: "dialog_history", definition: "Предыдущие сообщения из диалога для сохранения контекста беседы." },
+        { term: "system_guidelines", definition: "Системные инструкции для LLM (стиль ответа, ограничения, формат вывода)." },
+    ];
 
     return (
         <>
@@ -220,33 +227,8 @@ const GptTunnelMechanicsSection: React.FC = () => {
   "system_guidelines": "...формат ответа, стиль, ограничения..."
 }
             `} />
-            <div className="my-6 not-prose overflow-x-auto">
-                <table className="w-full text-left border-collapse text-base">
-                    <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
-                        <tr>
-                            <th className="p-3 border border-gray-200 dark:border-slate-700">Ключ</th>
-                            <th className="p-3 border border-gray-200 dark:border-slate-700">Описание</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
-                        <tr className="border-b dark:border-slate-700">
-                            <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">question</td>
-                            <td className="p-3 border-x border-gray-200 dark:border-slate-700">Очищенный и нормализованный вопрос клиента.</td>
-                        </tr>
-                        <tr className="border-b dark:border-slate-700">
-                            <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">context</td>
-                            <td className="p-3 border-x border-gray-200 dark:border-slate-700">Массив наиболее релевантных фрагментов, найденных в RAG-базе знаний.</td>
-                        </tr>
-                        <tr className="border-b dark:border-slate-700">
-                            <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">dialog_history</td>
-                            <td className="p-3 border-x border-gray-200 dark:border-slate-700">Предыдущие сообщения из диалога для сохранения контекста беседы.</td>
-                        </tr>
-                        <tr className="border-b dark:border-slate-700">
-                            <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">system_guidelines</td>
-                            <td className="p-3 border-x border-gray-200 dark:border-slate-700">Системные инструкции для LLM (стиль ответа, ограничения, формат вывода).</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div className="my-6">
+                <DefinitionList items={contextPackageFields} />
             </div>
         </>
     );
@@ -481,7 +463,7 @@ const KnowledgeBaseSection: React.FC = () => {
                 title="7. База знаний и JSON-логи"
                 subtitle="Фундамент системы: как RAG-файл обеспечивает точность, и как JSON-логи помогают системе обучаться."
             />
-            <figure className="my-12 not-prose text-center" aria-labelledby={diagramTitleId}>
+            <figure role="group" className="my-12 not-prose text-center" aria-labelledby={diagramTitleId}>
                 <figcaption id={diagramTitleId} className="text-2xl font-bold mb-8 text-slate-800 dark:text-slate-200">Схема взаимодействия: от источника к результату</figcaption>
                 <div className="inline-block p-3 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
                     <p className="font-semibold">Запрос клиента</p>
