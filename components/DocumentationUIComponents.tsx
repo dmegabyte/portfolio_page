@@ -320,3 +320,23 @@ export const ReadMore: React.FC<ReadMoreProps> = ({ children, lines }) => {
         </div>
     );
 };
+
+// --- Definition List ---
+interface DefinitionListProps {
+  items: { term: string; definition: string }[];
+}
+
+export const DefinitionList: React.FC<DefinitionListProps> = ({ items }) => (
+    <dl className="space-y-4">
+        {items.map((item, index) => (
+            <div key={index} className="flex flex-col sm:flex-row text-base p-3 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
+                <dt className="w-full sm:w-1/3 flex-shrink-0 font-mono font-semibold text-slate-800 dark:text-slate-200">
+                    {item.term}
+                </dt>
+                <dd className="w-full sm:w-2/3 text-gray-700 dark:text-slate-300 sm:pl-4 mt-1 sm:mt-0">
+                    {item.definition}
+                </dd>
+            </div>
+        ))}
+    </dl>
+);

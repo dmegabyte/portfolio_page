@@ -1,6 +1,6 @@
 import React, { useRef, useId, useState, ReactNode } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, TooltipTerm, CodeBlockWithCopy, Modal } from '../components/DocumentationUIComponents';
+import { SectionHeader, InfoCard, TooltipTerm, CodeBlockWithCopy, Modal, DefinitionList } from '../components/DocumentationUIComponents';
 import { 
     CpuChipIcon, ShieldCheckIcon, DocumentTextIcon, WrenchScrewdriverIcon, 
     InboxArrowDownIcon, ArrowLongRightIcon, LightBulbIcon, 
@@ -420,21 +420,6 @@ const FullCycleExampleSection: React.FC = () => {
         </>
     );
 };
-
-const DefinitionList: React.FC<{ items: { term: string; definition: string }[] }> = ({ items }) => (
-    <dl className="space-y-4">
-        {items.map((item, index) => (
-            <div key={index} className="flex flex-col sm:flex-row text-base">
-                <dt className="w-full sm:w-1/3 flex-shrink-0 font-mono font-semibold text-slate-800 dark:text-slate-200">
-                    {item.term}
-                </dt>
-                <dd className="w-full sm:w-2/3 text-gray-700 dark:text-slate-300 sm:pl-4 mt-1 sm:mt-0">
-                    {item.definition}
-                </dd>
-            </div>
-        ))}
-    </dl>
-);
 
 const KnowledgeBaseSection: React.FC = () => {
     const arrowMarkerId = useId();
