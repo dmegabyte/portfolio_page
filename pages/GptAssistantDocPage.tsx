@@ -7,129 +7,130 @@ import {
     ScaleIcon, InboxArrowDownIcon, ArrowLongRightIcon, LightBulbIcon, 
     MagnifyingGlassIcon, PuzzlePieceIcon, SparklesIcon, PencilSquareIcon, 
     BookOpenIcon, BugAntIcon, HandRaisedIcon, FunnelIcon, CheckCircleIcon,
-    ArrowLongDownIcon, ExclamationTriangleIcon, AcademicCapIcon, ArrowPathIcon, FlagIcon, RocketLaunchIcon, Cog6ToothIcon, UsersIcon
+    ArrowLongDownIcon, ExclamationTriangleIcon, AcademicCapIcon, ArrowPathIcon, FlagIcon, RocketLaunchIcon, Cog6ToothIcon, UsersIcon, TableCellsIcon, ArchiveBoxIcon
 } from '@heroicons/react/24/outline';
 import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
 
 
-const TicketWorkflowDiagram: React.FC = () => {
-    const diagramRef = useRef<HTMLDivElement>(null);
-    useAnimateOnScroll(diagramRef, { targetSelector: '.diagram-element' });
-    
-    const [tooltipState, setTooltipState] = useState({ visible: false, content: '', top: 0, left: 0 });
-    const tooltipRef = useRef<HTMLDivElement>(null);
+const TicketProcessingPipeline: React.FC = () => {
+    const pipelineRef = useRef<HTMLDivElement>(null);
+    useAnimateOnScroll(pipelineRef, { targetSelector: '.pipeline-stage' });
 
-    const showTooltip = (event: React.MouseEvent<HTMLDivElement>, content: string) => {
-        const rect = event.currentTarget.getBoundingClientRect();
-        setTooltipState({
-            visible: true,
-            content,
-            top: rect.top - 8,
-            left: rect.left + rect.width / 2,
-        });
-    };
-
-    const hideTooltip = () => {
-        setTooltipState(prev => ({ ...prev, visible: false }));
-    };
-
-    const TooltipPortal = () => {
-        const tooltipRoot = document.getElementById('tooltip-root');
-        if (!tooltipRoot) return null;
-
-        return ReactDOM.createPortal(
-            <div
-                ref={tooltipRef}
-                className="fixed p-3 bg-slate-800 text-slate-200 text-sm rounded-md shadow-lg z-50 max-w-xs transition-opacity duration-200"
-                style={{
-                    top: tooltipState.top,
-                    left: tooltipState.left,
-                    transform: 'translate(-50%, -100%)',
-                    opacity: tooltipState.visible ? 1 : 0,
-                    pointerEvents: 'none'
-                }}
-                role="tooltip"
-            >
-                {tooltipState.content}
-            </div>,
-            tooltipRoot
-        );
-    };
-
-
-    const stages = [
-        { icon: <InboxArrowDownIcon className="w-10 h-10 text-indigo-500"/>, title: "1. Получение", tooltip: "Запрос от клиента поступает в систему из тикет-системы Omnidesk и становится отправной точкой для всего процесса анализа." },
-        { icon: <FunnelIcon className="w-10 h-10 text-indigo-500"/>, title: "2. Очистка и RAG", tooltip: "Текст запроса очищается от шума. Затем система производит семантический поиск по векторной базе знаний (RAG), чтобы найти наиболее релевантную информацию для формирования ответа." },
-        { icon: <PencilSquareIcon className="w-10 h-10 text-indigo-500"/>, title: "3. Генерация ответа", tooltip: "На основе найденных фактов LLM-модель составляет черновой вариант ответа, который максимально точно и полно отвечает на вопрос клиента." },
-        { icon: <CheckCircleIcon className="w-10 h-10 text-indigo-500"/>, title: "4. Оценка и отправка", tooltip: "Ответ предлагается оператору как готовый черновик, если его показатель уверенности (score) превышает 80%. В противном случае тикет передается на полную ручную обработку." },
+    const pipelineSteps = [
+        {
+            icon: <InboxArrowDownIcon className="w-8 h-8 text-indigo-500" />,
+            title: "Шаг 1: Получение тикета (Вход)",
+            description: "Процесс начинается, когда оригинальное сообщение клиента поступает из Omnidesk. Система немедленно фиксирует его в Google Sheet для отслеживания.",
+            columns: ["question", "subject", "case_link"]
+        },
+        {
+            icon: <FunnelIcon className="w-8 h-8 text-indigo-500" />,
+            title: "Шаг 2: Очистка",
+            description: "Из исходного текста запроса убираются все служебные метки, \"шум\" и повторения. Результат — чистый, нормализованный вопрос, готовый для семантического анализа.",
+            columns: ["clean_question"]
+        },
+        {
+            icon: <PencilSquareIcon className="w-8 h-8 text-indigo-500" />,
+            title: "Шаг 3: Генерация",
+            description: "На основе RAG-поиска и очищенного вопроса языковая модель (LLM) создает черновой вариант ответа. Этот текст является предварительным решением задачи клиента.",
+            columns: ["gpt_response"]
+        },
+        {
+            icon: <CheckCircleIcon className="w-8 h-8 text-indigo-500" />,
+            title: "Шаг 4: Контроль",
+            description: "Система оценивает уверенность сгенерированного ответа (score) и присваивает тикету статус. На этом этапе принимается решение, предлагать ли ответ оператору.",
+            columns: ["score", "status"]
+        },
+        {
+            icon: <DocumentTextIcon className="w-8 h-8 text-indigo-500" />,
+            title: "Шаг 5: Диагностика",
+            description: "Сохраняются полные внутренние логи, включая \"цепочку рассуждений\" модели. Это позволяет анализировать и отлаживать процесс принятия решений ассистентом.",
+            columns: ["triage_response", "JSON"]
+        }
     ];
-    
+
     return (
-        <div ref={diagramRef} className="my-8 not-prose">
-            <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                 <div className="flex flex-col md:flex-row items-stretch justify-center gap-4 text-center">
-                    {stages.map((stage, index) => (
-                        <React.Fragment key={stage.title}>
-                            <div 
-                                className="flex-1 flex justify-center diagram-element" 
-                                style={{ transitionDelay: `${index * 150}ms` }}
-                                onMouseEnter={(e) => showTooltip(e, stage.tooltip)}
-                                onMouseLeave={hideTooltip}
-                            >
-                                <div className="flex flex-col items-center text-center p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm w-full max-w-[180px] h-full">
-                                    {stage.icon}
-                                    <h4 className="font-semibold mt-3 text-gray-800 dark:text-slate-200 flex-grow flex items-center">{stage.title}</h4>
+        <div ref={pipelineRef} className="my-8 not-prose">
+            <div className="space-y-8 relative">
+                {/* Vertical connecting line */}
+                <div className="absolute left-9 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-slate-700" aria-hidden="true"></div>
+                
+                {pipelineSteps.map((step, index) => (
+                    <div 
+                        key={index} 
+                        className="relative flex items-start gap-6 pipeline-stage"
+                        style={{ transitionDelay: `${index * 150}ms` }}
+                    >
+                        {/* Icon */}
+                        <div className="flex-shrink-0 w-20 h-20 bg-white dark:bg-slate-900 border-4 border-gray-200 dark:border-slate-700 rounded-full flex items-center justify-center z-10">
+                            {step.icon}
+                        </div>
+                        {/* Content */}
+                        <div className="flex-grow pt-1">
+                            <h4 className="font-bold text-xl text-slate-900 dark:text-slate-200 mt-0">{step.title}</h4>
+                            <p className="mt-1 text-base text-gray-700 dark:text-slate-300">{step.description}</p>
+                             <div className="mt-3 bg-gray-50 dark:bg-slate-800/50 rounded-md p-3 border border-gray-200 dark:border-slate-700">
+                                <h5 className="text-sm font-semibold text-gray-600 dark:text-slate-400 flex items-center gap-2">
+                                    <TableCellsIcon className="w-4 h-4" />
+                                    Затрагиваемые столбцы в Google Sheets:
+                                </h5>
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {step.columns.map(col => (
+                                        <code key={col} className="text-sm font-mono bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-slate-200 px-2 py-1 rounded-md">{col}</code>
+                                    ))}
                                 </div>
                             </div>
-                            {index < stages.length - 1 && (
-                                <>
-                                    <ArrowLongRightIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 self-center hidden md:block diagram-element" style={{ transitionDelay: `${index * 150 + 75}ms` }} />
-                                    <ArrowLongDownIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 self-center md:hidden my-2 diagram-element" style={{ transitionDelay: `${index * 150 + 75}ms` }} />
-                                </>
-                            )}
-                        </React.Fragment>
-                    ))}
-                </div>
+                        </div>
+                    </div>
+                ))}
             </div>
-            <TooltipPortal />
         </div>
     );
 };
 
+
 const GptAssistantDocumentationPage: React.FC = () => {
     const scoreExplanation = "Это показатель уверенности модели (от 0.0 до 1.0) в том, что сгенерированный ответ точен и релевантен. Если score ≥ 0.8, система предлагает ответ оператору как готовый к отправке черновик. Если score ниже, тикет помечается для полной ручной обработки. Этот механизм гарантирует, что оператор получает только качественные подсказки, а не сомнительные варианты.";
+    const gptTunnelDiagramRef = useRef<HTMLDivElement>(null);
+    useAnimateOnScroll(gptTunnelDiagramRef, { targetSelector: '.diagram-element' });
 
     const cycleSteps = [
         {
             icon: <InboxArrowDownIcon className="w-8 h-8 text-indigo-500"/>,
             title: "Шаг 1: Получение тикета",
-            description: "Клиентский запрос «Я не могу войти в личный кабинет, пишет неверный пароль» поступает из Omnidesk. Ассистент немедленно фиксирует его в Google Sheet для отслеживания."
+            description: "Клиентский запрос поступает из Omnidesk. Ассистент немедленно фиксирует его в Google Sheet для отслеживания.",
+            inputOutput: {
+                input: { title: "Запрос клиента", data: `"Я не могу войти в личный кабинет, пишет неверный пароль"` },
+                output: { title: "Запись в Google Sheet", data: `question: "Я не могу войти..."\nsubject: "Вход"\ncase_link: "..."` }
+            }
         },
         {
             icon: <FunnelIcon className="w-8 h-8 text-indigo-500"/>,
             title: "Шаг 2: Очистка вопроса",
-            description: "Система нормализует текст, удаляя шум и приводя его к каноническому виду. Результат записывается в столбец `clean_question`: «Не могу войти в личный кабинет, забыл пароль»."
+            description: "Система нормализует текст, удаляя шум и приводя его к каноническому виду. Результат записывается в столбец `clean_question`.",
+            inputOutput: {
+                input: { title: "Столбец `question`", data: `"Я не могу войти в личный кабинет, пишет неверный пароль"` },
+                output: { title: "Столбец `clean_question`", data: `"Не могу войти в личный кабинет, забыл пароль"` }
+            }
         },
         {
             icon: <MagnifyingGlassIcon className="w-8 h-8 text-indigo-500"/>,
-            title: "Шаг 3: RAG-поиск",
-            description: "Очищенный запрос векторизуется и сравнивается с базой знаний. Система находит наиболее релевантный блок — «Восстановление пароля»."
+            title: "Шаг 3: RAG-поиск и генерация",
+            description: "Очищенный запрос векторизуется и сравнивается с базой знаний. На основе наиболее релевантного блока LLM формирует ответ.",
+            inputOutput: {
+                input: { title: "Столбец `clean_question`", data: `"Не могу войти в личный кабинет, забыл пароль"` },
+                output: { title: "Столбец `gpt_response`", data: `"Чтобы восстановить доступ, перейдите по ссылке 'Забыли пароль'..."` }
+            }
         },
         {
-            icon: <PencilSquareIcon className="w-8 h-8 text-indigo-500"/>,
-            title: "Шаг 4: Генерация и оценка",
-            description: "На основе найденного блока LLM формирует ответ. Система оценивает его уверенность: `score = 91%`. JSON-лог, содержащий всю цепочку выбора, сохраняется."
+            icon: <CheckCircleIcon className="w-8 h-8 text-indigo-500"/>,
+            title: "Шаг 4: Оценка и результат",
+            description: "Система оценивает уверенность ответа. Поскольку `score` высокий (91% > 80%), сгенерированный ответ отображается в интерфейсе Omnidesk как готовый черновик.",
+            inputOutput: {
+                input: { title: "Столбец `gpt_response`", data: `"Чтобы восстановить доступ, перейдите..."` },
+                output: { title: "Столбцы `score` и `status`", data: `score: 91\nstatus: "Подсказка"` }
+            }
         },
-        {
-            icon: <CheckCircleIcon className="w-8 h-8 text-green-500"/>,
-            title: "Шаг 5: Результат (Score ≥ 80%)",
-            description: "Поскольку `score` высокий (91% > 80%), сгенерированный ответ отображается в интерфейсе Omnidesk как готовый к отправке черновик-подсказка для оператора. Оператор может отправить его в один клик."
-        },
-         {
-            icon: <HandRaisedIcon className="w-8 h-8 text-amber-500"/>,
-            title: "Альтернативный сценарий (Score < 80%)",
-            description: "Если бы `score` был 62%, система бы не предложила черновик. Тикет был бы просто передан оператору для полной ручной обработки, без AI-подсказки."
-        }
     ];
 
 
@@ -149,7 +150,7 @@ const GptAssistantDocumentationPage: React.FC = () => {
                         <ul className="list-disc list-inside space-y-2 text-base">
                             <li><b>Роль ассистента-помощника:</b> Основная задача — помогать оператору, а не заменять его. Система готовит качественные черновики, которые человек может отправить в один клик.</li>
                             <li><b>Динамическая база знаний:</b> База знаний ведется в Google-таблице, которая служит единым «хабом» для управления данными и жизненным циклом обращения.</li>
-                            <li><b><TooltipTerm definition="Retrieval-Augmented Generation — технология, которая позволяет языковой модели (LLM) получать доступ к внешней, актуальной информации (например, из базы знаний) перед генерацией ответа, чтобы сделать его более точным и контекстуальным.">RAG</TooltipTerm>-архитектура:</b> Использует семантический поиск по векторной базе для минимизации «галлюцинаций» и повышения точности ответов.</li>
+                            <li><b><TooltipTerm definition="Retrieval-Augmented Generation — технология, которая позволяет языковой модели (LLM) получать доступ к внешней, актуальной информации (например, из базы знаний) перед генерацией ответа, чтобы сделать его более точным и контекстульным.">RAG</TooltipTerm>-архитектура:</b> Использует семантический поиск по векторной базе для минимизации «галлюцинаций» и повышения точности ответов.</li>
                             <li><b>Контроль качества:</b> Встроенный параметр <TooltipTerm definition={scoreExplanation}>score</TooltipTerm> позволяет предлагать оператору только те ответы, в качестве которых система уверена.</li>
                             <li><b>Прозрачность и обучаемость:</b> Каждая обработка сопровождается подробным JSON-логом, что позволяет анализировать и улучшать работу системы через обратную связь.</li>
                         </ul>
@@ -185,49 +186,8 @@ const GptAssistantDocumentationPage: React.FC = () => {
                         title="3. Жизненный цикл обработки тикета"
                         subtitle="Пошаговый процесс: от получения запроса до предложения готового ответа оператору."
                     />
-                    <p>Каждый тикет проходит через стандартизированный конвейер обработки, который превращает сырой запрос клиента в структурированный и качественный ответ.</p>
-                    <TicketWorkflowDiagram />
-
-                    <h3 className="text-2xl font-bold mb-4 mt-12">Таблица этапов в Google Sheets</h3>
-                    <p className="mb-4">Google-таблица — это не просто хранилище, а рабочая панель, где столбцы отражают каждый этап пути:</p>
-                    <div className="my-6 not-prose overflow-x-auto">
-                         <table className="w-full text-left border-collapse text-base">
-                            <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
-                                <tr>
-                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Этап</th>
-                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Столбец</th>
-                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Что происходит</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
-                                <tr className="border-b dark:border-slate-700">
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-semibold">Вход</td>
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">question, subject, case_link</td>
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Сюда поступает оригинальное сообщение из Omnidesk.</td>
-                                </tr>
-                                <tr className="border-b dark:border-slate-700">
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-semibold">Очистка</td>
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">clean_question</td>
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Из текста убираются служебные метки, шум и повторения.</td>
-                                </tr>
-                                <tr className="border-b dark:border-slate-700">
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-semibold">Генерация</td>
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">gpt_response</td>
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Здесь появляется черновик ответа, созданный моделью.</td>
-                                </tr>
-                                 <tr className="border-b dark:border-slate-700">
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-semibold">Контроль</td>
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">score, status</td>
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Система оценивает уверенность и решает, предлагать ли ответ оператору.</td>
-                                </tr>
-                                 <tr className="border-b dark:border-slate-700">
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-semibold">Диагностика</td>
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">triage_response, JSON</td>
-                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Сохраняются внутренние логи и объяснения модели.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <p>Каждый тикет проходит через стандартизированный конвейер обработки, который превращает сырой запрос клиента в структурированный и качественный ответ. Google-таблица выступает в роли рабочей панели, где столбцы отражают каждый этап этого пути.</p>
+                    <TicketProcessingPipeline />
                 </section>
 
                 <section id="gpttunnel-mechanics" className="scroll-mt-24">
@@ -236,22 +196,42 @@ const GptAssistantDocumentationPage: React.FC = () => {
                         title="4. Под капотом: Механика gpttunnel"
                         subtitle="Центральный узел, который соединяет человека, базу знаний и большую языковую модель, выполняя всю «грязную работу» по обработке данных."
                     />
-                    <p>Если представить всю систему в виде цепочки, **gpttunnel** — это её центральный узел. Он действует как диспетчер, который не генерирует ответы сам, но управляет всем потоком данных: от векторизации запроса до сборки финального контекста для LLM. Без gpttunnel поток данных был бы хаотичным и неуправляемым.</p>
-                    <h3 className="text-2xl font-bold mt-8">Основные функции gpttunnel</h3>
-                     <div className="grid md:grid-cols-3 gap-6 mt-6 not-prose">
-                        <InfoCard icon={<PuzzlePieceIcon className="w-8 h-8"/>} title="Векторизация">
-                           <p>Превращает текстовые фрагменты RAG-файла в векторы — числовые координаты, отражающие смысл текста.</p>
-                        </InfoCard>
-                         <InfoCard icon={<MagnifyingGlassIcon className="w-8 h-8"/>} title="Поиск">
-                           <p>Находит в векторной базе 5 наиболее близких по смыслу фрагментов к запросу клиента.</p>
-                        </InfoCard>
-                         <InfoCard icon={<PencilSquareIcon className="w-8 h-8"/>} title="Генерация">
-                           <p>Передаёт найденные фрагменты в LLM, собирает и оформляет итоговый ответ, а также вычисляет `score`.</p>
-                        </InfoCard>
+                    <p>Если представить всю систему в виде цепочки, <strong>gpttunnel</strong> — это её центральный узел. Он действует как диспетчер, который не генерирует ответы сам, но управляет всем потоком данных: от превращения текста в понятные машине <TooltipTerm definition="Числовые представления текста, которые отражают его семантический смысл. Близкие по смыслу тексты имеют близкие векторы.">векторы</TooltipTerm> до сборки финального контекста для <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm>. Без gpttunnel поток данных был бы хаотичным и неуправляемым.</p>
+                    
+                    <h3 className="text-2xl font-bold mt-8 mb-4">Конвейер обработки gpttunnel</h3>
+                    <div ref={gptTunnelDiagramRef} className="not-prose my-8 bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                        <div className="flex flex-col md:flex-row items-center justify-around gap-4 text-center">
+                            {/* Step 1: Vectorization */}
+                            <div className="flex flex-col items-center w-52 diagram-element" style={{transitionDelay: '0ms'}}>
+                                <div className="p-3 bg-white dark:bg-slate-800 rounded-full border dark:border-slate-700 shadow-sm"><PuzzlePieceIcon className="w-10 h-10 text-indigo-500"/></div>
+                                <h4 className="font-bold text-lg mt-3">1. Векторизация</h4>
+                                <p className="text-sm text-gray-600 dark:text-slate-400">Превращает текстовые фрагменты RAG-файла в числовые векторы, отражающие их смысл.</p>
+                            </div>
+                            
+                            <ArrowLongRightIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block diagram-element" style={{transitionDelay: '150ms'}}/>
+                            <ArrowLongDownIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 md:hidden diagram-element" style={{transitionDelay: '150ms'}}/>
+
+                            {/* Step 2: Search */}
+                            <div className="flex flex-col items-center w-52 diagram-element" style={{transitionDelay: '300ms'}}>
+                                <div className="p-3 bg-white dark:bg-slate-800 rounded-full border dark:border-slate-700 shadow-sm"><MagnifyingGlassIcon className="w-10 h-10 text-indigo-500"/></div>
+                                <h4 className="font-bold text-lg mt-3">2. Поиск</h4>
+                                <p className="text-sm text-gray-600 dark:text-slate-400">Находит в векторной базе 5 наиболее близких по смыслу фрагментов к запросу клиента.</p>
+                            </div>
+
+                             <ArrowLongRightIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block diagram-element" style={{transitionDelay: '450ms'}}/>
+                             <ArrowLongDownIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 md:hidden diagram-element" style={{transitionDelay: '450ms'}}/>
+
+                            {/* Step 3: Assembly */}
+                            <div className="flex flex-col items-center w-52 diagram-element" style={{transitionDelay: '600ms'}}>
+                                <div className="p-3 bg-white dark:bg-slate-800 rounded-full border dark:border-slate-700 shadow-sm"><ArchiveBoxIcon className="w-10 h-10 text-indigo-500"/></div>
+                                <h4 className="font-bold text-lg mt-3">3. Сборка пакета</h4>
+                                <p className="text-sm text-gray-600 dark:text-slate-400">Формирует «контекстный пакет», вычисляет `score` и передает его в LLM для генерации ответа.</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <h3 className="text-2xl font-bold mt-8">Контекстный пакет (Context Bundle)</h3>
-                    <p>Перед обращением к модели gpttunnel формирует внутренний документ — «контекстный пакет». Именно этот пакет определяет, какую информацию модель увидит и на основании чего примет решение. Если контекст собран правильно — ответ почти всегда будет точным.</p>
+                    <h3 className="text-2xl font-bold mt-12">Продукт работы: «Контекстный пакет»</h3>
+                    <p>Результатом работы конвейера gpttunnel является внутренний документ — «контекстный пакет». Именно этот пакет определяет, какую информацию модель увидит и на основании чего примет решение. Если контекст собран правильно — ответ почти всегда будет точным.</p>
                     <CodeBlockWithCopy title="Пример внутреннего контекстного пакета" code={`
 {
   "question": "Как восстановить пароль?",
@@ -263,6 +243,35 @@ const GptAssistantDocumentationPage: React.FC = () => {
   "system_guidelines": "...формат ответа, стиль, ограничения..."
 }
                     `} />
+                    
+                    <div className="my-6 not-prose overflow-x-auto">
+                        <table className="w-full text-left border-collapse text-base">
+                            <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
+                                <tr>
+                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Ключ</th>
+                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Описание</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
+                                <tr className="border-b dark:border-slate-700">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">question</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Очищенный и нормализованный вопрос клиента.</td>
+                                </tr>
+                                <tr className="border-b dark:border-slate-700">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">context</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Массив наиболее релевантных фрагментов, найденных в RAG-базе знаний.</td>
+                                </tr>
+                                <tr className="border-b dark:border-slate-700">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">dialog_history</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Предыдущие сообщения из диалога для сохранения контекста беседы.</td>
+                                </tr>
+                                <tr className="border-b dark:border-slate-700">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">system_guidelines</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Системные инструкции для LLM (стиль ответа, ограничения, формат вывода).</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
                 
                 <section id="quality-control" className="scroll-mt-24">
@@ -325,9 +334,44 @@ const GptAssistantDocumentationPage: React.FC = () => {
                                 <div className="flex-grow pt-5">
                                     <h4 className="font-bold text-xl text-slate-900 dark:text-slate-200 mt-0">{step.title}</h4>
                                     <p className="mt-1 text-base text-gray-700 dark:text-slate-300">{step.description}</p>
+                                    {step.inputOutput && (
+                                        <div className="mt-4 grid md:grid-cols-2 gap-4">
+                                            <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
+                                                <h5 className="font-semibold text-gray-700 dark:text-slate-300 mb-2">Вход: {step.inputOutput.input.title}</h5>
+                                                <code className="block text-sm whitespace-pre-wrap bg-white dark:bg-slate-900 p-2 rounded">{step.inputOutput.input.data}</code>
+                                            </div>
+                                            <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-700">
+                                                 <h5 className="font-semibold text-green-800 dark:text-green-300 mb-2">Выход: {step.inputOutput.output.title}</h5>
+                                                <code className="block text-sm whitespace-pre-wrap bg-green-100/50 dark:bg-green-900/50 p-2 rounded">{step.inputOutput.output.data}</code>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}
+                    </div>
+                    <div className="mt-8">
+                        <InfoCard icon={<HandRaisedIcon className="w-8 h-8"/>} title="Альтернативный сценарий (Score < 80%)">
+                            <p>Если бы итоговый `score` был 62%, система не предложила бы черновик. Тикет был бы просто передан оператору для полной ручной обработки, без AI-подсказки. Это гарантирует, что оператор не отвлекается на некачественные или сомнительные варианты.</p>
+                        </InfoCard>
+                    </div>
+                    <div className="mt-12">
+                        <h3 className="text-2xl font-bold mb-4">Финальный JSON-лог примера</h3>
+                        <CodeBlockWithCopy 
+                            title="Полный цифровой след обработки тикета"
+                            code={`
+{
+  "question": "Не могу войти в личный кабинет, забыл пароль",
+  "retrieved_candidates": [
+    {"id": 23, "category": "Авторизация", "similarity": 0.91},
+    {"id": 57, "category": "Аккаунт", "similarity": 0.77}
+  ],
+  "selected": {"id": 23, "reason": "наибольшее совпадение по смыслу"},
+  "model_score": 91,
+  "final_response": "Чтобы восстановить доступ, перейдите по ссылке 'Забыли пароль' и следуйте инструкциям."
+}
+                            `} 
+                        />
                     </div>
                 </section>
 
@@ -337,77 +381,128 @@ const GptAssistantDocumentationPage: React.FC = () => {
                         title="7. База знаний и JSON-логи"
                         subtitle="Фундамент системы: как RAG-файл обеспечивает точность, и как JSON-логи помогают системе обучаться."
                     />
-                    <h3 className="text-2xl font-bold">RAG-файл — сердце векторной базы</h3>
-                    <p>Чтобы языковая модель могла не “придумывать” ответы, а искать их в реальных данных, ей нужна база знаний, которую она понимает. Обычный CSV для этого не подходит. Поэтому данные превращаются в **RAG-файл** (Retrieval Augmented Generation Corpus) — особый текстовый индекс, где каждый вопрос и ответ имеют строго заданную структуру. Каждый такой блок — это отдельный “кирпичик” в векторной базе. Когда файл загружается в gpttunnel, внутренний механизм превращает эти блоки в векторы — числовые представления смысла текста.</p>
-                     <CodeBlockWithCopy title="Пример записи в RAG-файле" code={`
+                     <div className="my-12 not-prose text-center">
+                        <h3 className="text-2xl font-bold mb-8 text-slate-800 dark:text-slate-200">Схема взаимодействия: от источника к результату</h3>
+                        
+                        <div className="inline-block p-3 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
+                            <p className="font-semibold">Запрос клиента</p>
+                            <p className="text-sm text-gray-500 dark:text-slate-400">"Как восстановить пароль?"</p>
+                        </div>
+                        
+                        <div className="flex justify-center my-2">
+                            <ArrowLongDownIcon className="w-8 h-8 text-gray-400 dark:text-slate-500" />
+                        </div>
+
+                        <div className="inline-block p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg border border-indigo-200 dark:border-indigo-800 shadow-sm">
+                            <p className="font-semibold text-indigo-800 dark:text-indigo-300">Механизм RAG-поиска (gpttunnel)</p>
+                        </div>
+
+                        <div className="relative mt-2 w-full max-w-2xl mx-auto h-24">
+                            <svg width="100%" height="100%" viewBox="0 0 400 100" preserveAspectRatio="xMidYMid meet" className="absolute inset-0">
+                                <defs>
+                                    <marker id="arrowhead-diag" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                        <path d="M 0 0 L 10 5 L 0 10 z" className="fill-current text-gray-400 dark:text-slate-500" />
+                                    </marker>
+                                </defs>
+                                <path d="M 200 0 V 20 L 80 80" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-gray-400 dark:text-slate-500" markerEnd="url(#arrowhead-diag)" />
+                                <path d="M 200 20 L 320 80" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-gray-400 dark:text-slate-500" markerEnd="url(#arrowhead-diag)" />
+                            </svg>
+                            <div className="absolute top-10 left-[calc(25%+20px)] -translate-x-1/2 text-sm text-gray-500 dark:text-slate-400 italic">Ищет в...</div>
+                            <div className="absolute top-10 right-[calc(25%+20px)] translate-x-1/2 text-sm text-gray-500 dark:text-slate-400 italic">Формирует...</div>
+                        </div>
+
+                        <div className="flex justify-between items-start max-w-4xl mx-auto relative -top-3">
+                            <div className="w-[48%] p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
+                                <h4 className="font-bold">RAG-файл (Библиотека)</h4>
+                                <p className="text-sm text-gray-500 dark:text-slate-400">Хранит факты и ответы</p>
+                            </div>
+                            <div className="w-[48%] p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
+                                <h4 className="font-bold">JSON-лог (Дневник)</h4>
+                                <p className="text-sm text-gray-500 dark:text-slate-400">Записывает процесс выбора</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-8 items-start not-prose">
+                        {/* RAG File Column */}
+                        <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col space-y-6">
+                            <div className="flex-grow">
+                                <h3 className="text-2xl font-bold mt-0">RAG-файл — библиотека ассистента</h3>
+                                <p>Чтобы языковая модель не “придумывала” ответы, ей нужна база знаний. RAG-файл — это особый текстовый индекс, где каждый “кирпичик” информации имеет строгую структуру. Когда файл загружается в gpttunnel, он превращается в <TooltipTerm definition="Числовые представления текста, которые отражают его семантический смысл. Близкие по смыслу тексты имеют близкие векторы.">векторы</TooltipTerm> — числовые представления смысла.</p>
+                                <div className="mt-4">
+                                  <CodeBlockWithCopy title="Пример записи в RAG-файле" code={`
 <BEGIN_BLOCK>
 <Q> Как восстановить пароль?
-<A> Чтобы восстановить доступ, перейдите по ссылке "Забыли пароль"...
+<A> Чтобы восстановить доступ, перейдите по ссылке...
 <CATEGORY> Авторизация
 <SUBCATEGORY> Восстановление пароля
 <KEYWORDS> пароль; доступ; сброс; личный кабинет
 <END_BLOCK>
-                    `} />
-                     <div className="mt-6">
-                         <InfoCard icon={<SparklesIcon className="w-8 h-8"/>} title="Преимущества формата RAG-файла">
-                            <ul className="list-disc list-inside space-y-2">
-                                <li><b>Прозрачность:</b> Каждый блок можно прочитать человеку и понять, откуда взялся ответ.</li>
-                                <li><b>Масштабируемость:</b> Новые вопросы просто добавляются в конец файла без сложной миграции.</li>
-                                <li><b>Обучаемость:</b> Если модель ошиблась, в RAG-файл вносится исправление, и ошибка больше не повторяется.</li>
-                            </ul>
-                        </InfoCard>
-                     </div>
-
-                    <h3 className="text-2xl font-bold mt-8">JSON-логи — взгляд внутрь мышления ассистента</h3>
-                    <p>Каждый раз, когда ассистент обрабатывает запрос, он создаёт JSON-лог. Это цифровой след, показывающий, как именно модель искала ответ, какие темы она рассматривала и почему выбрала одну из них. Это фактически “дневник рассуждений” ассистента, который даёт возможность объяснить любую ошибку и улучшать базу знаний.</p>
-                    
-                    <CollapsibleSection title="Показать структуру и расшифровку JSON-лога">
-                         <CodeBlockWithCopy title="Пример реального фрагмента JSON-лога" code={`
+                                `} />
+                                </div>
+                                <div className="mt-4">
+                                    <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">Расшифровка тегов</h4>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left border-collapse text-base">
+                                            <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
+                                                <tr>
+                                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Тег</th>
+                                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Назначение</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
+                                                <tr className="border-b dark:border-slate-700"><td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">&lt;Q&gt;</td><td className="p-3 border-x border-gray-200 dark:border-slate-700">Канонический вопрос, описывающий проблему.</td></tr>
+                                                <tr className="border-b dark:border-slate-700"><td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">&lt;A&gt;</td><td className="p-3 border-x border-gray-200 dark:border-slate-700">Эталонный, исчерпывающий ответ.</td></tr>
+                                                <tr className="border-b dark:border-slate-700"><td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">&lt;CATEGORY&gt;</td><td className="p-3 border-x border-gray-200 dark:border-slate-700">Категория верхнего уровня.</td></tr>
+                                                <tr className="border-b dark:border-slate-700"><td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">&lt;SUBCATEGORY&gt;</td><td className="p-3 border-x border-gray-200 dark:border-slate-700">Уточняющая подкатегория.</td></tr>
+                                                <tr className="border-b dark:border-slate-700"><td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">&lt;KEYWORDS&gt;</td><td className="p-3 border-x border-gray-200 dark:border-slate-700">Набор ключевых слов через точку с запятой для улучшения поиска.</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* JSON Log Column */}
+                         <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col space-y-6">
+                            <div className="flex-grow">
+                                <h3 className="text-2xl font-bold mt-0">JSON-логи — дневник ассистента</h3>
+                                <p>Каждый раз, когда ассистент обрабатывает запрос, он создаёт JSON-лог. Это цифровой след, показывающий, как именно модель искала ответ. Это фактически “дневник рассуждений” ассистента, который даёт возможность объяснить любую ошибку и улучшать базу знаний.</p>
+                                <div className="mt-4">
+                                  <CodeBlockWithCopy title="Пример реального фрагмента JSON-лога" code={`
 {
   "question": "Как восстановить пароль?",
   "retrieved_candidates": [
     {"id": 23, "category": "Авторизация", "similarity": 0.94},
-    {"id": 57, "category": "Аккаунт", "similarity": 0.81},
-    {"id": 114, "category": "Безопасность", "similarity": 0.76}
+    {"id": 57, "category": "Аккаунт", "similarity": 0.81}
   ],
-  "selected": {"id": 23, "reason": "наибольшее совпадение ключевых слов и контекста"},
+  "selected": {"id": 23, "reason": "наибольшее совпадение"},
   "model_score": 86,
-  "final_response": "Чтобы восстановить пароль, нажмите «Забыли пароль»..."
+  "final_response": "Чтобы восстановить пароль, нажмите..."
 }
-                            `} />
-                        <div className="my-6 not-prose overflow-x-auto">
-                            <table className="w-full text-left border-collapse text-base">
-                                <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
-                                    <tr>
-                                        <th className="p-3 border border-gray-200 dark:border-slate-700">Поле</th>
-                                        <th className="p-3 border border-gray-200 dark:border-slate-700">Назначение</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
-                                    <tr className="border-b dark:border-slate-700">
-                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">question</td>
-                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700">Очищенный запрос клиента.</td>
-                                    </tr>
-                                    <tr className="border-b dark:border-slate-700">
-                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">retrieved_candidates</td>
-                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700">Массив тем из RAG-базы, которые система рассмотрела как потенциально релевантные.</td>
-                                    </tr>
-                                    <tr className="border-b dark:border-slate-700">
-                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">selected</td>
-                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700">Фрагмент-«победитель», на основе которого был сгенерирован ответ, и причина выбора.</td>
-                                    </tr>
-                                    <tr className="border-b dark:border-slate-700">
-                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">model_score</td>
-                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700">Итоговая уверенность модели в ответе (от 0 до 100).</td>
-                                    </tr>
-                                    <tr className="border-b dark:border-slate-700">
-                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">final_response</td>
-                                        <td className="p-3 border-x border-gray-200 dark:border-slate-700">Черновой ответ, который был передан оператору в качестве подсказки.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                `} />
+                                </div>
+                                <div className="mt-4">
+                                    <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">Расшифровка полей</h4>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left border-collapse text-base">
+                                            <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
+                                                <tr>
+                                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Поле</th>
+                                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Назначение</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
+                                                <tr className="border-b dark:border-slate-700"><td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">question</td><td className="p-3 border-x border-gray-200 dark:border-slate-700">Очищенный запрос клиента.</td></tr>
+                                                <tr className="border-b dark:border-slate-700"><td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">retrieved_candidates</td><td className="p-3 border-x border-gray-200 dark:border-slate-700">Массив тем из RAG-базы, которые система рассмотрела как потенциально релевантные.</td></tr>
+                                                <tr className="border-b dark:border-slate-700"><td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">selected</td><td className="p-3 border-x border-gray-200 dark:border-slate-700">Фрагмент-«победитель», на основе которого был сгенерирован ответ, и причина выбора.</td></tr>
+                                                <tr className="border-b dark:border-slate-700"><td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">model_score</td><td className="p-3 border-x border-gray-200 dark:border-slate-700">Итоговая уверенность модели в ответе (от 0 до 100).</td></tr>
+                                                <tr className="border-b dark:border-slate-700"><td className="p-3 border-x border-gray-200 dark:border-slate-700 font-mono">final_response</td><td className="p-3 border-x border-gray-200 dark:border-slate-700">Черновой ответ, который был передан оператору в качестве подсказки.</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </CollapsibleSection>
+                    </div>
                 </section>
                 
                 <section id="evolution" className="scroll-mt-24">
