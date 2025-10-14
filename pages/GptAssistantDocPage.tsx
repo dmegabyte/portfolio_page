@@ -19,46 +19,87 @@ const TicketProcessingPipeline: React.FC = () => {
         {
             icon: <InboxArrowDownIcon className="w-8 h-8 text-indigo-500" />,
             title: "Шаг 1: Получение тикета (Вход)",
-            description: "Процесс начинается, когда оригинальное сообщение клиента поступает из Omnidesk. Система немедленно фиксирует его в Google Sheet для отслеживания.",
+            description: "Процесс начинается, когда оригинальное сообщение клиента поступает из Omnidesk. Оно содержит HTML-разметку, стили и служебную информацию.",
             transformation: {
-                input: { title: "Сообщение клиента", data: `"Не могу войти в личный кабинет..."` },
-                output: { title: "Столбцы: `question`, `subject`...", data: `question: "Не могу войти..."\nsubject: "Вход",\ncase_link: "..."` }
+                input: { 
+                    title: "Сообщение клиента (Raw HTML)", 
+                    data: `<img alt="pixel" src="..." />
+
+Добрый день!<br /><br />Прошу Вас помощи для подключения сайта к яндекс вебмастеру...
+
+<div>
+  <h2 style="font-size:16px;">Системная информация</h2>
+  <hr />
+  <span style="font:bold 15px/1.2 sans-serif;">form: </span>
+  <span>help-ru</span>
+  <br />
+  ...
+</div>`
+                },
+                output: { 
+                    title: "Столбцы: `question`, `subject`...", 
+                    data: `question: "<img alt=\\"pixel\\" ...>"\nsubject: "Помощь с сайтом"\ncase_link: "..."`
+                }
             }
         },
         {
             icon: <FunnelIcon className="w-8 h-8 text-indigo-500" />,
             title: "Шаг 2: Очистка",
-            description: "Из исходного текста запроса убираются все служебные метки, \"шум\" и повторения. Результат — чистый, нормализованный вопрос, готовый для семантического анализа.",
+            description: "Из исходного HTML-текста запроса убираются все теги, стили, служебные метки и \"шум\". Результат — чистый, нормализованный вопрос, готовый для семантического анализа.",
             transformation: {
-                input: { title: "Столбец `question`", data: `"Не могу войти в личный кабинет..."` },
-                output: { title: "Столбец: `clean_question`", data: `"не могу войти личный кабинет"` }
+                input: { 
+                    title: "Столбец `question` (Raw HTML)", 
+                    data: `"Добрый день!<br /><br />Прошу Вас помощи ... <div>Системная информация...</div>"`
+                },
+                output: { 
+                    title: "Столбец: `clean_question`", 
+                    data: `"Добрый день! Прошу Вас помощи для подключения сайта к яндекс вебмастеру. В корневой папке сайта создайте файл с именем yandex_9aaf9dd87bc62c36.html, скопируйте в него код из поля ниже и сохраните. Verification: 9aaf9dd87bc62c36"`
+                }
             }
         },
         {
             icon: <PencilSquareIcon className="w-8 h-8 text-indigo-500" />,
             title: "Шаг 3: Генерация",
-            description: "На основе RAG-поиска и очищенного вопроса языковая модель (LLM) создает черновой вариант ответа. Этот текст является предварительным решением задачи клиента.",
+            description: "На основе RAG-поиска и очищенного вопроса языковая модель (LLM) создает черновой вариант ответа, релевантный задаче клиента.",
              transformation: {
-                input: { title: "Столбец `clean_question`", data: `"не могу войти личный кабинет"` },
-                output: { title: "Столбец: `gpt_response`", data: `"Чтобы восстановить доступ, перейдите..."` }
+                input: { 
+                    title: "Столбец `clean_question`", 
+                    data: `"Добрый день! Прошу Вас помощи для подключения сайта к яндекс вебмастеру..."`
+                },
+                output: { 
+                    title: "Столбец: `gpt_response`", 
+                    data: `"Здравствуйте! Для верификации сайта в Яндекс.Вебмастер, пожалуйста, создайте HTML-файл с указанным именем и содержимым в корневой папке вашего сайта."`
+                }
             }
         },
         {
             icon: <CheckCircleIcon className="w-8 h-8 text-indigo-500" />,
             title: "Шаг 4: Контроль",
-            description: "Система оценивает уверенность сгенерированного ответа (score) и присваивает тикету статус. На этом этапе принимается решение, предлагать ли ответ оператору.",
+            description: "Система оценивает уверенность сгенерированного ответа (score). Так как ответ является точной инструкцией, score высокий.",
             transformation: {
-                input: { title: "Столбец `gpt_response`", data: `"Чтобы восстановить доступ..."` },
-                output: { title: "Столбцы: `score`, `status`", data: `score: 91\nstatus: "Подсказка"` }
+                input: { 
+                    title: "Столбец `gpt_response`", 
+                    data: `"Здравствуйте! Для верификации сайта в Яндекс.Вебмастер..."`
+                },
+                output: { 
+                    title: "Столбцы: `score`, `status`", 
+                    data: `score: 96\nstatus: "Подсказка"`
+                }
             }
         },
         {
             icon: <DocumentTextIcon className="w-8 h-8 text-indigo-500" />,
             title: "Шаг 5: Диагностика",
-            description: "Сохраняются полные внутренние логи, включая \"цепочку рассуждений\" модели. Это позволяет анализировать и отлаживать процесс принятия решений ассистентом.",
+            description: "Сохраняются полные внутренние логи, включая \"цепочку рассуждений\" модели. Это позволяет анализировать и отлаживать процесс.",
             transformation: {
-                input: { title: "Результат генерации", data: `{\n  model_score: 91, ...\n}` },
-                output: { title: "Столбцы: `triage_response`, `JSON`", data: `"{ \\"question\\": \\"...\\" }"` }
+                input: { 
+                    title: "Результат генерации", 
+                    data: `{\n  model_score: 96,\n  ...\n}` 
+                },
+                output: { 
+                    title: "Столбцы: `triage_response`, `JSON`", 
+                    data: `"{ \\"question\\": \\"подключение сайта к яндекс вебмастеру...\\" }"`
+                }
             }
         }
     ];
@@ -109,15 +150,10 @@ const TicketProcessingPipeline: React.FC = () => {
     );
 };
 
-// --- Section Components ---
+// --- Section Content Components ---
 
-const ConceptSection: React.FC = () => (
+const ConceptSectionContent: React.FC = () => (
     <>
-        <SectionHeader 
-            icon={<CpuChipIcon className="w-8 h-8" />}
-            title="1. Концепция: интеллектуальный помощник оператора"
-            subtitle="Описание AI-ассистента, который снижает нагрузку на первую линию поддержки, автоматически готовя черновики ответов на типовые вопросы с помощью динамической базы знаний."
-        />
         <p>Этот GPT-ассистент — не просто бот, а автоматизированный сотрудник поддержки, у которого есть память, интуиция и самооценка. Он не заменяет человека — он освобождает его время для действительно сложных задач, беря на себя рутинный поиск информации и подготовку ответов.</p>
         
         <InfoCard icon={<LightBulbIcon className="w-8 h-8" />} title="Ключевые выводы (Key Takeaways)">
@@ -132,13 +168,8 @@ const ConceptSection: React.FC = () => (
     </>
 );
 
-const ArchitectureSection: React.FC = () => (
+const ArchitectureSectionContent: React.FC = () => (
     <>
-        <SectionHeader 
-            icon={<WrenchScrewdriverIcon className="w-8 h-8" />}
-            title="2. Архитектура и отказоустойчивость"
-            subtitle="Как Google-таблица выступает в роли центрального хаба, и почему разделение ответственности делает систему устойчивой."
-        />
         <p>Главная особенность архитектуры — это чёткое разделение ответственности между компонентами. Каждый элемент системы изолирован и выполняет свою уникальную функцию, что делает систему масштабируемой и отказоустойчивой.</p>
          <div className="grid md:grid-cols-2 gap-6 mt-6 not-prose">
             <InfoCard icon={<DocumentTextIcon className="w-8 h-8"/>} title="Google Sheets">
@@ -157,19 +188,14 @@ const ArchitectureSection: React.FC = () => (
     </>
 );
 
-const WorkflowStepsSection: React.FC = () => (
+const WorkflowStepsSectionContent: React.FC = () => (
     <>
-        <SectionHeader 
-            icon={<ArrowPathIcon className="w-8 h-8" />}
-            title="3. Жизненный цикл обработки тикета"
-            subtitle="Пошаговый процесс: от получения запроса до предложения готового ответа оператору."
-        />
         <p>Каждый тикет проходит через стандартизированный конвейер обработки, который превращает сырой запрос клиента в структурированный и качественный ответ. Google-таблица выступает в роли рабочей панели, где столбцы отражают каждый этап этого пути.</p>
         <TicketProcessingPipeline />
     </>
 );
 
-const GptTunnelMechanicsSection: React.FC = () => {
+const GptTunnelMechanicsSectionContent: React.FC = () => {
     const gptTunnelDiagramRef = useRef<HTMLDivElement>(null);
     useAnimateOnScroll(gptTunnelDiagramRef, { targetSelector: '.diagram-element' });
     
@@ -182,11 +208,6 @@ const GptTunnelMechanicsSection: React.FC = () => {
 
     return (
         <>
-            <SectionHeader 
-                icon={<Cog6ToothIcon className="w-8 h-8" />}
-                title="4. Под капотом: Механика gpttunnel"
-                subtitle="Центральный узел, который соединяет человека, базу знаний и большую языковую модель, выполняя всю «грязную работу» по обработке данных."
-            />
             <p>Если представить всю систему в виде цепочки, <strong>gpttunnel</strong> — это её центральный узел. Он действует как диспетчер, который не генерирует ответы сам, но управляет всем потоком данных: от превращения текста в понятные машине <TooltipTerm definition="Числовые представления текста, которые отражают его семантический смысл. Близкие по смыслу тексты имеют близкие векторы.">векторы</TooltipTerm> до сборки финального контекста для <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm>. Без gpttunnel поток данных был бы хаотичным и неуправляемым.</p>
             
             <h3 className="text-2xl font-bold mt-8 mb-4">Конвейер обработки gpttunnel</h3>
@@ -234,13 +255,8 @@ const GptTunnelMechanicsSection: React.FC = () => {
     );
 };
 
-const QualityControlSection: React.FC = () => (
+const QualityControlSectionContent: React.FC = () => (
     <>
-         <SectionHeader 
-            icon={<ShieldCheckIcon className="w-8 h-8" />}
-            title="5. Контроль качества и синергия с оператором"
-            subtitle="Как score-фильтр и fallback-механизм превращают AI в надежного напарника, а не замену человеку."
-        />
         <p>Ключевая роль ассистента — помогать, а не мешать. Система контроля качества построена на двух столпах: интеллектуальном фильтре <TooltipTerm definition={"Это показатель уверенности модели (от 0.0 до 1.0) в том, что сгенерированный ответ точен и релевантен. Если score ≥ 0.8, система предлагает ответ оператору как готовый к отправке черновик. Если score ниже, тикет помечается для полной ручной обработки. Этот механизм гарантирует, что оператор получает только качественные подсказки, а не сомнительные варианты."}>score</TooltipTerm> и безопасном <TooltipTerm definition="Резервный механизм, который активируется, когда основная система не может выполнить задачу. В данном случае, тикет передается оператору.">fallback-механизме</TooltipTerm>.</p>
         
         <h3 className="text-2xl font-bold mt-8">Score — умный фильтр и подсказка оператору</h3>
@@ -285,7 +301,7 @@ interface CycleStepModalData {
     output: { title: string; data: string };
 }
 
-const FullCycleExampleSection: React.FC = () => {
+const FullCycleExampleSectionContent: React.FC = () => {
     const [modalData, setModalData] = useState<CycleStepModalData | null>(null);
 
     const cycleSteps = [
@@ -339,11 +355,6 @@ const FullCycleExampleSection: React.FC = () => {
 
     return (
         <>
-            <SectionHeader 
-                icon={<FlagIcon className="w-8 h-8" />}
-                title="6. Пример полного цикла обработки"
-                subtitle="Пошаговый разбор реального кейса: от вопроса клиента до готового черновика для оператора."
-            />
              <div className="space-y-8 relative not-prose">
                 <div className="absolute left-9 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-slate-700" aria-hidden="true"></div>
                 {cycleSteps.map((step, index) => (
@@ -421,7 +432,7 @@ const FullCycleExampleSection: React.FC = () => {
     );
 };
 
-const KnowledgeBaseSection: React.FC = () => {
+const KnowledgeBaseSectionContent: React.FC = () => {
     const arrowMarkerId = useId();
     const diagramTitleId = useId();
 
@@ -443,11 +454,6 @@ const KnowledgeBaseSection: React.FC = () => {
     
     return (
         <>
-            <SectionHeader 
-                icon={<BookOpenIcon className="w-8 h-8" />}
-                title="7. База знаний и JSON-логи"
-                subtitle="Фундамент системы: как RAG-файл обеспечивает точность, и как JSON-логи помогают системе обучаться."
-            />
             <figure role="group" className="my-12 not-prose text-center" aria-labelledby={diagramTitleId}>
                 <figcaption id={diagramTitleId} className="text-2xl font-bold mb-8 text-slate-800 dark:text-slate-200">Схема взаимодействия: от источника к результату</figcaption>
                 <div className="inline-block p-3 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
@@ -487,7 +493,7 @@ const KnowledgeBaseSection: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-8 items-start not-prose">
                 <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col">
                     <h3 className="text-2xl font-bold mt-0">RAG-файл — библиотека ассистента</h3>
-                    <p className="text-base mt-2">Это «библиотека» знаний системы. Структурированный текстовый файл, где каждый блок преобразуется в <TooltipTerm definition="Числовые представления текста, которые отражают его семантический смысл. Близкие по смыслу тексты имеют близкие векторы.">векторы</TooltipTerm> для семантического поиска.</p>
+                    <p className="text-base mt-2">Это «библиотека» знаний системы. Она содержит структурированные факты, которые преобразуются в <TooltipTerm definition="Числовые представления текста, которые отражают его семантический смысл. Близкие по смыслу тексты имеют близкие векторы.">векторы</TooltipTerm> для точного семантического поиска.</p>
                     <div className="mt-6">
                       <CodeBlockWithCopy title="Пример записи в RAG-файле" code={`
 <BEGIN_BLOCK>
@@ -500,14 +506,13 @@ const KnowledgeBaseSection: React.FC = () => {
                     `} />
                     </div>
                     <div className="mt-6">
-                        <CollapsibleSection title="Показать расшифровку тегов">
-                            <DefinitionList items={ragTags} />
-                        </CollapsibleSection>
+                        <h4 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-200">Расшифровка тегов</h4>
+                        <DefinitionList items={ragTags} />
                     </div>
                 </div>
                  <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col">
                     <h3 className="text-2xl font-bold mt-0">JSON-логи — дневник ассистента</h3>
-                    <p className="text-base mt-2">Это «дневник рассуждений» ассистента. Цифровой след, показывающий, как модель пришла к ответу. Ключевой инструмент для отладки и улучшения базы знаний.</p>
+                    <p className="text-base mt-2">Это «дневник рассуждений» ассистента. Он записывает цифровой след принятия решений, что позволяет отлаживать и улучшать базу знаний.</p>
                     <div className="mt-6">
                       <CodeBlockWithCopy title="Пример реального фрагмента JSON-лога" code={`
 {
@@ -523,9 +528,8 @@ const KnowledgeBaseSection: React.FC = () => {
                     `} />
                     </div>
                     <div className="mt-6">
-                        <CollapsibleSection title="Показать расшифровку полей">
-                         <DefinitionList items={jsonFields} />
-                        </CollapsibleSection>
+                        <h4 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-200">Расшифровка полей</h4>
+                        <DefinitionList items={jsonFields} />
                     </div>
                 </div>
             </div>
@@ -533,13 +537,8 @@ const KnowledgeBaseSection: React.FC = () => {
     );
 };
 
-const EvolutionSection: React.FC = () => (
+const EvolutionSectionContent: React.FC = () => (
     <>
-        <SectionHeader 
-            icon={<RocketLaunchIcon className="w-8 h-8" />}
-            title="8. Эволюция и дорожная карта"
-            subtitle="От быстрой генерации к прозрачным рассуждениям, текущие ограничения и планы на будущее."
-        />
          <div className="space-y-8">
             <InfoCard icon={<AcademicCapIcon className="w-8 h-8"/>} title="Эволюция: от Gemini Flash к Pro">
                 <p>Поначалу система работала на модели Gemini 2.5 Flash — быстрой, но без возможности выводить рассуждения. Позднее произошел переход на Gemini 2.5 Pro, которая умеет объяснять свои шаги. Теперь разработчики видят **“цепочку рассуждений”**: как модель выбирала статью, какие кандидаты рассматривала и почему отвергла одни и выбрала другие. Это превратило систему в прозрачный инструмент, где каждая ошибка может быть разобрана и исправлена.</p>
@@ -562,13 +561,8 @@ const EvolutionSection: React.FC = () => (
     </>
 );
 
-const ConclusionSection: React.FC = () => (
+const ConclusionSectionContent: React.FC = () => (
     <>
-        <SectionHeader 
-            icon={<FlagIcon className="w-8 h-8" />}
-            title="9. Заключение"
-            subtitle="Сила системы — в сочетании автоматизации, прозрачности и постоянного улучшения."
-        />
         <p>Этот GPT-ассистент — не просто бот, а автоматизированный сотрудник поддержки, который помогает человеку, а не заменяет его. Он освобождает время операторов для действительно сложных и творческих задач. Система обучается, анализирует себя, растёт и со временем становится умнее, превращаясь из инструмента в настоящего партнёра.</p>
     </>
 );
@@ -576,23 +570,78 @@ const ConclusionSection: React.FC = () => (
 const GptAssistantDocumentationPage: React.FC = () => {
     
     const sections = [
-        { id: 'concept', Component: ConceptSection },
-        { id: 'architecture', Component: ArchitectureSection },
-        { id: 'workflow-steps', Component: WorkflowStepsSection },
-        { id: 'gpttunnel-mechanics', Component: GptTunnelMechanicsSection },
-        { id: 'quality-control', Component: QualityControlSection },
-        { id: 'full-cycle-example', Component: FullCycleExampleSection },
-        { id: 'knowledge-base', Component: KnowledgeBaseSection },
-        { id: 'evolution', Component: EvolutionSection },
-        { id: 'conclusion', Component: ConclusionSection },
+        { 
+            id: 'concept', 
+            icon: <CpuChipIcon className="w-8 h-8" />,
+            title: "1. Концепция: интеллектуальный помощник оператора",
+            subtitle: "Описание AI-ассистента, который снижает нагрузку на первую линию поддержки, автоматически готовя черновики ответов на типовые вопросы с помощью динамической базы знаний.",
+            ContentComponent: ConceptSectionContent 
+        },
+        { 
+            id: 'architecture', 
+            icon: <WrenchScrewdriverIcon className="w-8 h-8" />,
+            title: "2. Архитектура и отказоустойчивость",
+            subtitle: "Как Google-таблица выступает в роли центрального хаба, и почему разделение ответственности делает систему устойчивой.",
+            ContentComponent: ArchitectureSectionContent
+        },
+        { 
+            id: 'workflow-steps',
+            icon: <ArrowPathIcon className="w-8 h-8" />,
+            title: "3. Жизненный цикл обработки тикета",
+            subtitle: "Пошаговый процесс: от получения запроса до предложения готового ответа оператору.",
+            ContentComponent: WorkflowStepsSectionContent
+        },
+        { 
+            id: 'gpttunnel-mechanics',
+            icon: <Cog6ToothIcon className="w-8 h-8" />,
+            title: "4. Под капотом: Механика gpttunnel",
+            subtitle: "Центральный узел, который соединяет человека, базу знаний и большую языковую модель, выполняя всю «грязную работу» по обработке данных.",
+            ContentComponent: GptTunnelMechanicsSectionContent
+        },
+        { 
+            id: 'quality-control',
+            icon: <ShieldCheckIcon className="w-8 h-8" />,
+            title: "5. Контроль качества и синергия с оператором",
+            subtitle: "Как score-фильтр и fallback-механизм превращают AI в надежного напарника, а не замену человеку.",
+            ContentComponent: QualityControlSectionContent
+        },
+        { 
+            id: 'full-cycle-example',
+            icon: <FlagIcon className="w-8 h-8" />,
+            title: "6. Пример полного цикла обработки",
+            subtitle: "Пошаговый разбор реального кейса: от вопроса клиента до готового черновика для оператора.",
+            ContentComponent: FullCycleExampleSectionContent
+        },
+        { 
+            id: 'knowledge-base',
+            icon: <BookOpenIcon className="w-8 h-8" />,
+            title: "7. База знаний и JSON-логи",
+            subtitle: "Фундамент системы: как RAG-файл обеспечивает точность, и как JSON-логи помогают системе обучаться.",
+            ContentComponent: KnowledgeBaseSectionContent
+        },
+        { 
+            id: 'evolution',
+            icon: <RocketLaunchIcon className="w-8 h-8" />,
+            title: "8. Эволюция и дорожная карта",
+            subtitle: "От быстрой генерации к прозрачным рассуждениям, текущие ограничения и планы на будущее.",
+            ContentComponent: EvolutionSectionContent
+        },
+        { 
+            id: 'conclusion',
+            icon: <FlagIcon className="w-8 h-8" />,
+            title: "9. Заключение",
+            subtitle: "Сила системы — в сочетании автоматизации, прозрачности и постоянного улучшения.",
+            ContentComponent: ConclusionSectionContent
+        },
     ];
 
     return (
         <DocumentationPageLayout title="GPT-ассистент с RAG">
             <div className="space-y-16">
-                {sections.map(({ id, Component }) => (
+                {sections.map(({ id, icon, title, subtitle, ContentComponent }) => (
                     <section key={id} id={id} className="scroll-mt-24">
-                        <Component />
+                        <SectionHeader icon={icon} title={title} subtitle={subtitle} />
+                        <ContentComponent />
                     </section>
                 ))}
             </div>
