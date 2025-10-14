@@ -487,7 +487,7 @@ const KnowledgeBaseSection: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-8 items-start not-prose">
                 <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col">
                     <h3 className="text-2xl font-bold mt-0">RAG-файл — библиотека ассистента</h3>
-                    <p className="text-base mt-2">Это «библиотека» знаний системы. Структурированный текстовый файл, где каждый блок преобразуется в <TooltipTerm definition="Числовые представления текста, которые отражают его семантический смысл. Близкие по смыслу тексты имеют близкие векторы.">векторы</TooltipTerm> для поиска.</p>
+                    <p className="text-base mt-2">Это «библиотека» знаний системы. Структурированный текстовый файл, где каждый блок преобразуется в <TooltipTerm definition="Числовые представления текста, которые отражают его семантический смысл. Близкие по смыслу тексты имеют близкие векторы.">векторы</TooltipTerm> для семантического поиска.</p>
                     <div className="mt-6">
                       <CodeBlockWithCopy title="Пример записи в RAG-файле" code={`
 <BEGIN_BLOCK>
@@ -500,14 +500,14 @@ const KnowledgeBaseSection: React.FC = () => {
                     `} />
                     </div>
                     <div className="mt-6">
-                        <CollapsibleSection title="Показать расшифровку тегов RAG-файла">
+                        <CollapsibleSection title="Показать расшифровку тегов">
                             <DefinitionList items={ragTags} />
                         </CollapsibleSection>
                     </div>
                 </div>
                  <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col">
                     <h3 className="text-2xl font-bold mt-0">JSON-логи — дневник ассистента</h3>
-                    <p className="text-base mt-2">Это «дневник рассуждений» ассистента. Цифровой след, который показывает, как модель искала ответ. Ключевой инструмент для отладки.</p>
+                    <p className="text-base mt-2">Это «дневник рассуждений» ассистента. Цифровой след, показывающий, как модель пришла к ответу. Ключевой инструмент для отладки и улучшения базы знаний.</p>
                     <div className="mt-6">
                       <CodeBlockWithCopy title="Пример реального фрагмента JSON-лога" code={`
 {
@@ -523,7 +523,7 @@ const KnowledgeBaseSection: React.FC = () => {
                     `} />
                     </div>
                     <div className="mt-6">
-                        <CollapsibleSection title="Показать расшифровку полей JSON-лога">
+                        <CollapsibleSection title="Показать расшифровку полей">
                          <DefinitionList items={jsonFields} />
                         </CollapsibleSection>
                     </div>
