@@ -10,6 +10,7 @@ import ScrollToTopButton from './components/ScrollToTopButton';
 const HomePage = lazy(() => import('./pages/HomePage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
+const GalleryPage = lazy(() => import('./pages/GalleryPage'));
 const ProjectPage = lazy(() => import('./pages/ProjectPage'));
 const ClientSegmentationDocumentationPage = lazy(() => import('./pages/ClientSegmentationDocPage'));
 const InterfaceGeneratorDocumentationPage = lazy(() => import('./pages/InterfaceGenDocPage'));
@@ -41,6 +42,7 @@ const App: React.FC = () => {
               <Route path="/" element={<HomePage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/gallery" element={<GalleryPage />} />
               <Route path="/project/:slug" element={<ProjectPage />} />
               {/* Documentation Pages */}
               <Route path="/documentation/client-segmentation" element={<ClientSegmentationDocumentationPage />} />

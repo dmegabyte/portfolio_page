@@ -83,6 +83,9 @@ const Header: React.FC = () => {
                     <NavLink to="/about" className={getNavLinkClasses}>
                       Обо мне
                     </NavLink>
+                    <NavLink to="/gallery" className={getNavLinkClasses}>
+                      Галерея
+                    </NavLink>
                     {/* FIX: In react-router-dom v6, `activeClassName` is replaced by a function in `className`. */}
                     <NavLink to="/contact" className={getNavLinkClasses}>
                       Контакты
@@ -127,6 +130,9 @@ const Header: React.FC = () => {
           {/* FIX: In react-router-dom v6, `activeClassName` is replaced by a function in `className`. */}
           <NavLink to="/about" className={getMobileNavLinkClasses} onClick={() => setIsOpen(false)}>
             Обо мне
+          </NavLink>
+          <NavLink to="/gallery" className={getMobileNavLinkClasses} onClick={() => setIsOpen(false)}>
+            Галерея
           </NavLink>
           {/* FIX: In react-router-dom v6, `activeClassName` is replaced by a function in `className`. */}
           <NavLink to="/contact" className={getMobileNavLinkClasses} onClick={() => setIsOpen(false)}>
