@@ -323,10 +323,17 @@ export const DefinitionList: React.FC<DefinitionListProps> = ({ items }) => (
 // --- Annotated Code Block ---
 interface AnnotatedCodeBlockProps {
     title: string;
+    annotationTitle: string;
     items: { code: string; annotation: string; isHighlighted?: boolean }[];
 }
-export const AnnotatedCodeBlock: React.FC<AnnotatedCodeBlockProps> = ({ title, items }) => {
+export const AnnotatedCodeBlock: React.FC<AnnotatedCodeBlockProps> = ({ title, annotationTitle, items }) => {
+    // No item is selected by default to encourage user interaction and discovery.
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+    const handleInteraction = (index: number) => {
+        // Allow toggling the active annotation off by clicking it again.
+        setActiveIndex(activeIndex === index ? null : index);
+    };
 
     return (
         <div className="relative not-prose bg-slate-900 rounded-lg border border-slate-700 shadow-lg my-6">
@@ -336,28 +343,28 @@ export const AnnotatedCodeBlock: React.FC<AnnotatedCodeBlockProps> = ({ title, i
             <div className="flex flex-col md:flex-row">
                 {/* Code Area */}
                 <div className="md:w-1/2 p-4">
-                    <pre className="text-slate-300 text-base mt-0 bg-transparent">
-                        <code className="flex flex-col">
-                            {items.map((item, index) => (
-                                <span
-                                    key={index}
-                                    onMouseEnter={() => setActiveIndex(index)}
-                                    onMouseLeave={() => setActiveIndex(null)}
+                    <ul className="text-slate-300 text-base bg-transparent font-mono list-none p-0 m-0" role="listbox">
+                        {items.map((item, index) => (
+                            <li key={index} role="option" aria-selected={activeIndex === index}>
+                                <button
+                                    onClick={() => handleInteraction(index)}
                                     className={`
-                                        block p-1 rounded-md transition-colors duration-200 cursor-pointer
+                                        block w-full text-left p-1 rounded-md transition-colors duration-200 cursor-pointer
+                                        focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500
                                         ${activeIndex === index ? 'bg-indigo-900/50' : 'hover:bg-slate-800/50'}
                                         ${item.isHighlighted ? 'font-bold text-sky-300' : ''}
                                     `}
                                 >
-                                    {item.code}
-                                </span>
-                            ))}
-                        </code>
-                    </pre>
+                                    <div style={{ whiteSpace: 'pre-wrap' }}>{item.code}</div>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
                 {/* Annotation Area */}
                 <div className="md:w-1/2 p-4 border-t md:border-t-0 md:border-l border-slate-700 bg-slate-800/50 rounded-b-lg md:rounded-b-none md:rounded-r-lg">
-                    <div className="relative h-full min-h-[150px]">
+                    <h4 className="text-sm font-semibold text-slate-400 mb-4">{annotationTitle}</h4>
+                    <div className="relative h-full min-h-[150px] flex items-center">
                         {items.map((item, index) => (
                             <div
                                 key={index}
@@ -366,16 +373,17 @@ export const AnnotatedCodeBlock: React.FC<AnnotatedCodeBlockProps> = ({ title, i
                                     ${activeIndex === index ? 'opacity-100' : 'opacity-0'}
                                 `}
                                 aria-hidden={activeIndex !== index}
+                                aria-live="polite"
                             >
                                 <div className="flex items-start gap-3">
-                                    <InformationCircleIcon className="w-5 h-5 mt-0.5 text-sky-400 flex-shrink-0" />
-                                    <p className="text-slate-300 text-sm">{item.annotation}</p>
+                                    <InformationCircleIcon className="w-5 h-5 mt-1 flex-shrink-0 text-sky-400" />
+                                    <p className="text-slate-300 text-base break-words">{item.annotation}</p>
                                 </div>
                             </div>
                         ))}
                          {activeIndex === null && (
                             <div className="flex items-center justify-center h-full text-slate-500 text-sm">
-                                Наведите на строку кода, чтобы увидеть описание.
+                                Кликните на строку кода, чтобы увидеть описание.
                             </div>
                         )}
                     </div>
