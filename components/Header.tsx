@@ -1,19 +1,13 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { projects } from '../data/projects';
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDocMenuOpen, setIsDocMenuOpen] = useState(false);
-  const [isMobileDocMenuOpen, setIsMobileDocMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isProjectOrDocPage = location.pathname.startsWith('/project/') || location.pathname.startsWith('/documentation/');
-  const docMenuRef = useRef<HTMLDivElement>(null);
-
-  const docProjects = projects.filter(p => p.documentationPage);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -31,21 +25,7 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     setIsOpen(false);
-    setIsDocMenuOpen(false);
-    setIsMobileDocMenuOpen(false);
   }, [location.pathname]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (docMenuRef.current && !docMenuRef.current.contains(event.target as Node)) {
-        setIsDocMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   const baseClasses = "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300";
   const activeClasses = "bg-slate-900 dark:bg-slate-700 text-white";
@@ -90,46 +70,6 @@ const Header: React.FC = () => {
                     <NavLink to="/about" className={getNavLinkClasses}>
                       Обо мне
                     </NavLink>
-                    <NavLink to="/gallery" className={getNavLinkClasses}>
-                      Галерея
-                    </NavLink>
-
-                    <div className="relative" ref={docMenuRef}>
-                      <button
-                        onClick={() => setIsDocMenuOpen(!isDocMenuOpen)}
-                        className={`${baseClasses} ${inactiveClasses} flex items-center gap-1`}
-                        aria-haspopup="true"
-                        aria-expanded={isDocMenuOpen}
-                      >
-                        Документация
-                        <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isDocMenuOpen ? 'rotate-180' : ''}`} />
-                      </button>
-                      {isDocMenuOpen && (
-                        <div className="absolute right-0 mt-2 w-64 origin-top-right rounded-md shadow-lg bg-white dark:bg-slate-800 ring-1 ring-black dark:ring-slate-700 ring-opacity-5 focus:outline-none animate-fade-in" style={{animationDuration: '150ms'}}>
-                          <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                            {docProjects.map(project => (
-                              <NavLink
-                                key={project.id}
-                                to={project.documentationPage!}
-                                className={({ isActive }) => `block w-full text-left px-4 py-2 text-sm ${isActive ? 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white font-semibold' : 'text-slate-700 dark:text-slate-300'} hover:bg-slate-100 dark:hover:bg-slate-700`}
-                                role="menuitem"
-                              >
-                                {project.title}
-                              </NavLink>
-                            ))}
-                             <div className="border-t border-gray-200 dark:border-slate-700 my-1"></div>
-                            <NavLink
-                                to="/documentation/ui-components"
-                                className={({ isActive }) => `block w-full text-left px-4 py-2 text-sm ${isActive ? 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white font-semibold' : 'text-slate-700 dark:text-slate-300'} hover:bg-slate-100 dark:hover:bg-slate-700`}
-                                role="menuitem"
-                              >
-                                UI Компоненты
-                              </NavLink>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    
                     <NavLink to="/contact" className={getNavLinkClasses}>
                       Контакты
                     </NavLink>
@@ -172,41 +112,6 @@ const Header: React.FC = () => {
           <NavLink to="/about" className={getMobileNavLinkClasses}>
             Обо мне
           </NavLink>
-          <NavLink to="/gallery" className={getMobileNavLinkClasses}>
-            Галерея
-          </NavLink>
-          
-          <div>
-            <button
-              onClick={() => setIsMobileDocMenuOpen(!isMobileDocMenuOpen)}
-              className={`${baseClasses} ${inactiveClasses} w-full flex justify-between items-center`}
-              aria-haspopup="true"
-              aria-expanded={isMobileDocMenuOpen}
-            >
-              <span>Документация</span>
-              <ChevronDownIcon className={`w-5 h-5 transition-transform duration-200 ${isMobileDocMenuOpen ? 'rotate-180' : ''}`} />
-            </button>
-            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobileDocMenuOpen ? 'max-h-96' : 'max-h-0'}`}>
-              <div className="pl-4 pt-1 space-y-1 border-l-2 border-slate-700 ml-3">
-                {docProjects.map(project => (
-                  <NavLink
-                    key={project.id}
-                    to={project.documentationPage!}
-                    className={getMobileNavLinkClasses}
-                  >
-                    {project.title}
-                  </NavLink>
-                ))}
-                 <NavLink
-                  to="/documentation/ui-components"
-                  className={getMobileNavLinkClasses}
-                >
-                  UI Компоненты
-                </NavLink>
-              </div>
-            </div>
-          </div>
-
           <NavLink to="/contact" className={getMobileNavLinkClasses}>
             Контакты
           </NavLink>

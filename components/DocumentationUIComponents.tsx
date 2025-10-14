@@ -104,18 +104,18 @@ export const CodeBlockWithCopy: React.FC<CodeBlockWithCopyProps> = ({ code, titl
   };
 
   return (
-    <div className="relative not-prose bg-slate-900 rounded-lg border border-slate-700 shadow-lg">
+    <div className="relative not-prose bg-slate-900 rounded-lg border border-slate-700 shadow-lg my-6">
        <div className="flex justify-between items-center px-4 py-2 border-b border-slate-700">
-            <span className="text-base font-semibold text-slate-300 dark:text-slate-400">{title}</span>
+            <span className="text-sm font-semibold text-slate-400">{title}</span>
             <button
                 onClick={handleCopy}
-                className="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-1 px-2 rounded-md transition-colors"
+                className="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold py-1 px-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-indigo-500"
                 aria-label="Копировать код"
             >
                 {copied ? 'Скопировано!' : 'Копировать'}
             </button>
        </div>
-      <pre className="text-white p-4 text-base overflow-x-auto mt-0 rounded-b-lg bg-transparent">
+      <pre className="text-slate-300 p-4 text-base overflow-x-auto mt-0 rounded-b-lg bg-transparent">
         <code>{code.trim()}</code>
       </pre>
     </div>
