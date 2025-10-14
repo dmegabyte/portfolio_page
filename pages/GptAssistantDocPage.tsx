@@ -140,31 +140,51 @@ JSON: "{ \\"question\\": \\"...\\", \\"candidates\\": [...] }"`
                 title="3. Под капотом: Механика gpttunnel"
                 subtitle="Центральный узел системы, который выполняет всю основную интеллектуальную работу: от векторизации до генерации ответа."
             />
-            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">Три базовые роли gpttunnel</h3>
-             <div className="not-prose my-8">
-                <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center">
-                        <div className="flex flex-col items-center flex-1"><CircleStackIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>Векторизация</strong><p className="text-sm text-gray-500 dark:text-slate-400">Превращает текстовые фрагменты RAG-файла в векторы (числовые координаты смысла).</p></div>
+            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">Логика внутренней обработки</h3>
+            <div className="not-prose my-8">
+                 <div className="flex flex-col md:flex-row items-stretch justify-between gap-4">
+                    {/* Stage 1 */}
+                    <div className="flex-1 bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col items-center text-center">
+                        <MagnifyingGlassIcon className="w-10 h-10 mb-3 text-indigo-500"/>
+                        <h4 className="font-bold text-lg text-slate-800 dark:text-slate-200">Этап 1: Подготовка и Поиск</h4>
+                        <ol className="list-decimal list-inside text-left space-y-2 mt-4 text-sm text-gray-700 dark:text-slate-300">
+                            <li>Получение запроса</li>
+                            <li>Векторизация запроса</li>
+                            <li>Поиск в Vector DB</li>
+                        </ol>
+                    </div>
+
+                    <div className="flex items-center justify-center">
                         <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                        <div className="flex flex-col items-center flex-1"><MagnifyingGlassIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>Поиск</strong><p className="text-sm text-gray-500 dark:text-slate-400">Находит наиболее близкие по смыслу векторы к запросу клиента.</p></div>
+                    </div>
+
+                    {/* Stage 2 */}
+                    <div className="flex-1 bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col items-center text-center">
+                        <CpuChipIcon className="w-10 h-10 mb-3 text-indigo-500"/>
+                        <h4 className="font-bold text-lg text-slate-800 dark:text-slate-200">Этап 2: Анализ и Генерация</h4>
+                        <ol className="list-decimal list-inside text-left space-y-2 mt-4 text-sm text-gray-700 dark:text-slate-300" start={4}>
+                            <li>Анализ кандидатов</li>
+                            <li>Сборка «контекстного пакета»</li>
+                            <li>Запрос к LLM</li>
+                        </ol>
+                    </div>
+
+                     <div className="flex items-center justify-center">
                         <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                        <div className="flex flex-col items-center flex-1"><SparklesIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>Генерация</strong><p className="text-sm text-gray-500 dark:text-slate-400">Передаёт найденные фрагменты в LLM, собирает и оформляет итоговый ответ.</p></div>
+                    </div>
+
+                    {/* Stage 3 */}
+                    <div className="flex-1 bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col items-center text-center">
+                        <DocumentDuplicateIcon className="w-10 h-10 mb-3 text-indigo-500"/>
+                        <h4 className="font-bold text-lg text-slate-800 dark:text-slate-200">Этап 3: Формирование и Возврат</h4>
+                         <ol className="list-decimal list-inside text-left space-y-2 mt-4 text-sm text-gray-700 dark:text-slate-300" start={7}>
+                            <li>Получение результата</li>
+                            <li>Формирование лога</li>
+                            <li>Возврат результата</li>
+                        </ol>
                     </div>
                 </div>
             </div>
-            
-            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-8 mb-4">Логика внутренней обработки</h3>
-            <DefinitionList items={[
-                { term: '1. Получение запроса', definition: 'Принимает `clean_question` из Google Sheet.' },
-                { term: '2. Векторизация запроса', definition: 'Преобразует текст вопроса в числовой вектор.' },
-                { term: '3. Поиск в Vector DB', definition: 'Находит 5 ближайших по смыслу фрагментов из RAG-базы.' },
-                { term: '4. Анализ кандидатов', definition: 'Оценивает релевантность и вес каждого из 5 найденных фрагментов.' },
-                { term: '5. Сборка «контекстного пакета»', definition: 'Формирует единый JSON-объект с вопросом, найденным контекстом и системными инструкциями.' },
-                { term: '6. Запрос к LLM', definition: 'Отправляет «контекстный пакет» в модель Gemini 2.5 Pro.' },
-                { term: '7. Получение результата', definition: 'Получает ответ от модели и вычисляет итоговый `score`.' },
-                { term: '8. Формирование лога', definition: 'Создает подробный JSON-лог со всеми кандидатами, выбранным вариантом и оценкой.' },
-                { term: '9. Возврат результата', definition: 'Отправляет `gpt_response`, `score` и `JSON`-лог обратно в Google Sheet.' }
-            ]} />
 
              <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-12 mb-4">Контекстный пакет (Context Bundle)</h3>
              <p>Внутренний документ, который gpttunnel формирует перед обращением к модели. Именно он определяет, какую информацию увидит LLM.</p>
@@ -257,48 +277,54 @@ JSON: "{ \\"question\\": \\"...\\", \\"candidates\\": [...] }"`
                     </div>
                 </div>
             </figure>
-            <div className="grid md:grid-cols-2 gap-8 items-start">
-                <div className="bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">RAG-файл — библиотека ассистента</h3>
-                    <p className="mt-2">Это «библиотека» знаний системы. Структурированный текстовый файл, где каждый блок содержит вопрос, ответ и метаданные, которые преобразуются в <TooltipTerm definition="Числовые представления смысла текста.">векторы</TooltipTerm> для семантического поиска.</p>
-                    <CodeBlockWithCopy title="Пример записи в RAG-файле" code={`<BEGIN_BLOCK>
+            <div className="bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">RAG-файл — библиотека ассистента</h3>
+                <p className="mt-2">Это «библиотека» знаний системы. Структурированный текстовый файл, где каждый блок содержит вопрос, ответ и метаданные, которые преобразуются в <TooltipTerm definition="Числовые представления смысла текста.">векторы</TooltipTerm> для семантического поиска.</p>
+                <CodeBlockWithCopy title="Пример записи в RAG-файле" code={`<BEGIN_BLOCK>
 <Q> Как восстановить пароль?
 <A> Чтобы восстановить доступ, перейдите по ссылке...
 <CATEGORY> Авторизация
 <SUBCATEGORY> Восстановление пароля
 <KEYWORDS> пароль; доступ; сброс; личный кабинет
 <END_BLOCK>`} />
-                    <h4 className="text-lg font-bold mt-6">Расшифровка тегов</h4>
-                    <DefinitionList items={[
-                        { term: '<Q>', definition: 'Канонический, очищенный вопрос, описывающий суть проблемы.' },
-                        { term: '<A>', definition: 'Эталонный, исчерпывающий и готовый к использованию ответ на вопрос.' },
-                        { term: '<CATEGORY>', definition: 'Категория верхнего уровня для группировки (напр., `Авторизация`).' },
-                        { term: '<SUBCATEGORY>', definition: 'Уточняющая подкатегория для большей детализации.' },
-                        { term: '<KEYWORDS>', definition: 'Набор ключевых слов через точку с запятой для улучшения поиска.' },
-                    ]} />
-                </div>
-                <div className="bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">JSON-логи — дневник ассистента</h3>
-                    <p className="mt-2">Это «дневник рассуждений» ассистента. Цифровой след, который показывает, как модель искала ответ, каких кандидатов рассматривала и почему сделала свой выбор. Ключевой инструмент для отладки и улучшения базы знаний.</p>
-                    <CodeBlockWithCopy title="Пример реального фрагмента JSON-лога" code={`{
-  "question": "как восстановить пароль?",
-  "retrieved_candidates": [
-    {"id": 23, "category": "Авторизация", "similarity": 0.91},
-    {"id": 57, "category": "Аккаунт", "similarity": 0.77}
-  ],
-  "selected": {"id": 23, "reason": "наибольшее совпадение"},
-  "model_score": 86,
-  "final_response": "Чтобы восстановить пароль, нажмите..."
+                <h4 className="text-lg font-bold mt-6">Расшифровка тегов</h4>
+                <DefinitionList items={[
+                    { term: '<Q>', definition: 'Канонический, очищенный вопрос, описывающий суть проблемы.' },
+                    { term: '<A>', definition: 'Эталонный, исчерпывающий и готовый к использованию ответ на вопрос.' },
+                    { term: '<CATEGORY>', definition: 'Категория верхнего уровня для группировки (напр., `Авторизация`).' },
+                    { term: '<SUBCATEGORY>', definition: 'Уточняющая подкатегория для большей детализации.' },
+                    { term: '<KEYWORDS>', definition: 'Набор ключевых слов через точку с запятой для улучшения поиска.' },
+                ]} />
+            </div>
+        </section>
+
+        <section id="json-logs" className="scroll-mt-24">
+             <SectionHeader 
+                icon={<DocumentDuplicateIcon className="w-8 h-8" />}
+                title="6. JSON-логи: Дневник ассистента"
+                subtitle="Это «дневник рассуждений» ассистента. Цифровой след, который показывает, как модель искала ответ, каких кандидатов рассматривала и почему сделала свой выбор."
+            />
+            <div className="bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">JSON-логи — дневник ассистента</h3>
+                <p className="mt-2">Это «дневник рассуждений» ассистента. Цифровой след, который показывает, как модель искала ответ, каких кандидатов рассматривала и почему сделала свой выбор. Ключевой инструмент для отладки и улучшения базы знаний.</p>
+                <CodeBlockWithCopy title="Пример реального фрагмента JSON-лога" code={`{
+"question": "как восстановить пароль?",
+"retrieved_candidates": [
+{"id": 23, "category": "Авторизация", "similarity": 0.91},
+{"id": 57, "category": "Аккаунт", "similarity": 0.77}
+],
+"selected": {"id": 23, "reason": "наибольшее совпадение"},
+"model_score": 86,
+"final_response": "Чтобы восстановить пароль, нажмите..."
 }`} />
-                    <h4 className="text-lg font-bold mt-6">Расшифровка полей</h4>
-                    <DefinitionList items={[
-                        { term: 'question', definition: 'Очищенный запрос клиента после обработки.' },
-                        { term: 'retrieved_candidates', definition: 'Массив тем из RAG-базы, которые система сочла релевантными.' },
-                        { term: 'selected', definition: 'Фрагмент-«победитель», на основе которого был сгенерирован ответ.' },
-                        { term: 'model_score', definition: 'Итоговая уверенность модели в ответе (от 0 до 100).' },
-                        { term: 'final_response', definition: 'Черновой ответ, предложенный оператору в качестве подсказки.' },
-                    ]} />
-                </div>
+                <h4 className="text-lg font-bold mt-6">Расшифровка полей</h4>
+                <DefinitionList items={[
+                    { term: 'question', definition: 'Очищенный запрос клиента после обработки.' },
+                    { term: 'retrieved_candidates', definition: 'Массив тем из RAG-базы, которые система сочла релевантными.' },
+                    { term: 'selected', definition: 'Фрагмент-«победитель», на основе которого был сгенерирован ответ.' },
+                    { term: 'model_score', definition: 'Итоговая уверенность модели в ответе (от 0 до 100).' },
+                    { term: 'final_response', definition: 'Черновой ответ, предложенный оператору в качестве подсказки.' },
+                ]} />
             </div>
         </section>
 
