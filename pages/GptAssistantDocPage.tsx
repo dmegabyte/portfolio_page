@@ -1,6 +1,6 @@
 import React, { useRef, useId, useState, ReactNode } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, TooltipTerm, CodeBlockWithCopy, Modal, DefinitionList } from '../components/DocumentationUIComponents';
+import { SectionHeader, InfoCard, TooltipTerm, CodeBlockWithCopy, Modal, DefinitionList, CollapsibleSection } from '../components/DocumentationUIComponents';
 import { 
     CpuChipIcon, ShieldCheckIcon, DocumentTextIcon, WrenchScrewdriverIcon, 
     InboxArrowDownIcon, ArrowLongRightIcon, LightBulbIcon, 
@@ -487,7 +487,7 @@ const KnowledgeBaseSection: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-8 items-start not-prose">
                 <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col">
                     <h3 className="text-2xl font-bold mt-0">RAG-файл — библиотека ассистента</h3>
-                    <p className="text-base mt-2">Это «библиотека» знаний системы. Структурированный текстовый файл, где каждый блок содержит вопрос, ответ и метаданные, которые преобразуются в <TooltipTerm definition="Числовые представления текста, которые отражают его семантический смысл. Близкие по смыслу тексты имеют близкие векторы.">векторы</TooltipTerm> для семантического поиска.</p>
+                    <p className="text-base mt-2">Это «библиотека» знаний системы. Структурированный текстовый файл, где каждый блок преобразуется в <TooltipTerm definition="Числовые представления текста, которые отражают его семантический смысл. Близкие по смыслу тексты имеют близкие векторы.">векторы</TooltipTerm> для поиска.</p>
                     <div className="mt-6">
                       <CodeBlockWithCopy title="Пример записи в RAG-файле" code={`
 <BEGIN_BLOCK>
@@ -500,13 +500,14 @@ const KnowledgeBaseSection: React.FC = () => {
                     `} />
                     </div>
                     <div className="mt-6">
-                        <h4 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-4">Расшифровка тегов</h4>
-                        <DefinitionList items={ragTags} />
+                        <CollapsibleSection title="Показать расшифровку тегов RAG-файла">
+                            <DefinitionList items={ragTags} />
+                        </CollapsibleSection>
                     </div>
                 </div>
                  <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 flex flex-col">
                     <h3 className="text-2xl font-bold mt-0">JSON-логи — дневник ассистента</h3>
-                    <p className="text-base mt-2">Это «дневник рассуждений» ассистента. Цифровой след, который показывает, как модель искала ответ, каких кандидатов рассматривала и почему сделала свой выбор. Ключевой инструмент для отладки и улучшения базы знаний.</p>
+                    <p className="text-base mt-2">Это «дневник рассуждений» ассистента. Цифровой след, который показывает, как модель искала ответ. Ключевой инструмент для отладки.</p>
                     <div className="mt-6">
                       <CodeBlockWithCopy title="Пример реального фрагмента JSON-лога" code={`
 {
@@ -522,8 +523,9 @@ const KnowledgeBaseSection: React.FC = () => {
                     `} />
                     </div>
                     <div className="mt-6">
-                        <h4 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-4">Расшифровка полей</h4>
+                        <CollapsibleSection title="Показать расшифровку полей JSON-лога">
                          <DefinitionList items={jsonFields} />
+                        </CollapsibleSection>
                     </div>
                 </div>
             </div>
