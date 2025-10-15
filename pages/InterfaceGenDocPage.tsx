@@ -242,15 +242,15 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                             
                             <ul className="space-y-3 pl-2">
                                 <li className="flex items-start">
-                                    <div className="flex-shrink-0 w-4 h-4 mt-1.5 mr-3 bg-blue-500 rounded-sm border border-blue-600"></div>
+                                    <span aria-hidden="true" className="flex-shrink-0 w-4 h-4 mt-1.5 mr-3 bg-blue-500 rounded-sm border border-blue-600"></span>
                                     <div><strong>CSS-режим</strong> — для изменения внешнего вида.</div>
                                 </li>
                                 <li className="flex items-start">
-                                    <div className="flex-shrink-0 w-4 h-4 mt-1.5 mr-3 bg-green-500 rounded-sm border border-green-600"></div>
+                                    <span aria-hidden="true" className="flex-shrink-0 w-4 h-4 mt-1.5 mr-3 bg-green-500 rounded-sm border border-green-600"></span>
                                     <div><strong>HTML + JS-режим</strong> — для добавления новых элементов.</div>
                                 </li>
                                 <li className="flex items-start">
-                                    <div className="flex-shrink-0 w-4 h-4 mt-1.5 mr-3 bg-yellow-500 rounded-sm border border-yellow-600"></div>
+                                    <span aria-hidden="true" className="flex-shrink-0 w-4 h-4 mt-1.5 mr-3 bg-yellow-500 rounded-sm border border-yellow-600"></span>
                                     <div><strong>System Codes-режим</strong> — для подстановки данных.</div>
                                 </li>
                             </ul>

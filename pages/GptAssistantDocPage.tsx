@@ -1,4 +1,4 @@
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, useRef } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
 import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, DefinitionList, Modal, AnnotatedCodeBlock } from '../components/DocumentationUIComponents';
 import { 
@@ -8,6 +8,116 @@ import {
     ArrowDownTrayIcon, ArrowUpTrayIcon, EyeIcon, CubeTransparentIcon, BoltIcon,
     DocumentDuplicateIcon, CheckCircleIcon, ExclamationCircleIcon, ClockIcon, ArrowPathIcon, ArrowLongDownIcon
 } from '@heroicons/react/24/outline';
+import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
+
+const TicketLifecycleDiagram: React.FC = () => {
+    const [modalContent, setModalContent] = useState<{ title: string; content: ReactNode } | null>(null);
+    const diagramRef = useRef<HTMLDivElement>(null);
+    useAnimateOnScroll(diagramRef, { targetSelector: '.diagram-element' });
+
+    const modalDescriptions = {
+        clientRequest: {
+            title: "Подробнее: Запрос клиента",
+            content: (
+                <div className="space-y-4 text-base">
+                    <p>Это начальная точка всего процесса. Система получает обращение клиента из тикет-системы Omnidesk. На этом этапе запрос представляет собой "сырые" данные, часто в формате HTML, и может содержать форматирование, изображения и служебную информацию.</p>
+                </div>
+            )
+        },
+        aiAnalysis: {
+            title: "Подробнее: AI-анализ (gpttunnel)",
+            content: (
+                 <div className="space-y-4 text-base">
+                    <p>Центральный этап, где происходит вся интеллектуальная работа. Процесс состоит из нескольких шагов:</p>
+                    <ol className="list-decimal list-inside space-y-2">
+                        <li><strong>Очистка:</strong> Из запроса удаляется HTML-разметка и лишние артефакты.</li>
+                        <li><strong>RAG-поиск:</strong> Очищенный вопрос векторизуется и сравнивается с базой знаний для поиска наиболее релевантных ответов.</li>
+                        <li><strong>Генерация:</strong> Модель генерирует черновой ответ на основе найденной информации.</li>
+                        <li><strong>Расчет score:</strong> Система оценивает свою уверенность в сгенерированном ответе по шкале от 0 до 100.</li>
+                    </ol>
+                </div>
+            )
+        },
+        highScore: {
+            title: "Подробнее: Score ≥ 80%",
+            content: (
+                 <div className="space-y-4 text-base">
+                    <p>Если оценка уверенности (score) высока, это означает, что система нашла очень релевантный ответ в базе знаний и уверена в его качестве.</p>
+                    <p><strong>Действие:</strong> Сгенерированный ответ автоматически передается в Google Sheet и помечается как **«Подсказка оператору»**. Оператор поддержки видит этот готовый черновик и может использовать его, сэкономив время на поиске информации.</p>
+                </div>
+            )
+        },
+        lowScore: {
+            title: "Подробнее: Score < 80%",
+            content: (
+                 <div className="space-y-4 text-base">
+                    <p>Низкая оценка уверенности означает, что система либо не нашла подходящего ответа в базе, либо считает сгенерированный ответ недостаточно точным. Это защитный механизм от отправки неверной информации.</p>
+                    <p><strong>Действие:</strong> Ответ **не предлагается** оператору. Вместо этого сохраняется только подробный **JSON-лог** с "рассуждениями" модели. Тикет остается в очереди на ручную обработку оператором, который может проанализировать лог для улучшения базы знаний.</p>
+                </div>
+            )
+        }
+    };
+
+    return (
+        <>
+            <figure ref={diagramRef} className="not-prose my-8" role="group" aria-labelledby="ticket-cycle-title">
+                <figcaption id="ticket-cycle-title" className="sr-only">
+                    Диаграмма жизненного цикла тикета, показывающая путь от запроса клиента до итогового решения.
+                </figcaption>
+                <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center">
+                        {/* Stage 1: Client Request */}
+                        <button onClick={() => setModalContent(modalDescriptions.clientRequest)} className="diagram-element flex flex-col items-center w-48 p-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-800 transition-all duration-300 transform hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/50" style={{ transitionDelay: '0ms' }}>
+                            <UserIcon className="w-12 h-12 p-2 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-full text-indigo-500 mb-3"/>
+                            <h3 className="font-semibold text-gray-800 dark:text-slate-200">Запрос клиента</h3>
+                            <p className="text-sm text-gray-500 dark:text-slate-400">Поступает в Omnidesk</p>
+                        </button>
+                        
+                        <ArrowLongRightIcon className="diagram-element w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block" style={{ transitionDelay: '150ms' }} />
+                        <ArrowLongDownIcon className="diagram-element w-10 h-10 text-gray-300 dark:text-slate-600 md:hidden" style={{ transitionDelay: '150ms' }} />
+
+                        {/* Stage 2: AI Analysis */}
+                        <button onClick={() => setModalContent(modalDescriptions.aiAnalysis)} className="diagram-element flex flex-col items-center w-64 p-4 rounded-lg bg-white dark:bg-slate-800 border dark:border-slate-700 hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/50" style={{ transitionDelay: '300ms' }}>
+                           <BoltIcon className="w-12 h-12 p-2 bg-indigo-100 dark:bg-slate-700 rounded-full text-indigo-500 mb-3"/>
+                           <h3 className="font-semibold text-gray-800 dark:text-slate-200">AI-анализ (gpttunnel)</h3>
+                           <p className="text-sm text-gray-500 dark:text-slate-400">Очистка → RAG-поиск → Генерация → Расчет <TooltipTerm definition="Оценка уверенности модели (от 0 до 100), что ответ соответствует вопросу.">score</TooltipTerm></p>
+                        </button>
+
+                        <ArrowLongRightIcon className="diagram-element w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block" style={{ transitionDelay: '450ms' }} />
+                        <ArrowLongDownIcon className="diagram-element w-10 h-10 text-gray-300 dark:text-slate-600 md:hidden" style={{ transitionDelay: '450ms' }} />
+                        
+                        {/* Stage 3: Decision Fork */}
+                        <div className="flex flex-col items-stretch gap-4">
+                            <button onClick={() => setModalContent(modalDescriptions.highScore)} className="diagram-element flex items-center gap-4 text-left p-4 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 w-full md:w-80 hover:shadow-lg hover:border-green-300 dark:hover:border-green-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-green-500/50" style={{ transitionDelay: '600ms' }}>
+                                <CheckCircleIcon className="w-10 h-10 text-green-600 dark:text-green-400 flex-shrink-0"/>
+                                <div>
+                                    <h3 className="font-semibold text-green-800 dark:text-green-300">Score ≥ 80%</h3>
+                                    <p className="text-sm text-green-900 dark:text-green-200">Ответ передаётся в Google Sheet как **«Подсказка оператору»**.</p>
+                                </div>
+                            </button>
+                            <button onClick={() => setModalContent(modalDescriptions.lowScore)} className="diagram-element flex items-center gap-4 text-left p-4 rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 w-full md:w-80 hover:shadow-lg hover:border-amber-300 dark:hover:border-amber-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-500/50" style={{ transitionDelay: '750ms' }}>
+                                <ExclamationCircleIcon className="w-10 h-10 text-amber-600 dark:text-amber-400 flex-shrink-0"/>
+                                <div>
+                                    <h3 className="font-semibold text-amber-800 dark:text-amber-300">Score &lt; 80%</h3>
+                                    <p className="text-sm text-amber-900 dark:text-amber-200">Ответ **не отправляется**, сохраняется только JSON-лог. Тикет остается на операторе.</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </figure>
+            {modalContent && (
+                <Modal
+                    isOpen={!!modalContent}
+                    onClose={() => setModalContent(null)}
+                    title={modalContent.title}
+                >
+                    {modalContent.content}
+                </Modal>
+            )}
+        </>
+    );
+};
 
 const GptAssistantDocumentationPage: React.FC = () => {
     const [modalData, setModalData] = useState<any>(null);
@@ -75,6 +185,20 @@ JSON: "{ \\"question\\": \\"...\\", \\"candidates\\": [...] }"`
         { code: '<END_BLOCK>', annotation: 'Конец информационного блока.' },
     ];
 
+    const jsonLogContent = [
+        { code: '{', annotation: 'Начало JSON-объекта, представляющего полный лог рассуждений модели.' },
+        { code: '  "question": "как восстановить пароль?",', annotation: 'Очищенный и нормализованный запрос клиента, который был подан на вход RAG-системы.', isHighlighted: true },
+        { code: '  "retrieved_candidates": [', annotation: 'Массив фрагментов-кандидатов, которые RAG-система нашла в базе знаний как потенциально релевантные.' },
+        { code: '    {"id": 23, "category": "Авторизация", "similarity": 0.91},', annotation: 'Первый кандидат с очень высокой степенью схожести (91%).' },
+        { code: '    {"id": 57, "category": "Аккаунт", "similarity": 0.77}', annotation: 'Второй, менее релевантный кандидат.' },
+        { code: '  ],', annotation: 'Конец массива кандидатов.' },
+        { code: '  "selected": {"id": 23, "reason": "наибольшее совпадение"},', annotation: 'Объект, указывающий на фрагмент-«победитель», который модель выбрала для генерации ответа, и причина выбора.', isHighlighted: true },
+        { code: '  "model_score": 86,', annotation: 'Итоговая оценка уверенности модели (от 0 до 100), что сгенерированный ответ является точным и полным на основе выбранного кандидата.', isHighlighted: true },
+        { code: '  "final_response": "Чтобы восстановить пароль, нажмите..."', annotation: 'Финальный, готовый к использованию черновой ответ, который был предложен оператору поддержки в качестве подсказки.' },
+        { code: '}', annotation: 'Конец JSON-объекта.' },
+    ];
+    
+
 
     return (
     <DocumentationPageLayout title="GPT-ассистент с RAG">
@@ -102,47 +226,7 @@ JSON: "{ \\"question\\": \\"...\\", \\"candidates\\": [...] }"`
                 title="2. Единый цикл обработки тикета"
                 subtitle="Пошаговый процесс: от получения сырого запроса до предложения готового ответа оператору."
             />
-            <div className="not-prose my-8">
-                <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                     <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center">
-                        {/* Flow Start */}
-                        <div className="flex flex-col items-center w-48 p-2">
-                            <UserIcon className="w-12 h-12 p-2 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-full text-indigo-500 mb-3"/>
-                            <h3 className="font-semibold text-gray-800 dark:text-slate-200">Запрос клиента</h3>
-                            <p className="text-sm text-gray-500 dark:text-slate-400">Поступает в Omnidesk</p>
-                        </div>
-                        <ArrowLongRightIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block" />
-                        
-                        {/* AI Core */}
-                        <div className="flex flex-col items-center w-64 p-4 rounded-lg bg-white dark:bg-slate-800 border dark:border-slate-700">
-                           <BoltIcon className="w-12 h-12 p-2 bg-indigo-100 dark:bg-slate-700 rounded-full text-indigo-500 mb-3"/>
-                           <h3 className="font-semibold text-gray-800 dark:text-slate-200">AI-анализ (gpttunnel)</h3>
-                           <p className="text-sm text-gray-500 dark:text-slate-400">Очистка → RAG-поиск → Генерация → Расчет <TooltipTerm definition="Оценка уверенности модели (от 0 до 100), что ответ соответствует вопросу.">score</TooltipTerm></p>
-                        </div>
-                        <ArrowLongRightIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block" />
-
-                        {/* Decision Fork */}
-                        <div className="flex flex-col items-center gap-4">
-                            {/* Path 1: High Score */}
-                            <div className="flex items-center gap-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 w-full md:w-80">
-                                <CheckCircleIcon className="w-10 h-10 text-green-600 dark:text-green-400 flex-shrink-0"/>
-                                <div className="text-left">
-                                    <h3 className="font-semibold text-green-800 dark:text-green-300">Score ≥ 80%</h3>
-                                    <p className="text-sm text-green-900 dark:text-green-200">Ответ передаётся в Google Sheet как **«Подсказка оператору»**.</p>
-                                </div>
-                            </div>
-                            {/* Path 2: Low Score */}
-                            <div className="flex items-center gap-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 w-full md:w-80">
-                                <ExclamationCircleIcon className="w-10 h-10 text-amber-600 dark:text-amber-400 flex-shrink-0"/>
-                                <div className="text-left">
-                                    <h3 className="font-semibold text-amber-800 dark:text-amber-300">Score &lt; 80%</h3>
-                                    <p className="text-sm text-amber-900 dark:text-amber-200">Ответ **не отправляется**, сохраняется только JSON-лог. Тикет остается на операторе.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <TicketLifecycleDiagram />
         </section>
 
         <section id="gpttunnel-mechanics" className="scroll-mt-24">
@@ -196,24 +280,6 @@ JSON: "{ \\"question\\": \\"...\\", \\"candidates\\": [...] }"`
                     </div>
                 </div>
             </div>
-
-             <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-12 mb-4">Контекстный пакет (Context Bundle)</h3>
-             <p>Внутренний документ, который gpttunnel формирует перед обращением к модели. Именно он определяет, какую информацию увидит LLM.</p>
-            <CodeBlockWithCopy title="Пример структуры Context Bundle" code={`{
-  "question": "Как восстановить пароль?",
-  "context": [
-    {"category": "Авторизация", "score": 0.91, "text": "...инструкция по восстановлению..."},
-    {"category": "Аккаунт", "score": 0.77, "text": "...дополнительные сведения..."}
-  ],
-  "dialog_history": "...",
-  "system_guidelines": "...формат ответа, стиль, ограничения..."
-}`} />
-            <DefinitionList items={[
-                { term: 'question', definition: 'Очищенный вопрос клиента.' },
-                { term: 'context', definition: 'Массив найденных релевантных фрагментов из RAG-базы с их весом.' },
-                { term: 'dialog_history', definition: 'История предыдущих сообщений в диалоге для сохранения контекста.' },
-                { term: 'system_guidelines', definition: 'Системные инструкции для модели (стиль ответа, ограничения, формат).' }
-            ]} />
         </section>
 
         <section id="model-evolution" className="scroll-mt-24">
@@ -222,26 +288,48 @@ JSON: "{ \\"question\\": \\"...\\", \\"candidates\\": [...] }"`
                 title="4. Эволюция архитектуры: от каскада к рассуждению"
                 subtitle="Как система перешла от сложной трехуровневой схемы к одной, более мощной и предсказуемой модели."
             />
-            <div className="grid md:grid-cols-2 gap-8 items-start not-prose">
-                <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-gray-200 dark:border-slate-700 h-full">
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-0 flex items-center gap-2"><ExclamationCircleIcon className="w-6 h-6 text-amber-500" />Ранняя архитектура (Каскад моделей)</h3>
-                    <p className="mt-2 text-base text-slate-700 dark:text-slate-300">Изначально система использовала связку из трёх моделей для баланса скорости и качества:</p>
-                    <ul className="list-decimal list-inside space-y-2 mt-4 text-base">
+            <div className="flex flex-col items-center gap-6 not-prose">
+                {/* Stage 1: Early Architecture */}
+                <div className="w-full max-w-3xl bg-white dark:bg-slate-800 rounded-lg p-6 border-2 border-amber-500/30 dark:border-amber-500/40 shadow-md">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-0 flex items-center gap-3">
+                        <div className="flex-shrink-0 w-8 h-8 bg-amber-100 dark:bg-amber-900/50 rounded-full flex items-center justify-center">
+                            <ExclamationCircleIcon className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                        </div>
+                        <span>Ранняя архитектура (Каскад моделей)</span>
+                    </h3>
+                    <p className="mt-3 text-base text-slate-700 dark:text-slate-300">Изначально система использовала связку из трёх моделей для баланса скорости и качества:</p>
+                    <ol className="list-decimal list-inside space-y-2 mt-4 text-base pl-4">
                         <li><b>Level 1 (Gemini 2.5 Flash):</b> Быстрый RAG-поиск по внутренней базе.</li>
                         <li><b>Level 2 (GPT-4o):</b> Поиск уточнений во внешних источниках (интернет, внутренняя база знаний).</li>
                         <li><b>Level 3 (GPT-4.0 mini):</b> Финальная сборка и стилизация ответа.</li>
-                    </ul>
-                    <p className="mt-4 text-sm text-slate-500 dark:text-slate-400"><b>Недостаток:</b> С ростом RAG-базы второй уровень стал избыточным, а последовательные вызовы замедляли процесс.</p>
+                    </ol>
+                    <div className="mt-5 pt-4 border-t border-gray-200 dark:border-slate-700">
+                        <p className="text-sm text-slate-600 dark:text-slate-400"><strong className="text-slate-800 dark:text-slate-200">Недостаток:</strong> С ростом RAG-базы второй уровень стал избыточным, а последовательные вызовы замедляли процесс.</p>
+                    </div>
                 </div>
-                <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-green-300 dark:border-green-700 h-full">
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-0 flex items-center gap-2"><CheckCircleIcon className="w-6 h-6 text-green-500" />Текущая архитектура (Рассуждающая модель)</h3>
-                    <p className="mt-2 text-base text-slate-700 dark:text-slate-300">Архитектура была упрощена до одной, более мощной модели — <strong>Gemini 2.5 Pro</strong>. Она не просто генерирует ответ, а выполняет всю цепочку рассуждений:</p>
-                    <ul className="list-decimal list-inside space-y-2 mt-4 text-base">
+                
+                {/* Arrow Connector */}
+                <div className="flex justify-center my-2">
+                    <ArrowLongDownIcon className="w-10 h-10 text-gray-400 dark:text-slate-500" />
+                </div>
+
+                {/* Stage 2: Current Architecture */}
+                <div className="w-full max-w-3xl bg-white dark:bg-slate-800 rounded-lg p-6 border-2 border-green-500/40 dark:border-green-500/50 shadow-lg">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-0 flex items-center gap-3">
+                         <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center">
+                            <CheckCircleIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
+                        </div>
+                        <span>Текущая архитектура (Рассуждающая модель)</span>
+                    </h3>
+                    <p className="mt-3 text-base text-slate-700 dark:text-slate-300">Архитектура была упрощена до одной, более мощной модели — <strong>Gemini 2.5 Pro</strong>. Она не просто генерирует ответ, а выполняет всю цепочку рассуждений:</p>
+                    <ol className="list-decimal list-inside space-y-2 mt-4 text-base pl-4">
                         <li>Анализирует вопрос.</li>
                         <li>Находит несколько релевантных блоков в RAG-базе.</li>
                         <li>Сравнивает их и выбирает лучший, аргументируя свой выбор.</li>
-                    </ul>
-                     <p className="mt-4 text-sm text-slate-500 dark:text-slate-400"><b>Преимущества:</b> Система стала **быстрее**, **точнее** и **предсказуемее**, так как вся цепочка рассуждений видна в логах.</p>
+                    </ol>
+                    <div className="mt-5 pt-4 border-t border-gray-200 dark:border-slate-700">
+                         <p className="text-sm text-slate-600 dark:text-slate-400"><strong className="text-slate-800 dark:text-slate-200">Преимущества:</strong> Система стала <strong>быстрее</strong>, <strong>точнее</strong> и <strong>предсказуемее</strong>, так как вся цепочка рассуждений видна в логах.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -306,29 +394,16 @@ JSON: "{ \\"question\\": \\"...\\", \\"candidates\\": [...] }"`
              <SectionHeader 
                 icon={<DocumentDuplicateIcon className="w-8 h-8" />}
                 title="6. JSON-логи: Дневник ассистента"
-                subtitle="Это «дневник рассуждений» ассистента. Цифровой след, который показывает, как модель искала ответ, каких кандидатов рассматривала и почему сделала свой выбор."
+                subtitle="Это «дневник рассуждений» ассистента. Цифровой след, который показывает, как модель искала ответ, каких кандидатов рассматривала и почему сделала свой выбор. Ключевой инструмент для отладки и улучшения базы знаний."
             />
             <div className="bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
-                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">JSON-логи — дневник ассистента</h3>
-                <p className="mt-2">Это «дневник рассуждений» ассистента. Цифровой след, который показывает, как модель искала ответ, каких кандидатов рассматривала и почему сделала свой выбор. Ключевой инструмент для отладки и улучшения базы знаний.</p>
-                <CodeBlockWithCopy title="Пример реального фрагмента JSON-лога" code={`{
-"question": "как восстановить пароль?",
-"retrieved_candidates": [
-{"id": 23, "category": "Авторизация", "similarity": 0.91},
-{"id": 57, "category": "Аккаунт", "similarity": 0.77}
-],
-"selected": {"id": 23, "reason": "наибольшее совпадение"},
-"model_score": 86,
-"final_response": "Чтобы восстановить пароль, нажмите..."
-}`} />
-                <h4 className="text-lg font-bold mt-6">Расшифровка полей</h4>
-                <DefinitionList items={[
-                    { term: 'question', definition: 'Очищенный запрос клиента после обработки.' },
-                    { term: 'retrieved_candidates', definition: 'Массив тем из RAG-базы, которые система сочла релевантными.' },
-                    { term: 'selected', definition: 'Фрагмент-«победитель», на основе которого был сгенерирован ответ.' },
-                    { term: 'model_score', definition: 'Итоговая уверенность модели в ответе (от 0 до 100).' },
-                    { term: 'final_response', definition: 'Черновой ответ, предложенный оператору в качестве подсказки.' },
-                ]} />
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mt-0">Анатомия JSON-лога</h3>
+                <p className="mt-2">Каждый JSON-лог — это детальный отчет о том, как модель пришла к своему выводу. Он позволяет точно отследить, какие данные из базы знаний были использованы и почему. Кликните на любую строку в примере ниже, чтобы увидеть подробное описание каждого поля.</p>
+                <AnnotatedCodeBlock 
+                    title="Пример реального фрагмента JSON-лога"
+                    annotationTitle="Описание поля"
+                    items={jsonLogContent} 
+                />
             </div>
         </section>
 
