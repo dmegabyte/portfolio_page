@@ -1,16 +1,19 @@
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, useRef } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
 import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, CollapsibleSection, Modal } from '../components/DocumentationUIComponents';
 import { 
     CubeTransparentIcon, CodeBracketIcon, BoltIcon, CommandLineIcon, QuestionMarkCircleIcon, 
     TableCellsIcon, DocumentTextIcon, ArchiveBoxIcon, ExclamationTriangleIcon, PlayIcon, 
     UserIcon, ArrowsRightLeftIcon, SparklesIcon, ArrowLongRightIcon, LightBulbIcon, WrenchScrewdriverIcon, ShieldExclamationIcon, PuzzlePieceIcon,
-    CheckBadgeIcon, MagnifyingGlassIcon, PaintBrushIcon, CodeBracketSquareIcon, HandRaisedIcon, NoSymbolIcon, CheckIcon, PencilSquareIcon, InboxStackIcon, CircleStackIcon
+    CheckBadgeIcon, MagnifyingGlassIcon, PaintBrushIcon, CodeBracketSquareIcon, HandRaisedIcon, NoSymbolIcon, CheckIcon, PencilSquareIcon, InboxStackIcon, CircleStackIcon, ArrowLongDownIcon
 } from '@heroicons/react/24/outline';
+import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
 
 
 const InteractiveGeneratorWorkflowDiagram: React.FC = () => {
     const [modalContent, setModalContent] = useState<{ title: string; content: ReactNode } | null>(null);
+    const diagramRef = useRef<HTMLDivElement>(null);
+    useAnimateOnScroll(diagramRef, { targetSelector: '.diagram-element' });
 
     const modalDescriptions = {
         request: {
@@ -95,21 +98,31 @@ const InteractiveGeneratorWorkflowDiagram: React.FC = () => {
     ];
     
     return (
-        <div className="not-prose my-8">
+        <div className="not-prose my-8" ref={diagramRef}>
             <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center">
                     {stages.map((stage, index) => (
                         <React.Fragment key={stage.id}>
                             <button 
                                 onClick={() => setModalContent(modalDescriptions[stage.id as keyof typeof modalDescriptions])}
-                                className="flex flex-col items-center w-48 p-4 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors duration-200"
+                                className="diagram-element flex flex-col items-center w-48 p-4 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-800 transition-all duration-300 transform hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/50"
+                                style={{ transitionDelay: `${index * 200}ms` }}
                             >
                                 <div className="mb-3">{stage.icon}</div>
                                 <h3 className={`font-semibold mt-2 ${stage.id === 'result' ? 'text-green-800 dark:text-green-300' : 'text-gray-800 dark:text-slate-200'}`}>{stage.title}</h3>
                                 <p className="text-sm text-gray-500 dark:text-slate-400">{stage.description}</p>
                             </button>
                             {index < stages.length - 1 && (
-                                <ArrowLongRightIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block my-4 md:my-0" />
+                                <>
+                                    <ArrowLongRightIcon 
+                                        className="diagram-element w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block my-4 md:my-0" 
+                                        style={{ transitionDelay: `${index * 200 + 100}ms` }} 
+                                    />
+                                    <ArrowLongDownIcon 
+                                        className="diagram-element w-10 h-10 text-gray-300 dark:text-slate-600 md:hidden my-4" 
+                                        style={{ transitionDelay: `${index * 200 + 100}ms` }} 
+                                    />
+                                </>
                             )}
                         </React.Fragment>
                     ))}
