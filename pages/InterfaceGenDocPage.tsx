@@ -144,6 +144,8 @@ const InteractiveGeneratorWorkflowDiagram: React.FC = () => {
 
 const InterfaceGeneratorDocumentationPage: React.FC = () => {
     const [modalContent, setModalContent] = useState<{ title: string; content: ReactNode } | null>(null);
+    const errorHandlingRef = useRef<HTMLDivElement>(null);
+    useAnimateOnScroll(errorHandlingRef, { targetSelector: '.diagram-element' });
 
     const engineModalDescriptions = {
         css: {
@@ -584,15 +586,56 @@ footer a:hover {
                     title="6. Обработка ошибок и неоднозначностей"
                     subtitle="Как система ведет себя в нестандартных ситуациях."
                 />
-                 <div className="space-y-4">
-                    <InfoCard icon={<QuestionMarkCircleIcon className="w-6 h-6"/>} title="Неоднозначные запросы (Fallback-поведение)">
-                        <p>Если запрос недостаточно конкретен, особенно в CSS-режиме (например, "измени цвет кнопки" без указания селектора), система не будет "додумывать" и вернет уточняющий вопрос. Это поведение обеспечивается промтом `askUserIntent`.</p>
-                        <p className="mt-2"><strong>Пример ответа системы:</strong> «Не удалось определить, к какой кнопке применить стили. Пожалуйста, укажите <TooltipTerm definition="Строка, которая определяет, к какому HTML-элементу или элементам применяются CSS-правила.">CSS-селектор</TooltipTerm> (например, `.btn-submit` или `#main-button`).»</p>
-                    </InfoCard>
-                    <InfoCard icon={<ExclamationTriangleIcon className="w-6 h-6"/>} title="Некорректные запросы">
-                        <p>Если запрос совершенно не связан с генерацией кода или является бессмысленным набором символов, система вернет стандартный ответ об ошибке, указывая на невозможность обработки. Она не будет пытаться "угадать" намерение пользователя, чтобы избежать непредсказуемых результатов.</p>
-                    </InfoCard>
-                 </div>
+                 <div ref={errorHandlingRef} className="not-prose my-8">
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center">
+                        {/* Entry Point */}
+                        <div className="diagram-element flex flex-col items-center w-48 p-2" style={{ transitionDelay: '0ms' }}>
+                            <UserIcon className="w-12 h-12 p-2 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-full text-indigo-500 mb-3"/>
+                            <h3 className="font-semibold text-gray-800 dark:text-slate-200">Входящий запрос</h3>
+                        </div>
+                        
+                        <ArrowLongRightIcon className="diagram-element w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block" style={{ transitionDelay: '150ms' }} />
+                        <ArrowLongDownIcon className="diagram-element w-10 h-10 text-gray-300 dark:text-slate-600 md:hidden" style={{ transitionDelay: '150ms' }} />
+
+                        {/* Analysis Hub */}
+                        <div className="diagram-element flex flex-col items-center w-56 p-4 rounded-lg bg-white dark:bg-slate-800 border-2 border-indigo-500 dark:border-indigo-400 shadow-lg" style={{ transitionDelay: '300ms' }}>
+                           <BoltIcon className="w-12 h-12 text-indigo-500 dark:text-indigo-400 mb-3"/>
+                           <h3 className="font-semibold text-gray-800 dark:text-slate-200">Анализ системой</h3>
+                           <p className="text-sm text-gray-500 dark:text-slate-400">Проверка на конкретность и релевантность</p>
+                        </div>
+                        
+                        <ArrowLongRightIcon className="diagram-element w-10 h-10 text-gray-300 dark:text-slate-600 hidden md:block" style={{ transitionDelay: '450ms' }} />
+                        <ArrowLongDownIcon className="diagram-element w-10 h-10 text-gray-300 dark:text-slate-600 md:hidden" style={{ transitionDelay: '450ms' }} />
+
+                        {/* Decision Fork */}
+                        <div className="flex flex-col items-stretch gap-4">
+                            {/* Ambiguous Path */}
+                            <div className="diagram-element bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 w-full md:w-96 text-left" style={{ transitionDelay: '600ms' }}>
+                                <div className="flex items-start gap-4">
+                                    <div className="flex-shrink-0 w-12 h-12 bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-400 rounded-lg flex items-center justify-center">
+                                        <QuestionMarkCircleIcon className="w-7 h-7"/>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-0">Неоднозначные запросы (Fallback)</h4>
+                                        <p className="mt-2 text-base text-slate-700 dark:text-slate-300">Если запрос недостаточно конкретен (например, "измени цвет кнопки" без селектора), система вернет уточняющий вопрос. Промт: `askUserIntent`.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Incorrect Path */}
+                            <div className="diagram-element bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700 w-full md:w-96 text-left" style={{ transitionDelay: '750ms' }}>
+                                <div className="flex items-start gap-4">
+                                     <div className="flex-shrink-0 w-12 h-12 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 rounded-lg flex items-center justify-center">
+                                        <ExclamationTriangleIcon className="w-7 h-7"/>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-0">Некорректные запросы</h4>
+                                        <p className="mt-2 text-base text-slate-700 dark:text-slate-300">Если запрос не связан с генерацией кода, система вернет стандартный ответ об ошибке, не пытаясь "угадать" намерение.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
         </div>

@@ -73,24 +73,22 @@
       .animate-modal-enter {
         animation: modal-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
       }
+      @keyframes subtle-fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      .animate-subtle-fade-in {
+        animation: subtle-fade-in 0.2s ease-out forwards;
+      }
       /* Styles for scroll-triggered animations */
-      .workflow-stage {
+      .workflow-stage, .diagram-element, .fade-in-section {
         opacity: 0;
         transform: translateY(20px);
         transition: opacity 0.6s ease-out, transform 0.6s ease-out;
       }
-      .workflow-stage.is-visible {
+      .workflow-stage.is-visible, .diagram-element.is-visible, .fade-in-section.is-visible {
         opacity: 1;
         transform: translateY(0);
-      }
-      .diagram-element {
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-      }
-      .diagram-element.is-visible {
-          opacity: 1;
-          transform: translateY(0);
       }
       /* Custom scrollbar for better aesthetics */
       .custom-scrollbar::-webkit-scrollbar {

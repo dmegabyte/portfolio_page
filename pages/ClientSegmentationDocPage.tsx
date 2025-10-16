@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
 import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, DefinitionList } from '../components/DocumentationUIComponents';
 import {
@@ -11,11 +11,71 @@ import {
     ArrowPathIcon,
     BookOpenIcon,
     Cog6ToothIcon,
+    ArrowDownTrayIcon,
+    UserGroupIcon,
+    CalendarDaysIcon,
+    SparklesIcon,
+    PaperAirplaneIcon,
+    DocumentTextIcon,
 } from '@heroicons/react/24/outline';
 import { glossary } from '../data/glossary';
+import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
+
 
 const ClientSegmentationDocumentationPage: React.FC = () => {
     const glossaryItems = Object.entries(glossary).map(([term, definition]) => ({ term, definition }));
+    const workflowRef = useRef<HTMLDivElement>(null);
+    useAnimateOnScroll(workflowRef, { targetSelector: '.workflow-stage' });
+
+    const workflowStages = [
+        {
+            icon: <ArrowDownTrayIcon className="w-7 h-7" />,
+            title: "1. Инициализация",
+            content: "Скрипт запускается (обычно раз в сутки) и загружает все данные с листов «Клиенты», «Шаблоны», «Акции» и «Персонализация» в оперативную память."
+        },
+        {
+            icon: <UserGroupIcon className="w-7 h-7" />,
+            title: "2. Глобальная сегментация",
+            content: "Для каждого клиента определяется его тип, лояльность, активность, ценовой сегмент и предпочтения (например, \"Активный постоянный массажник\")."
+        },
+        {
+            icon: <CalendarDaysIcon className="w-7 h-7" />,
+            title: "3. Расчет даты отправки",
+            content: () => (
+                <>
+                    Для каждого клиента вычисляется оптимальная дата следующего контакта (<TooltipTerm definition="Ключевое поле; расчетная дата, когда клиенту должно быть отправлено сообщение.">send_date</TooltipTerm>) на основе его индивидуальной истории посещений (<TooltipTerm definition="Самый короткий промежуток времени между двумя последовательными визитами.">minInterval</TooltipTerm>) или средних показателей по сегменту (<TooltipTerm definition="Среднестатистический промежуток времени между визитами для клиентов в сегменте.">avgInterval</TooltipTerm>).
+                </>
+            )
+        },
+        {
+            icon: <SparklesIcon className="w-7 h-7" />,
+            title: "4. Подбор контента",
+            content: () => (
+                <>
+                    Для клиентов, у которых `send_date` совпадает с текущей датой, система ищет наиболее подходящий контент:
+                    <ul className="list-disc list-inside ml-4 mt-2 space-y-1 text-base">
+                        <li>Сначала ищется уникальное предложение в листе «Персонализация».</li>
+                        <li>Если ничего не найдено, ищется групповое предложение в листе «Акции».</li>
+                        <li>Параллельно подбирается наиболее релевантный текст из листа «Шаблоны».</li>
+                    </ul>
+                </>
+            )
+        },
+        {
+            icon: <PaperAirplaneIcon className="w-7 h-7" />,
+            title: "5. Формирование и отправка",
+            content: () => (
+                 <>
+                    Скрипт объединяет найденный шаблон и акцию, формирует финальное сообщение и отправляет его через <TooltipTerm definition="Программный интерфейс приложения — это набор правил и инструментов, который позволяет различным программным приложениям взаимодействовать друг с другом.">API</TooltipTerm> сервиса WAHelp.
+                </>
+            )
+        },
+        {
+            icon: <DocumentTextIcon className="w-7 h-7" />,
+            title: "6. Логирование",
+            content: "Все действия, отправленные сообщения и ошибки записываются на лист «Логи» для последующего анализа."
+        }
+    ];
 
     return (
         <DocumentationPageLayout title="AI-маркетолог: Сегментация клиентов">
@@ -81,20 +141,26 @@ const ClientSegmentationDocumentationPage: React.FC = () => {
                         title="4. Основной флоу работы (пошагово)"
                         subtitle="Жизненный цикл обработки данных от запуска скрипта до отправки сообщения."
                     />
-                    <ol className="list-decimal list-inside space-y-4 text-base">
-                        <li><b>Инициализация:</b> Скрипт запускается (обычно раз в сутки) и загружает все данные с листов «Клиенты», «Шаблоны», «Акции» и «Персонализация» в оперативную память.</li>
-                        <li><b>Глобальная сегментация:</b> Для каждого клиента определяется его тип, лояльность, активность, ценовой сегмент и предпочтения (например, "Активный постоянный массажник").</li>
-                        <li><b>Расчет даты отправки (<TooltipTerm definition="Ключевое поле; расчетная дата, когда клиенту должно быть отправлено сообщение.">send_date</TooltipTerm>):</b> Для каждого клиента вычисляется оптимальная дата следующего контакта на основе его индивидуальной истории посещений (<TooltipTerm definition="Самый короткий промежуток времени между двумя последовательными визитами.">minInterval</TooltipTerm>) или средних показателей по сегменту (<TooltipTerm definition="Среднестатистический промежуток времени между визитами для клиентов в сегменте.">avgInterval</TooltipTerm>).</li>
-                        <li><b>Подбор контента:</b> Для клиентов, у которых `send_date` совпадает с текущей датой, система ищет наиболее подходящий контент:
-                            <ul className="list-disc list-inside ml-6 mt-2">
-                                <li>Сначала ищется уникальное предложение в листе «Персонализация».</li>
-                                <li>Если ничего не найдено, ищется групповое предложение в листе «Акции».</li>
-                                <li>Параллельно подбирается наиболее релевантный текст из листа «Шаблоны».</li>
-                            </ul>
-                        </li>
-                        <li><b>Формирование и отправка:</b> Скрипт объединяет найденный шаблон и акцию, формирует финальное сообщение и отправляет его через <TooltipTerm definition="Программный интерфейс приложения — это набор правил и инструментов, который позволяет различным программным приложениям взаимодействовать друг с другом.">API</TooltipTerm> сервиса WAHelp.</li>
-                        <li><b>Логирование:</b> Все действия, отправленные сообщения и ошибки записываются на лист «Логи» для последующего анализа.</li>
-                    </ol>
+                     <div ref={workflowRef} className="relative mt-8 not-prose">
+                        {/* Vertical line connector */}
+                        <div className="absolute left-6 top-0 h-full w-0.5 bg-gray-200 dark:bg-slate-700" aria-hidden="true"></div>
+                        
+                        <div className="space-y-12">
+                            {workflowStages.map((stage, index) => (
+                                <div key={index} className="workflow-stage relative pl-16" style={{ transitionDelay: `${index * 150}ms` }}>
+                                    <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500 text-white shadow-md">
+                                        {stage.icon}
+                                    </div>
+                                    <div className="bg-gray-50 dark:bg-slate-900/50 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
+                                        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-0">{stage.title}</h3>
+                                        <div className="mt-2 text-base text-slate-700 dark:text-slate-300">
+                                            {typeof stage.content === 'function' ? stage.content() : stage.content}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </section>
 
                 <section id="core-mechanics" className="scroll-mt-24">
@@ -103,16 +169,24 @@ const ClientSegmentationDocumentationPage: React.FC = () => {
                         title="5. Ключевые принципы и механики"
                         subtitle="Фундаментальные концепции, обеспечивающие эффективность и надежность системы."
                     />
-                    <h3 className="text-xl font-bold mb-4">Принцип «idFirst»</h3>
-                    <p>
-                        Один из ключевых архитектурных принципов. Все ключевые категории (тип клиента, лояльность, активность и т.д.) хранятся и обрабатываются как числовые ID, а не как строки. Например, вместо "Активный" используется `1`, вместо "Пассивный" — `2`. Это дает несколько преимуществ:
-                    </p>
-                     <ul className="list-disc list-inside space-y-2 my-4">
-                        <li><b>Производительность:</b> Сравнение чисел в Google Sheets и Apps Script на порядки быстрее, чем сравнение строк, что критично при обработке тысяч клиентов.</li>
-                        <li><b>Надежность:</b> Исключаются ошибки, связанные с опечатками, лишними пробелами или разными регистрами в текстовых значениях.</li>
-                        <li><b>Гибкость:</b> Легко добавлять новые категории, не меняя основную логику кода.</li>
-                    </ul>
-                     <CodeBlockWithCopy title="Пример проверки по ID вместо текста" code={`
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 items-start">
+                        {/* Left column for explanation */}
+                        <div>
+                            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mt-0 mb-4">Принцип «idFirst»</h3>
+                            <div className="space-y-4 text-base text-slate-700 dark:text-slate-300">
+                                <p>
+                                    Один из ключевых архитектурных принципов. Все ключевые категории (тип клиента, лояльность, активность и т.д.) хранятся и обрабатываются как числовые ID, а не как строки. Например, вместо "Активный" используется `1`, вместо "Пассивный" — `2`. Это дает несколько преимуществ:
+                                </p>
+                                <ul className="list-disc list-inside space-y-2 !my-0">
+                                    <li><strong>Производительность:</strong> Сравнение чисел в Google Sheets и Apps Script на порядки быстрее, чем сравнение строк, что критично при обработке тысяч клиентов.</li>
+                                    <li><strong>Надежность:</strong> Исключаются ошибки, связанные с опечатками, лишними пробелами или разными регистрами в текстовых значениях.</li>
+                                    <li><strong>Гибкость:</strong> Легко добавлять новые категории, не меняя основную логику кода.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        {/* Right column for the code example */}
+                        <div className="flex flex-col justify-center">
+                            <CodeBlockWithCopy title="Пример проверки по ID вместо текста" code={`
 // ПЛОХО (медленно и ненадежно)
 if (client.activity === "Активный" && client.loyalty === "Повторный (2-4 раза)") {
     // ...
@@ -122,7 +196,9 @@ if (client.activity === "Активный" && client.loyalty === "Повторн
 if (client.activityId === 1 && client.loyaltyId === 2) {
     // ...
 }
-                    `} />
+                                `} />
+                        </div>
+                    </div>
                 </section>
                 
                 <section id="glossary" className="scroll-mt-24">

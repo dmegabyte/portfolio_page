@@ -1,3 +1,4 @@
+
 export interface Project {
   id: number;
   slug: string;
@@ -9,6 +10,7 @@ export interface Project {
   keyFeatures: string[];
   repoUrl?: string;
   documentationPage?: string; 
+  reportPage?: string;
 }
 
 // NOTE: The imageUrls have been optimized to request a smaller width (w=800) and leverage
@@ -21,7 +23,7 @@ export const projects: Project[] = [
     slug: 'client-segmentation',
     title: 'AI-маркетолог',
     summary: 'Автоматическая сегментация клиентов и генерация персонализированных рассылок в Google Sheets.',
-    description: 'Разработка сложной системы рассылок, учитывающей множество категорий клиентов (тип, лояльность, активность, частота, ценовой сегмент). Скрипты Apps Script анализируют данные, подбирают шаблоны и акции, рассчитывают даты и запускают отправку через WAHelp.',
+    description: 'Система полностью автоматизирует персонализированные рассылки. Она анализирует клиентскую базу по 7+ параметрам, прогнозирует оптимальный момент для контакта и самостоятельно запускает кампании, повышая LTV без участия человека.',
     imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80&auto=format&fit=crop',
     technologies: ['Google Apps Script', 'Google Sheets', 'JavaScript', 'WAHelp API'],
     keyFeatures: [
@@ -31,6 +33,7 @@ export const projects: Project[] = [
         'Полная автоматизация процесса рассылок через WAHelp API.'
     ],
     documentationPage: '/documentation/client-segmentation',
+    reportPage: '/report/client-segmentation',
   },
   {
     id: 2,
@@ -63,6 +66,7 @@ export const projects: Project[] = [
         'Полная интеграция с ключевыми сервисами: gpttunnel и Omnidesk.'
     ],
     documentationPage: '/documentation/gpt-assistant',
+    reportPage: '/report/gpt-assistant',
   },
   {
     id: 4,

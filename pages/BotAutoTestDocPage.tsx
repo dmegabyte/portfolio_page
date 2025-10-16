@@ -1,9 +1,53 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
 import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, ReadMore } from '../components/DocumentationUIComponents';
-import { BugAntIcon, CogIcon, PlayCircleIcon, CodeBracketIcon, ChatBubbleBottomCenterTextIcon, CpuChipIcon } from '@heroicons/react/24/outline';
+import { BugAntIcon, CogIcon, PlayCircleIcon, CodeBracketIcon, ChatBubbleBottomCenterTextIcon, CpuChipIcon, ArrowDownTrayIcon, SparklesIcon, CheckBadgeIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
 
 const BotAutoTestDocumentationPage: React.FC = () => {
+    const workflowRef = useRef<HTMLDivElement>(null);
+    useAnimateOnScroll(workflowRef, { targetSelector: '.workflow-stage' });
+
+    const workflowStages = [
+        {
+            icon: <ArrowDownTrayIcon className="w-7 h-7" />,
+            title: "1. Загрузка файла",
+            content: "Загружается справочный файл (например, promo.json со списком акций), который служит «источником правды» для теста."
+        },
+        {
+            icon: <SparklesIcon className="w-7 h-7" />,
+            title: "2. Анализ и генерация тест-кейсов",
+            content: () => (
+                <>
+                    <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm> анализирует файл и формирует набор тест-кейсов под материал.
+                </>
+            )
+        },
+        {
+            icon: <PlayCircleIcon className="w-7 h-7" />,
+            title: "3. Выполнение сценариев",
+            content: () => (
+                <>
+                    Выполняются сценарии (через <TooltipTerm definition="Программный интерфейс приложения — это набор правил и инструментов, который позволяет различным программным приложениям взаимодействовать друг с другом.">API</TooltipTerm> или эмуляцию UI), фиксируются вопросы и ответы бота.
+                </>
+            )
+        },
+        {
+            icon: <CheckBadgeIcon className="w-7 h-7" />,
+            title: "4. Сверка результатов",
+            content: "Ответы сверяются с правилами акции и ожидаемыми условиями, прописанными в исходном файле."
+        },
+        {
+            icon: <DocumentTextIcon className="w-7 h-7" />,
+            title: "5. Формирование отчета",
+            content: () => (
+                <>
+                    Финальный отчёт формируется автоматически <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm> на основании загруженного файла и реального диалога.
+                </>
+            )
+        }
+    ];
+
   return (
     <DocumentationPageLayout title="AI-тестировщик чат-ботов">
         <div className="space-y-12">
@@ -64,14 +108,26 @@ const BotAutoTestDocumentationPage: React.FC = () => {
                     title="Механика и флоу работы"
                     subtitle="От загрузки правил до финального отчета."
                 />
-                <p>Процесс тестирования автоматизирован и проходит следующие этапы:</p>
-                <ol className="list-decimal list-inside space-y-2 mt-4">
-                    <li>Загружается справочный файл (например, <code>promo.json</code> со списком акций).</li>
-                    <li><TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm> анализирует файл и формирует набор тест-кейсов под материал.</li>
-                    <li>Выполняются сценарии (через <TooltipTerm definition="Программный интерфейс приложения — это набор правил и инструментов, который позволяет различным программным приложениям взаимодействовать друг с другом.">API</TooltipTerm> или эмуляцию UI), фиксируются вопросы и ответы бота.</li>
-                    <li>Ответы сверяются с правилами акции и ожидаемыми условиями.</li>
-                    <li>Финальный отчёт формируется автоматически <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm> на основании загруженного файла и реального диалога.</li>
-                </ol>
+                <div ref={workflowRef} className="relative mt-8 not-prose">
+                    {/* Vertical line connector */}
+                    <div className="absolute left-6 top-0 h-full w-0.5 bg-gray-200 dark:bg-slate-700" aria-hidden="true"></div>
+                    
+                    <div className="space-y-12">
+                        {workflowStages.map((stage, index) => (
+                            <div key={index} className="workflow-stage relative pl-16" style={{ transitionDelay: `${index * 150}ms` }}>
+                                <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500 text-white shadow-md">
+                                    {stage.icon}
+                                </div>
+                                <div className="bg-gray-50 dark:bg-slate-900/50 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-0">{stage.title}</h3>
+                                    <div className="mt-2 text-base text-slate-700 dark:text-slate-300">
+                                        {typeof stage.content === 'function' ? stage.content() : stage.content}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </section>
 
             <section id="example" className="scroll-mt-24">

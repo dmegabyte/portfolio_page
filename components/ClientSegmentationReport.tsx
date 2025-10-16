@@ -1,10 +1,10 @@
 import React from 'react';
 
 // This component is deprecated. Its content has been moved to a dedicated documentation page
-// at `pages/GptAssistantReportPage.tsx` to align with project best practices.
+// at `pages/ClientSegmentationReportPage.tsx` to align with project best practices.
 // This file is kept to avoid breaking imports in historical versions but should not be used.
-const GptAssistantReport: React.FC = () => {
+const ClientSegmentationReport: React.FC = () => {
   return null;
 };
 
-export default GptAssistantReport;
+export default ClientSegmentationReport;

@@ -1,4 +1,5 @@
 
+
 import React, { ReactNode, useEffect, useState, useRef, useMemo } from 'react';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 
@@ -17,6 +18,9 @@ const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ child
     // when the actual list of headings changes, adhering to best practices.
     const headingIds = useMemo(() => headings.map(h => h.id), [headings]);
     
+    // Use the custom scroll-spy hook to get the ID of the currently active section.
+    // The hook observes the sections within `contentRef` and returns the ID of the one
+    // currently in the viewport according to its logic. This is our activeId state.
     const activeId = useScrollSpy(headingIds, contentRef);
 
     // FIX: The `history.pushState` call was fundamentally incompatible with HashRouter,
@@ -64,16 +68,19 @@ const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ child
                         <h2 id="document-navigation" className="font-bold text-slate-900 dark:text-slate-200 mb-4 text-lg">Оглавление</h2>
                         <ul className="space-y-1">
                             {headings.map((heading) => {
+                                // Determine if the current TOC item is the active one by comparing its ID
+                                // with the activeId received from the scroll-spy hook.
                                 const isActive = activeId === heading.id;
                                 const isSubheading = heading.level > 2;
                                 
+                                // Dynamically construct the CSS classes based on the active state.
                                 const linkClasses = `
                                     block w-full text-left transition-colors duration-200
                                     border-l-2 py-1.5 pr-3 focus:outline-none
                                     ${isSubheading ? 'pl-7' : 'pl-3 font-semibold'}
                                     ${isActive
-                                        ? 'text-slate-900 dark:text-slate-200 font-bold border-indigo-500 dark:border-indigo-400'
-                                        : 'text-gray-600 dark:text-slate-400 border-transparent hover:text-gray-900 dark:hover:text-slate-100 hover:border-gray-300 dark:hover:border-slate-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:text-slate-900 dark:focus:text-slate-100'
+                                        ? 'text-slate-900 dark:text-slate-200 font-bold border-indigo-500 dark:border-indigo-400' // Active state styles
+                                        : 'text-gray-600 dark:text-slate-400 border-transparent hover:text-gray-900 dark:hover:text-slate-100 hover:border-gray-300 dark:hover:border-slate-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:text-slate-900 dark:focus:text-slate-100' // Inactive state styles
                                     }
                                 `;
 

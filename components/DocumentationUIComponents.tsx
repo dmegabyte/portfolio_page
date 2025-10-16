@@ -1,6 +1,8 @@
-import React, { useState, ReactNode, useEffect, useRef } from 'react';
+
+
+import React, { useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { ChevronDownIcon, XMarkIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, XMarkIcon, InformationCircleIcon, MagnifyingGlassIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import { useModalLogic } from '../hooks/useModalLogic';
 
 // --- Section Header ---
@@ -30,8 +32,8 @@ interface InfoCardProps {
 }
 
 export const InfoCard: React.FC<InfoCardProps> = ({ icon, title, children }) => (
-    <div className="bg-white dark:bg-slate-800/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-lg hover:border-indigo-500 dark:hover:border-indigo-400 transition-all duration-300 not-prose transform hover:-translate-y-1 flex flex-col">
-        <div className="flex items-center gap-4 mb-4">
+    <div className="bg-white dark:bg-slate-800/50 rounded-lg py-4 px-6 border border-transparent hover:shadow-sm transition-all duration-300 not-prose flex flex-col">
+        <div className="flex items-center gap-4 mb-3">
             <div className="flex-shrink-0 w-12 h-12 bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 rounded-lg flex items-center justify-center">
                 {icon}
             </div>
@@ -115,6 +117,44 @@ export const CodeBlockWithCopy: React.FC<CodeBlockWithCopyProps> = ({ code, titl
   );
 };
 
+// --- Simple Code Block ---
+interface SimpleCodeBlockProps {
+    children: React.ReactNode;
+}
+export const SimpleCodeBlock: React.FC<SimpleCodeBlockProps> = ({ children }) => (
+    <pre className="text-sm bg-gray-100 dark:bg-slate-800 p-4 rounded-lg custom-scrollbar overflow-x-auto not-prose" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+        <code>{children}</code>
+    </pre>
+);
+
+// --- Data Table ---
+interface TableProps {
+    headers: string[];
+    data: (string | number | ReactNode)[][];
+}
+export const Table: React.FC<TableProps> = ({ headers, data }) => (
+    <div className="overflow-x-auto my-4 not-prose">
+        <table className="w-full text-left border-collapse">
+            <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
+                <tr>
+                    {headers.map(header => (
+                        <th key={header} className="p-3 border border-gray-200 dark:border-slate-700">{header}</th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-slate-900/50 text-gray-700 dark:text-slate-300">
+                {data.map((row, rowIndex) => (
+                    <tr key={rowIndex} className="border-b dark:border-slate-700 last:border-b-0">
+                        {row.map((cell, cellIndex) => (
+                            <td key={cellIndex} className="p-3 border-x border-gray-200 dark:border-slate-700">{cell}</td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+);
+
 // --- Tooltip for Terms ---
 interface TooltipTermProps {
     children: ReactNode;
@@ -176,7 +216,7 @@ export const TooltipTerm: React.FC<TooltipTermProps> = ({ children, definition }
                 onBlur={handleHide}
                 tabIndex={0}
                 aria-describedby={isVisible ? tooltipId : undefined}
-                className="text-indigo-500 dark:text-indigo-400 font-semibold underline decoration-indigo-300 dark:decoration-indigo-500 decoration-dashed underline-offset-4 hover:text-indigo-600 dark:hover:text-indigo-300 hover:decoration-solid hover:decoration-indigo-500 dark:hover:decoration-indigo-400 transition-all cursor-help focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-interactive-primary)] ring-offset-[var(--ring-offset-light)] dark:focus:ring-offset-[var(--ring-offset-dark-card)] rounded-sm"
+                className="text-indigo-500 dark:text-indigo-400 font-semibold underline decoration-indigo-300 dark:decoration-indigo-500 decoration-dashed underline-offset-4 hover:text-indigo-600 dark:hover:text-indigo-300 hover:decoration-solid hover:decoration-indigo-500 dark:hover:decoration-indigo-400 transition-all cursor-help focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-interactive-primary)] ring-offset-[var(--ring-offset-light)] dark:focus-ring-offset-[var(--ring-offset-dark-card)] rounded-sm"
             >
                 {children}
             </span>
@@ -237,7 +277,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
                         <XMarkIcon className="w-6 h-6" />
                     </button>
                 </div>
-                <div className="p-6 max-h-[70vh] overflow-y-auto text-base">
+                <div className="p-6 max-h-[70vh] overflow-y-auto text-base custom-scrollbar">
                     {children}
                 </div>
             </div>
@@ -305,20 +345,88 @@ export const ReadMore: React.FC<ReadMoreProps> = ({ children, lines }) => {
 interface DefinitionListProps {
   items: { term: string; definition: string }[];
 }
-export const DefinitionList: React.FC<DefinitionListProps> = ({ items }) => (
-    <dl className="space-y-4">
-        {items.map((item, index) => (
-            <div key={index} className="flex flex-col sm:flex-row text-base p-3 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                <dt className="w-full sm:w-1/3 flex-shrink-0 font-mono font-semibold text-slate-800 dark:text-slate-200">
-                    {item.term}
-                </dt>
-                <dd className="w-full sm:w-2/3 text-gray-700 dark:text-slate-300 sm:pl-4 mt-1 sm:mt-0">
-                    {item.definition}
-                </dd>
+export const DefinitionList: React.FC<DefinitionListProps> = ({ items }) => {
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredItems = items.filter(item =>
+        item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.definition.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const highlightText = (text: string, highlight: string): React.ReactNode => {
+        if (!highlight.trim()) {
+            return text;
+        }
+        // Escape special characters in the highlight string for RegExp
+        const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escapedHighlight})`, 'gi');
+        const parts = text.split(regex);
+        return (
+            <>
+                {parts.map((part, i) =>
+                    regex.test(part) ? (
+                        <mark key={i} className="bg-yellow-200 dark:bg-yellow-700/50 px-0.5 rounded-sm text-black dark:text-yellow-100">
+                            {part}
+                        </mark>
+                    ) : (
+                        part
+                    )
+                )}
+            </>
+        );
+    };
+
+    return (
+        <div className="not-prose">
+            <div className="relative mb-6" role="search">
+                <label htmlFor="glossary-search" className="sr-only">
+                    Поиск по глоссарию
+                </label>
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-slate-500" aria-hidden="true" />
+                </div>
+                <input
+                    id="glossary-search"
+                    type="search"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Поиск по терминам и определениям..."
+                    className="block w-full rounded-md border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 py-2 pl-10 pr-10 text-slate-900 dark:text-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+                {searchTerm && (
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <button
+                            onClick={() => setSearchTerm('')}
+                            className="p-1 rounded-full text-gray-400 hover:text-gray-600 dark:text-slate-500 dark:hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            aria-label="Очистить поиск"
+                        >
+                            <XMarkIcon className="h-5 w-5" />
+                        </button>
+                    </div>
+                )}
             </div>
-        ))}
-    </dl>
-);
+
+            {filteredItems.length > 0 ? (
+                <dl className="-my-4 divide-y divide-gray-200 dark:divide-slate-700">
+                    {filteredItems.map((item, index) => (
+                        <div key={index} className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-x-8 items-baseline py-4">
+                            <dt className="md:col-span-1 font-bold text-slate-900 dark:text-slate-200">
+                                {highlightText(item.term, searchTerm)}
+                            </dt>
+                            <dd className="md:col-span-3 lg:col-span-4 mt-2 md:mt-0 text-slate-700 dark:text-slate-300">
+                                {highlightText(item.definition, searchTerm)}
+                            </dd>
+                        </div>
+                    ))}
+                </dl>
+            ) : (
+                <div className="text-center py-12">
+                    <p className="text-slate-600 dark:text-slate-400">По вашему запросу ничего не найдено.</p>
+                </div>
+            )}
+        </div>
+    );
+};
 
 // --- Annotated Code Block ---
 interface AnnotatedCodeBlockProps {
@@ -388,6 +496,190 @@ export const AnnotatedCodeBlock: React.FC<AnnotatedCodeBlockProps> = ({ title, a
                         )}
                     </div>
                 </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Line Chart (Overhauled for Snap-to-Point Interactivity) ---
+interface YKeyConfig {
+    key: string;
+    color: string;
+    label: string;
+    axis?: 'left' | 'right';
+}
+
+interface LineChartConfig {
+    xKey: string;
+    yKeys: YKeyConfig[];
+    yAxisLabelLeft: string;
+    yAxisLabelRight?: string;
+    height?: number;
+}
+
+interface LineChartProps {
+    data: any[];
+    config: LineChartConfig;
+    onPointClick?: (dataPoint: any) => void;
+}
+
+export const LineChart: React.FC<LineChartProps> = ({ data, config, onPointClick }) => {
+    const { xKey, yKeys, yAxisLabelLeft, yAxisLabelRight, height = 450 } = config;
+    const [tooltip, setTooltip] = useState<{ index: number; dataPoint: any; dataX: number } | null>(null);
+    const [hoveredLegendKey, setHoveredLegendKey] = useState<string | null>(null);
+    const chartRef = useRef<SVGSVGElement>(null);
+    
+    const padding = { top: 20, right: 60, bottom: 60, left: 60 };
+    const width = 800;
+
+    const { chartWidth, chartHeight, xScale, yScaleLeft, yScaleRight, linePaths, yTicksLeft, yTicksRight } = useMemo(() => {
+        const chartWidth = width - padding.left - padding.right;
+        const chartHeight = height - padding.top - padding.bottom;
+
+        const leftKeys = yKeys.filter(k => k.axis !== 'right');
+        const rightKeys = yKeys.filter(k => k.axis === 'right');
+
+        const allYLeftValues = data.flatMap(d => leftKeys.map(k => d[k.key])).filter(v => typeof v === 'number');
+        const calculatedYMaxLeft = allYLeftValues.length > 0 ? Math.max(...allYLeftValues) : 0;
+        const yMaxLeft = Math.max(10, Math.ceil(Math.max(0, calculatedYMaxLeft) / 10) * 10);
+
+        const allYRightValues = data.flatMap(d => rightKeys.map(k => d[k.key])).filter(v => typeof v === 'number');
+        const calculatedYMaxRight = allYRightValues.length > 0 ? Math.max(...allYRightValues) : 0;
+        const yMaxRight = Math.max(5, Math.ceil(Math.max(0, calculatedYMaxRight) / 5) * 5);
+
+        const xScale = (index: number) => padding.left + (index / (data.length - 1)) * chartWidth;
+        const yScaleLeft = (value: number) => padding.top + chartHeight - (value / yMaxLeft) * chartHeight;
+        const yScaleRight = (value: number) => padding.top + chartHeight - (value / yMaxRight) * chartHeight;
+
+        const linePaths = yKeys.map(yKey => {
+            const yScale = yKey.axis === 'right' ? yScaleRight : yScaleLeft;
+            const path = data.map((d, i) => `${i === 0 ? 'M' : 'L'}${xScale(i)},${yScale(d[yKey.key])}`).join(' ');
+            return { ...yKey, path };
+        });
+
+        const numTicks = 4;
+        const yTicksLeft = Array.from({ length: numTicks + 1 }, (_, i) => {
+            const value = Math.round(yMaxLeft - (i * yMaxLeft / numTicks));
+            return { value, y: padding.top + i * (chartHeight / numTicks) };
+        });
+
+        const yTicksRight = Array.from({ length: numTicks + 1 }, (_, i) => {
+            const value = Math.round(yMaxRight - (i * yMaxRight / numTicks));
+            return { value, y: padding.top + i * (chartHeight / numTicks) };
+        });
+
+        return { chartWidth, chartHeight, xScale, yScaleLeft, yScaleRight, linePaths, yTicksLeft, yTicksRight };
+    }, [data, yKeys, height, padding.top, padding.right, padding.bottom, padding.left]);
+
+    const handlePointHover = useCallback((index: number | null) => {
+        if (index !== null && data[index]) {
+            setTooltip({
+                index,
+                dataPoint: data[index],
+                dataX: xScale(index),
+            });
+        } else {
+            setTooltip(null);
+        }
+    }, [data, xScale]);
+
+    return (
+        <div className="not-prose my-6 bg-[#1A202C] dark:bg-slate-900 rounded-xl p-6 border border-gray-700 dark:border-slate-700 overflow-hidden shadow-2xl">
+            <svg 
+                ref={chartRef} 
+                viewBox={`0 0 ${width} ${height}`} 
+                className="w-full h-auto text-slate-400" 
+                aria-labelledby="chart-title" 
+                role="graphics-document"
+            >
+                <title id="chart-title">График динамики эффективности</title>
+                
+                {/* Axes and Grid */}
+                <g className="text-sm select-none">
+                    {yTicksLeft.map(({ value, y }) => (
+                        <g key={`grid-${value}`}>
+                            <line x1={padding.left} y1={y} x2={width - padding.right} y2={y} stroke="currentColor" strokeDasharray="3,6" opacity="0.2" />
+                            <text x={padding.left - 12} y={y + 4} textAnchor="end" fill="currentColor">{value}</text>
+                        </g>
+                    ))}
+                    <text transform={`rotate(-90)`} y={15} x={-(padding.top + chartHeight / 2)} textAnchor="middle" className="fill-current font-semibold text-slate-300">{yAxisLabelLeft}</text>
+
+                    {yAxisLabelRight && yTicksRight.map(({ value, y }) => (
+                         <text key={`y-right-${value}`} x={width - padding.right + 12} y={y + 4} fill="currentColor">{value}</text>
+                    ))}
+                    {yAxisLabelRight && <text transform={`rotate(90)`} y={-(width - 15)} x={(padding.top + chartHeight / 2)} textAnchor="middle" className="fill-current font-semibold text-slate-300">{yAxisLabelRight}</text>}
+
+                    {data.map((d, i) => (
+                        <text key={i} x={xScale(i)} y={height - padding.bottom + 25} textAnchor="middle" fill="currentColor" className="text-slate-300">{d[xKey]}</text>
+                    ))}
+                </g>
+
+                {/* Lines and Points */}
+                <g>
+                    {linePaths.map(({ key, path, color }) => (
+                        <path key={key} d={path} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="transition-opacity duration-300" style={{ opacity: hoveredLegendKey && hoveredLegendKey !== key ? 0.15 : 1 }} />
+                    ))}
+                    {data.map((d, i) => yKeys.map(yKey => {
+                        const yScale = yKey.axis === 'right' ? yScaleRight : yScaleLeft;
+                        return (
+                             <circle key={`${yKey.key}-${i}`} cx={xScale(i)} cy={yScale(d[yKey.key])} r={tooltip?.index === i ? 9 : 5} fill={yKey.color} className="transition-all duration-300 ease-in-out" style={{ opacity: hoveredLegendKey && hoveredLegendKey !== yKey.key ? 0.15 : 1 }}/>
+                        );
+                    }))}
+                </g>
+
+                {/* Interaction Hover Layer */}
+                <g onMouseLeave={() => handlePointHover(null)}>
+                    {data.map((_, i) => {
+                        const sliceWidth = chartWidth / (data.length - 1);
+                        const isFirst = i === 0;
+                        const isLast = i === data.length - 1;
+
+                        const rectX = isFirst ? padding.left : xScale(i) - sliceWidth / 2;
+                        const rectWidth = isFirst || isLast ? sliceWidth / 2 : sliceWidth;
+
+                        return (
+                            <rect
+                                key={`hover-rect-${i}`}
+                                x={rectX}
+                                y={padding.top}
+                                width={rectWidth}
+                                height={chartHeight}
+                                fill="transparent"
+                                onMouseEnter={() => handlePointHover(i)}
+                                onClick={() => onPointClick?.(data[i])}
+                                style={{ cursor: onPointClick ? 'pointer' : 'default' }}
+                            />
+                        );
+                    })}
+                </g>
+                
+                {/* Tooltip and Guide Line */}
+                {tooltip && (
+                    <g pointerEvents="none" className="animate-subtle-fade-in">
+                        <line x1={tooltip.dataX} y1={padding.top} x2={tooltip.dataX} y2={padding.top + chartHeight} stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="4,4" />
+                        <g transform={`translate(${tooltip.dataX > width / 2 ? tooltip.dataX - 210 : tooltip.dataX + 20}, ${padding.top + 10})`}>
+                            <rect x="0" y="0" width="190" height={yKeys.length * 22 + 35} rx="8" ry="8" fill="rgba(15, 23, 42, 0.85)" stroke="#4A5568" style={{ backdropFilter: 'blur(4px)' }} />
+                            <text x="12" y="24" fill="#F7FAFC" className="font-bold text-base">{tooltip.dataPoint[xKey]}</text>
+                            {yKeys.map((yk, index) => (
+                                <g key={yk.key} transform={`translate(12, ${48 + index * 22})`}>
+                                    <circle cx="0" cy="0" r="5" fill={yk.color} />
+                                    <text x="12" y="4" fill="#E2E8F0" className="text-sm">
+                                        {yk.label}: <tspan className="font-bold">{tooltip.dataPoint[yk.key]}</tspan>
+                                    </text>
+                                </g>
+                            ))}
+                        </g>
+                    </g>
+                )}
+            </svg>
+            {/* Legend */}
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 mt-4 text-sm" onMouseLeave={() => setHoveredLegendKey(null)}>
+                {yKeys.map(yk => (
+                    <div key={yk.key} className="flex items-center gap-2 cursor-pointer transition-opacity duration-300" style={{ opacity: hoveredLegendKey && hoveredLegendKey !== yk.key ? 0.4 : 1 }} onMouseEnter={() => setHoveredLegendKey(yk.key)}>
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: yk.color }}></span>
+                        <span className="text-slate-200">{yk.label}</span>
+                    </div>
+                ))}
             </div>
         </div>
     );

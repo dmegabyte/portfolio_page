@@ -6,25 +6,27 @@ const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const isProjectOrDocPage = location.pathname.startsWith('/project/') || location.pathname.startsWith('/documentation/');
+  const isProjectOrDocPage = location.pathname.startsWith('/project/') || 
+                             location.pathname.startsWith('/documentation/') || 
+                             location.pathname.startsWith('/report/');
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemThemeChange = (e: MediaQueryListEvent | MediaQueryList) => {
-      document.documentElement.classList.toggle('dark', e.matches);
-    };
-    
-    handleSystemThemeChange(mediaQuery);
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
-    
-    return () => {
-      mediaQuery.removeEventListener('change', handleSystemThemeChange);
-    };
-  }, []);
-
+  // Effect to close menu on navigation
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
+
+  // Effect to prevent body scrolling when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    // Cleanup function to ensure scroll is re-enabled on component unmount
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   const baseClasses = "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300";
   const activeClasses = "bg-slate-900 dark:bg-slate-700 text-white";
@@ -51,7 +53,8 @@ const Header: React.FC = () => {
               <div>
                 <button
                   onClick={() => navigate(-1)}
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-indigo-700 transition-colors duration-300 flex items-center"
+                  className="border border-slate-600 text-slate-300 px-4 py-2 rounded-md text-sm font-semibold hover:bg-slate-700 hover:text-white transition-all duration-300 flex items-center transform hover:-translate-y-px focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50"
+                  aria-label="Вернуться назад"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
@@ -63,9 +66,6 @@ const Header: React.FC = () => {
               <>
                 <div className="hidden md:block">
                   <div className="ml-4 flex items-baseline space-x-4">
-                    <NavLink to="/" end className={getNavLinkClasses}>
-                      Главная
-                    </NavLink>
                     <NavLink to="/about" className={getNavLinkClasses}>
                       Обо мне
                     </NavLink>
@@ -78,16 +78,19 @@ const Header: React.FC = () => {
                   <button
                     onClick={() => setIsOpen(!isOpen)}
                     type="button"
-                    className="bg-slate-800 dark:bg-slate-900 inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white"
+                    className="relative bg-slate-800 dark:bg-slate-900 inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white h-10 w-10"
                     aria-controls="mobile-menu"
                     aria-expanded={isOpen}
                   >
                     <span className="sr-only">Open main menu</span>
-                    {isOpen ? (
-                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                    ) : (
-                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                    )}
+                    <Bars3Icon
+                        className={`block h-6 w-6 transition-transform transition-opacity duration-300 ease-in-out ${isOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'}`}
+                        aria-hidden="true"
+                    />
+                    <XMarkIcon
+                        className={`absolute h-6 w-6 transition-transform transition-opacity duration-300 ease-in-out ${isOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'}`}
+                        aria-hidden="true"
+                    />
                   </button>
                 </div>
               </>
@@ -96,18 +99,25 @@ const Header: React.FC = () => {
         </div>
       </nav>
 
+      {/* Backdrop */}
+      {isOpen && !isProjectOrDocPage && (
+        <div
+          className="fixed inset-0 top-16 bg-black/30 backdrop-blur-sm z-40 md:hidden animate-fade-in"
+          onClick={() => setIsOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mobile Menu */}
       <div
         className={`
-          md:hidden overflow-hidden transition-all duration-300 ease-in-out
-          ${isOpen && !isProjectOrDocPage ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}
+          md:hidden absolute top-16 left-0 right-0 bg-slate-800 dark:bg-slate-900 transition-all duration-300 ease-in-out shadow-lg
+          ${isOpen && !isProjectOrDocPage ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-4 invisible'}
         `}
         id="mobile-menu"
         aria-label="Мобильное меню"
       >
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <NavLink to="/" end className={getMobileNavLinkClasses}>
-            Главная
-          </NavLink>
           <NavLink to="/about" className={getMobileNavLinkClasses}>
             Обо мне
           </NavLink>

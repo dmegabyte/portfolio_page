@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
-// FIX: In react-router-dom v6, `Redirect` is replaced by `Navigate`.
-import { useParams, Link, Navigate } from 'react-router-dom';
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { projects } from '../data/projects';
 import { CheckBadgeIcon } from '@heroicons/react/24/solid';
-import { Modal } from '../components/DocumentationUIComponents';
-import GptAssistantReport from '../components/GptAssistantReport';
+import NotFound from '../components/NotFound';
 
 const renderFeatureWithLinks = (feature: string) => {
     // This regex will split the string by "gpttunnel" or "Omnidesk", keeping the delimiters.
@@ -24,12 +22,16 @@ const renderFeatureWithLinks = (feature: string) => {
 const ProjectPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const project = projects.find((p) => p.slug === slug);
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   if (!project) {
-    // Or return a 404 component
-    // FIX: In react-router-dom v6, `Redirect` is replaced by `Navigate`.
-    return <Navigate to="/" />;
+    return (
+      <NotFound
+        title="Проект не найден"
+        message="К сожалению, мы не смогли найти проект, который вы ищете. Возможно, ссылка устарела или была допущена ошибка в адресе."
+        linkText="Посмотреть все проекты"
+        linkTo="/"
+      />
+    );
   }
 
   return (
@@ -90,14 +92,13 @@ const ProjectPage: React.FC = () => {
                     Читать документацию
                 </Link>
                 )}
-                {project.slug === 'gpt-assistant' && (
-                <button
-                    type="button"
-                    onClick={() => setIsReportModalOpen(true)}
-                    className="inline-block bg-sky-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-sky-700 transition-all duration-300 no-underline shadow-sm transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color-interactive-secondary)] focus-visible:ring-offset-2 ring-offset-[var(--ring-offset-light)] dark:focus-visible:ring-offset-[var(--ring-offset-dark-card)]"
-                >
-                    Технический отчёт
-                </button>
+                {project.reportPage && (
+                    <Link
+                        to={project.reportPage}
+                        className="inline-block bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-700 transition-all duration-300 no-underline shadow-sm transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-500/50 focus-visible:ring-offset-2 ring-offset-[var(--ring-offset-light)] dark:focus-visible:ring-offset-[var(--ring-offset-dark-card)]"
+                    >
+                        Технический отчёт
+                    </Link>
                 )}
                 {project.repoUrl && (
                 <a
@@ -112,15 +113,6 @@ const ProjectPage: React.FC = () => {
             </div>
         </article>
         </div>
-        {isReportModalOpen && project.slug === 'gpt-assistant' && (
-            <Modal
-            isOpen={isReportModalOpen}
-            onClose={() => setIsReportModalOpen(false)}
-            title="🧠 GPT-ассистент: Технический отчёт и история развития"
-            >
-            <GptAssistantReport />
-            </Modal>
-        )}
     </>
   );
 };
