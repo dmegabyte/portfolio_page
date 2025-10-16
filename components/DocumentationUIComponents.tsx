@@ -1,8 +1,6 @@
-
-
 import React, { useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { ChevronDownIcon, XMarkIcon, InformationCircleIcon, MagnifyingGlassIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, XMarkIcon, InformationCircleIcon, MagnifyingGlassIcon, ChartBarIcon, HandRaisedIcon, CheckCircleIcon, ShieldCheckIcon, EnvelopeOpenIcon, PaintBrushIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { useModalLogic } from '../hooks/useModalLogic';
 
 // --- Section Header ---
@@ -55,21 +53,19 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, c
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
     return (
-        <div className="not-prose border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+        <div className="my-6 not-prose border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg">
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 aria-expanded={isOpen}
-                className={`w-full flex justify-between items-center p-4 font-bold text-lg text-left cursor-pointer text-slate-900 dark:text-slate-200 bg-gray-50 dark:bg-slate-900/50 hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors duration-200 ${isOpen ? 'border-b border-gray-200 dark:border-slate-700' : ''}`}
+                className="w-full flex justify-between items-center p-4 text-lg text-left cursor-pointer text-slate-900 dark:text-slate-200 bg-gray-50 dark:bg-slate-900/50 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             >
-                <span>{title}</span>
-                <div className="p-1 rounded-full bg-white/50 dark:bg-slate-700/50">
-                    <ChevronDownIcon className={`w-5 h-5 text-gray-600 dark:text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}/>
-                </div>
+                <span className="font-semibold">{title}</span>
+                <ChevronDownIcon className={`w-6 h-6 text-gray-500 dark:text-slate-400 transition-transform duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}/>
             </button>
-            <div className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                <div className="overflow-hidden bg-white dark:bg-slate-800 rounded-b-lg">
-                    <div className="p-6">
+            <div className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                <div className="overflow-hidden">
+                    <div className="p-6 border-t border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
                         <div className="prose prose-base dark:prose-invert max-w-none">
                             {children}
                         </div>
@@ -82,15 +78,55 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, c
 
 
 // --- Code Block with Copy Button ---
+const highlightCode = (code: string, language?: 'json') => {
+    if (language !== 'json') {
+        return code.trim();
+    }
+
+    const highlighted = code.trim().replace(
+        /(\/\/.*$)|("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/gm,
+        (match, comment, jsonToken, _stringContent, colon) => {
+            if (comment) {
+                return `<span class="text-slate-500 italic">${comment}</span>`;
+            }
+            if (jsonToken) {
+                let cls = 'text-purple-400'; // number default
+                if (/^"/.test(jsonToken)) {
+                    if (colon) { // The colon capture group matched, so it's a key.
+                        cls = 'text-cyan-400';
+                    } else {
+                        cls = 'text-emerald-400'; // string value
+                    }
+                } else if (/true|false/.test(jsonToken)) {
+                    cls = 'text-amber-400'; // boolean
+                } else if (/null/.test(jsonToken)) {
+                    cls = 'text-rose-400'; // null
+                }
+                return `<span class="${cls}">${jsonToken}</span>`;
+            }
+            return match;
+        }
+    );
+
+    return <code dangerouslySetInnerHTML={{ __html: highlighted }} />;
+};
+
 interface CodeBlockWithCopyProps {
     code: string;
     title: string;
+    language?: 'json';
 }
-export const CodeBlockWithCopy: React.FC<CodeBlockWithCopyProps> = ({ code, title }) => {
+export const CodeBlockWithCopy: React.FC<CodeBlockWithCopyProps> = ({ code, title, language }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(code.trim()).then(() => {
+    const codeToCopy = code
+        .split('\n')
+        .filter(line => !line.trim().startsWith('//'))
+        .join('\n')
+        .trim();
+        
+    navigator.clipboard.writeText(codeToCopy).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }).catch(err => {
@@ -104,14 +140,22 @@ export const CodeBlockWithCopy: React.FC<CodeBlockWithCopyProps> = ({ code, titl
             <span className="text-sm font-semibold text-slate-400">{title}</span>
             <button
                 onClick={handleCopy}
-                className="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold py-1 px-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-indigo-500"
+                className="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold py-1 px-3 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-indigo-500 flex items-center gap-1.5"
                 aria-label="Копировать код"
+                aria-live="polite"
             >
-                {copied ? 'Скопировано!' : 'Копировать'}
+                {copied ? (
+                    <>
+                        <CheckIcon className="w-4 h-4 text-green-400" />
+                        <span>Скопировано!</span>
+                    </>
+                ) : (
+                    'Копировать'
+                )}
             </button>
        </div>
-      <pre className="text-slate-300 p-4 text-base overflow-x-auto mt-0 rounded-b-lg bg-transparent">
-        <code>{code.trim()}</code>
+      <pre className="text-slate-300 p-4 text-base overflow-x-auto mt-0 rounded-b-lg bg-transparent custom-scrollbar">
+        <code>{highlightCode(code, language)}</code>
       </pre>
     </div>
   );
@@ -135,7 +179,7 @@ interface TableProps {
 export const Table: React.FC<TableProps> = ({ headers, data }) => (
     <div className="overflow-x-auto my-4 not-prose">
         <table className="w-full text-left border-collapse">
-            <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
+            <thead className="text-base font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
                 <tr>
                     {headers.map(header => (
                         <th key={header} className="p-3 border border-gray-200 dark:border-slate-700">{header}</th>
@@ -657,18 +701,28 @@ export const LineChart: React.FC<LineChartProps> = ({ data, config, onPointClick
                 {tooltip && (
                     <g pointerEvents="none" className="animate-subtle-fade-in">
                         <line x1={tooltip.dataX} y1={padding.top} x2={tooltip.dataX} y2={padding.top + chartHeight} stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="4,4" />
-                        <g transform={`translate(${tooltip.dataX > width / 2 ? tooltip.dataX - 210 : tooltip.dataX + 20}, ${padding.top + 10})`}>
-                            <rect x="0" y="0" width="190" height={yKeys.length * 22 + 35} rx="8" ry="8" fill="rgba(15, 23, 42, 0.85)" stroke="#4A5568" style={{ backdropFilter: 'blur(4px)' }} />
-                            <text x="12" y="24" fill="#F7FAFC" className="font-bold text-base">{tooltip.dataPoint[xKey]}</text>
-                            {yKeys.map((yk, index) => (
-                                <g key={yk.key} transform={`translate(12, ${48 + index * 22})`}>
-                                    <circle cx="0" cy="0" r="5" fill={yk.color} />
-                                    <text x="12" y="4" fill="#E2E8F0" className="text-sm">
-                                        {yk.label}: <tspan className="font-bold">{tooltip.dataPoint[yk.key]}</tspan>
-                                    </text>
-                                </g>
-                            ))}
-                        </g>
+                        
+                        <foreignObject 
+                            x={tooltip.dataX > width / 2 ? tooltip.dataX - 250 - 20 : tooltip.dataX + 20} 
+                            y={padding.top + 10}
+                            width="250"
+                            height={yKeys.length * 28 + 50}
+                        >
+                            <div className="bg-slate-800/90 dark:bg-slate-900/90 backdrop-blur-sm border border-slate-700 rounded-lg shadow-2xl p-4 text-white font-sans">
+                                <p className="font-bold text-lg mb-3 text-slate-100">{tooltip.dataPoint[xKey]}</p>
+                                <div className="space-y-2">
+                                    {yKeys.map((yk) => (
+                                        <div key={yk.key} className="flex items-center justify-between text-base">
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: yk.color }}></span>
+                                                <span className="text-slate-300">{yk.label}:</span>
+                                            </div>
+                                            <span className="font-bold text-slate-100">{tooltip.dataPoint[yk.key]}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </foreignObject>
                     </g>
                 )}
             </svg>
@@ -683,4 +737,111 @@ export const LineChart: React.FC<LineChartProps> = ({ data, config, onPointClick
             </div>
         </div>
     );
+};
+
+// --- Status Badge ---
+interface StatusBadgeProps {
+  status: 'green' | 'red' | 'yellow' | 'stop' | 'go';
+  children: React.ReactNode;
+}
+
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, children }) => {
+  const colorClasses = {
+    green: 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300',
+    go: 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300',
+    red: 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300',
+    stop: 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300',
+    yellow: 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300',
+  };
+  const statusKey = status.toLowerCase() as keyof typeof colorClasses;
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${colorClasses[statusKey]}`}>
+      {children}
+    </span>
+  );
+};
+
+// --- JSON Report Viewer ---
+interface ReportData {
+  final_verdict: 'STOP' | 'GO';
+  reputation_check: { status: string; details: string };
+  content_check: { status: string; flags: { risk: string; comment: string }[] };
+  rendering_check: { status: string; details: string };
+}
+
+interface JsonReportViewerProps {
+  data: ReportData;
+}
+
+export const JsonReportViewer: React.FC<JsonReportViewerProps> = ({ data }) => {
+  const isStop = data.final_verdict === 'STOP';
+
+  const verdictIcon = isStop 
+    ? <HandRaisedIcon className="w-10 h-10" /> 
+    : <CheckCircleIcon className="w-10 h-10" />;
+  
+  const verdictBg = isStop 
+    ? 'bg-red-800/80 dark:bg-red-900/60 border-red-700/50' 
+    : 'bg-green-800/80 dark:bg-green-900/60 border-green-700/50';
+  
+  const verdictText = isStop ? 'text-red-100' : 'text-green-100';
+
+  return (
+    <div className="not-prose my-6 bg-slate-900 rounded-lg border border-slate-700 shadow-2xl p-6 space-y-6 font-sans">
+      
+      {/* Final Verdict */}
+      <div className={`flex items-center gap-6 p-6 rounded-lg ${verdictBg} text-white`}>
+        <div className={verdictText}>{verdictIcon}</div>
+        <div>
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-white/70">Финальный вердикт</h3>
+          <p className="text-4xl font-extrabold">{data.final_verdict}</p>
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        {/* Reputation Check */}
+        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="font-bold text-lg text-slate-200 flex items-center gap-2">
+              <ShieldCheckIcon className="w-6 h-6 text-slate-400" />
+              Анализ репутации
+            </h4>
+            <StatusBadge status={data.reputation_check.status as any}>{data.reputation_check.status.toUpperCase()}</StatusBadge>
+          </div>
+          <p className="text-slate-400 text-sm">{data.reputation_check.details}</p>
+        </div>
+
+        {/* Content Check */}
+        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+          <div className="flex justify-between items-center mb-3">
+            <h4 className="font-bold text-lg text-slate-200 flex items-center gap-2">
+              <EnvelopeOpenIcon className="w-6 h-6 text-slate-400" />
+              Анализ контента
+            </h4>
+            <StatusBadge status={data.content_check.status as any}>{data.content_check.status.toUpperCase()}</StatusBadge>
+          </div>
+          <div className="space-y-3 border-t border-slate-700 pt-3">
+            {data.content_check.flags.map((flag, index) => (
+              <div key={index} className="flex items-start gap-3">
+                <StatusBadge status={flag.risk as any}>{flag.risk.toUpperCase()}</StatusBadge>
+                <p className="text-slate-300 text-sm mt-px">{flag.comment}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Rendering Check */}
+        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="font-bold text-lg text-slate-200 flex items-center gap-2">
+              <PaintBrushIcon className="w-6 h-6 text-slate-400" />
+              Анализ рендеринга
+            </h4>
+            <StatusBadge status={data.rendering_check.status as any}>{data.rendering_check.status.toUpperCase()}</StatusBadge>
+          </div>
+          <p className="text-slate-400 text-sm">{data.rendering_check.details}</p>
+        </div>
+      </div>
+    </div>
+  );
 };

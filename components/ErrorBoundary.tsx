@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { ErrorInfo, ReactNode } from 'react';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 interface Props {
@@ -9,10 +9,13 @@ interface State {
   hasError: boolean;
 }
 
-class ErrorBoundary extends Component<Props, State> {
-  // Fix: Initialize state using modern class field syntax.
-  // This avoids potential issues with 'this' context in the constructor that may arise from a problematic build configuration,
-  // resolving errors where `this.props` and `this.state` were previously inaccessible.
+// FIX: Changed to extend React.Component directly. This resolves the issue where
+// the 'props' property was not being recognized on the class, likely due to a
+// module resolution quirk in the project's TypeScript setup.
+class ErrorBoundary extends React.Component<Props, State> {
+  // Switched to class property syntax for state initialization.
+  // This is a more modern and concise approach that avoids constructor boilerplate
+  // and resolves potential `this` context issues with some build configurations.
   state: State = { hasError: false };
 
   static getDerivedStateFromError(_: Error): State {
@@ -24,8 +27,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   handleRetry = () => {
-    // FIX: A full page reload is a robust way to recover from a render error.
-    // Setting state right before reloading is redundant as the state is lost on page load anyway.
+    // A full page reload is a robust way to recover from a render error.
     window.location.reload();
   };
 

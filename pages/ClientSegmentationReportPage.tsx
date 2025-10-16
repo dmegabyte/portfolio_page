@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, Table, SimpleCodeBlock, TooltipTerm, InfoCard } from '../components/DocumentationUIComponents';
+import { SectionHeader, SimpleCodeBlock, TooltipTerm, InfoCard } from '../components/DocumentationUIComponents';
 import {
     LightBulbIcon,
     WrenchScrewdriverIcon,
@@ -42,12 +42,45 @@ interface WorkflowStage {
     content: React.ReactNode | (() => React.ReactNode);
 }
 
+// A small component to visually highlight variables in template strings.
+const TemplateVariable: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <code className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 px-1.5 py-1 rounded-md font-mono text-sm transition-colors">
+        {'{'}{children}{'}'}
+    </code>
+);
+
 
 const ClientSegmentationReportPage: React.FC = () => {
     const historyRef = useRef<HTMLDivElement>(null);
     const algorithmRef = useRef<HTMLDivElement>(null);
     useAnimateOnScroll(historyRef, { targetSelector: '.workflow-stage' });
     useAnimateOnScroll(algorithmRef, { targetSelector: '.workflow-stage' });
+
+    const [hoveredRowIndex, setHoveredRowIndex] = useState<number | null>(null);
+
+    const templateExamples = [
+        {
+            category: "Новые клиенты",
+            template: <>“Добро пожаловать, <TemplateVariable>NAME</TemplateVariable>! Дарим скидку <TemplateVariable>PROMO</TemplateVariable>% на следующее посещение.”</>,
+            variables: <><TemplateVariable>NAME</TemplateVariable>, <TemplateVariable>PROMO</TemplateVariable></>,
+            example: "“Добро пожаловать, Анна! Дарим скидку 15% на следующее посещение.”",
+            exampleVars: "Анна, 15",
+        },
+        {
+            category: "Постоянные (2–4)",
+            template: <>“<TemplateVariable>NAME</TemplateVariable>, спасибо за доверие! Ваша скидка действует до <TemplateVariable>DATE</TemplateVariable>.”</>,
+            variables: <><TemplateVariable>NAME</TemplateVariable>, <TemplateVariable>DATE</TemplateVariable></>,
+            example: "“Иван, спасибо за доверие! Ваша скидка действует до 31.12.2024.”",
+            exampleVars: "Иван, 31.12.2024",
+        },
+        {
+            category: "VIP (5+)",
+            template: <>“<TemplateVariable>NAME</TemplateVariable>, вы наш лучший гость 🌿! Для вас — персональное предложение: <TemplateVariable>TEXT_PROMO</TemplateVariable>.”</>,
+            variables: <><TemplateVariable>NAME</TemplateVariable>, <TemplateVariable>TEXT_PROMO</TemplateVariable></>,
+            example: "“Мария, вы наш лучший гость 🌿! Для вас — персональное предложение: скидка 20% на любой массаж.”",
+            exampleVars: "Мария, 'скидка 20% на любой массаж'",
+        },
+    ];
 
     const historySectionRef = useRef<HTMLElement>(null);
     const [isHistoryVisible, setIsHistoryVisible] = useState(false);
@@ -159,15 +192,15 @@ const ClientSegmentationReportPage: React.FC = () => {
     ];
 
     return (
-        <DocumentationPageLayout title="SPA: Технический отчёт и история развития">
+        <DocumentationPageLayout title="AI-маркетолог: Технический отчёт и история развития">
              <div className="space-y-16">
                 <section id="introduction" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<LightBulbIcon className="w-8 h-8" />}
                         title="1. Введение"
-                        subtitle="Обзор проекта Smart Promo Automation (SPA) как интеллектуальной системы для автоматизации маркетинговых рассылок."
+                        subtitle="Обзор проекта «AI-маркетолог» как интеллектуальной системы для автоматизации маркетинговых рассылок."
                     />
-                    <p>Проект SPA (Smart Promo Automation) был разработан как интеллектуальная система рассылки рекламных материалов клиентам, основанная на принципах точной сегментации и минимальной себестоимости обработки запросов.</p>
+                    <p>Проект «AI-маркетолог» (изначальное кодовое название — SPA, Smart Promo Automation) был разработан как интеллектуальная система рассылки рекламных материалов клиентам, основанная на принципах точной сегментации и минимальной себестоимости обработки запросов.</p>
                     <p>Главная цель — автоматизация маркетинговых коммуникаций без участия оператора и без привлечения дорогостоящих <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm>-моделей для каждого отдельного клиента.</p>
                 </section>
 
@@ -175,7 +208,7 @@ const ClientSegmentationReportPage: React.FC = () => {
                     <SectionHeader 
                         icon={<ChartBarIcon className="w-8 h-8" />}
                         title="2. Ключевые выводы"
-                        subtitle="Основные результаты и инсайты, полученные в ходе разработки проекта SPA."
+                        subtitle="Основные результаты и инсайты, полученные в ходе разработки проекта «AI-маркетолог»."
                     />
                      <InfoCard icon={<ChartBarIcon className="w-8 h-8" /> } title="Главные достижения проекта">
                         <ul className="list-disc list-inside space-y-2 text-base">
@@ -235,15 +268,39 @@ const ClientSegmentationReportPage: React.FC = () => {
                         title="5. Архитектура и используемые технологии"
                         subtitle="Обзор технологического стека и двухуровневой системы разработки."
                     />
-                    <Table 
-                        headers={['Компонент', 'Назначение', 'Технология']}
-                        data={[
-                            ['Категоризация клиентов', 'Алгоритмическое распределение по типам', <><TooltipTerm definition="Высокоуровневый язык программирования общего назначения, известный своей простотой, читаемостью и обширной экосистемой библиотек.">Python</TooltipTerm> (NumPy + Pandas)</>],
-                            ['Хранилище данных', 'Обработка визитов, лояльности и акций', 'Google Sheets'],
-                            ['Алгоритм рассылки', 'Сборка сообщений и отправка', <TooltipTerm definition="Google Apps Script — это облачная платформа для разработки скриптов на JavaScript, которая позволяет автоматизировать задачи и расширять функциональность приложений Google Workspace.">Google Apps Script</TooltipTerm>],
-                            ['Инструменты разработки', 'Создание, тестирование, интеграция', 'Gemini, Claude, Codex CLI'],
-                        ]}
-                    />
+                    <div className="overflow-x-auto my-4 not-prose">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="text-base font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
+                                <tr>
+                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Компонент</th>
+                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Назначение</th>
+                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Технология</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white dark:bg-slate-900/50 text-gray-700 dark:text-slate-300">
+                                <tr className="border-b dark:border-slate-700">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Категоризация клиентов</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Алгоритмическое распределение по типам</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700"><><TooltipTerm definition="Высокоуровневый язык программирования общего назначения, известный своей простотой, читаемостью и обширной экосистемой библиотек.">Python</TooltipTerm> (NumPy + Pandas)</></td>
+                                </tr>
+                                <tr className="border-b dark:border-slate-700">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Хранилище данных</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Обработка визитов, лояльности и акций</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Google Sheets</td>
+                                </tr>
+                                <tr className="border-b dark:border-slate-700">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Алгоритм рассылки</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Сборка сообщений и отправка</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700"><TooltipTerm definition="Google Apps Script — это облачная платформа для разработки скриптов на JavaScript, которая позволяет автоматизировать задачи и расширять функциональность приложений Google Workspace.">Google Apps Script</TooltipTerm></td>
+                                </tr>
+                                <tr className="border-b dark:border-slate-700 last:border-b-0">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Инструменты разработки</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Создание, тестирование, интеграция</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Gemini, Claude, Codex CLI</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
 
                 <section id="history" className="scroll-mt-24" ref={historySectionRef}>
@@ -281,50 +338,10 @@ const ClientSegmentationReportPage: React.FC = () => {
                     </div>
                 </section>
                 
-                <section id="python-solution" className="scroll-mt-24">
-                    <SectionHeader 
-                        icon={<CommandLineIcon className="w-8 h-8" />}
-                        title="7. Решение: переход к Python-движку"
-                        subtitle="Как локальная разработка на Python позволила ускорить цикл, повысить стабильность и качество кода."
-                    />
-                    <div className="grid md:grid-cols-2 gap-8 items-stretch not-prose">
-                        <div className="bg-amber-50 dark:bg-amber-900/30 rounded-lg p-6 border border-amber-200 dark:border-amber-800">
-                            <h3 className="text-xl font-bold text-amber-800 dark:text-amber-300 mt-0">Старый цикл (в облаке)</h3>
-                            <div className="flex items-center justify-around my-4 text-amber-600 dark:text-amber-400">
-                                <CloudIcon className="w-10 h-10" />
-                                <ArrowLongRightIcon className="w-8 h-8" />
-                                <ArrowPathIcon className="w-10 h-10" />
-                                <ArrowLongRightIcon className="w-8 h-8" />
-                                <BugAntIcon className="w-10 h-10" />
-                            </div>
-                            <ul className="list-disc list-inside text-amber-900 dark:text-amber-200">
-                                <li>Редактирование кода напрямую в облаке.</li>
-                                <li>Длительное и сложное тестирование.</li>
-                                <li>Высокий риск ошибок в продакшене.</li>
-                            </ul>
-                        </div>
-                        <div className="bg-sky-50 dark:bg-sky-900/30 rounded-lg p-6 border border-sky-200 dark:border-sky-800">
-                            <h3 className="text-xl font-bold text-sky-800 dark:text-sky-300 mt-0">Новый цикл (Python → GAS)</h3>
-                            <div className="flex items-center justify-around my-4 text-sky-600 dark:text-sky-400">
-                                <ComputerDesktopIcon className="w-10 h-10" />
-                                <ArrowLongRightIcon className="w-8 h-8" />
-                                <ForwardIcon className="w-10 h-10" />
-                                <ArrowLongRightIcon className="w-8 h-8" />
-                                <CloudArrowUpIcon className="w-10 h-10" />
-                            </div>
-                            <ul className="list-disc list-inside text-sky-900 dark:text-sky-200">
-                                <li>Локальная разработка на <TooltipTerm definition="Высокоуровневый язык программирования общего назначения, известный своей простотой, читаемостью и обширной экосистемой библиотек.">Python</TooltipTerm>.</li>
-                                <li>Мгновенное модульное тестирование.</li>
-                                <li>Конвертация в <TooltipTerm definition="Google Apps Script — это облачная платформа для разработки скриптов на JavaScript, которая позволяет автоматизировать задачи и расширять функциональность приложений Google Workspace.">GAS</TooltipTerm> и безопасная выгрузка.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-
                 <section id="algorithm" className="scroll-mt-24" ref={algorithmSectionRef}>
                     <SectionHeader 
                         icon={<Cog6ToothIcon className="w-8 h-8" />}
-                        title="8. Логика работы алгоритма"
+                        title="7. Логика работы алгоритма"
                         subtitle="Пошаговый конвейер обработки данных: от импорта до отправки сообщения."
                     />
                      <div ref={algorithmRef} className="relative mt-8 not-prose">
@@ -354,45 +371,127 @@ const ClientSegmentationReportPage: React.FC = () => {
                 <section id="templates" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<TableCellsIcon className="w-8 h-8" />}
-                        title="9. Пример структуры шаблонов"
-                        subtitle="Как система адаптирует сообщения под разные категории клиентов."
+                        title="8. Пример структуры шаблонов"
+                        subtitle="Как система адаптирует сообщения под разные категории клиентов. Наведите на строку, чтобы увидеть пример."
                     />
-                    <Table 
-                        headers={['Категория клиента', 'Шаблон рассылки', 'Переменные']}
-                        data={[
-                            ['Новые клиенты', '“Добро пожаловать, {NAME}! Дарим скидку {PROMO}% на следующее посещение.”', '{NAME}, {PROMO}'],
-                            ['Постоянные (2–4)', '“{NAME}, спасибо за доверие! Ваша скидка действует до {DATE}.”', '{NAME}, {DATE}'],
-                            ['VIP (5+)', '“{NAME}, вы наш лучший гость 🌿! Для вас — персональное предложение: {TEXT_PROMO}.”', '{NAME}, {TEXT_PROMO}'],
-                        ]}
-                    />
+                    <div className="overflow-x-auto my-4 not-prose">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
+                                <tr>
+                                    <th className="p-4 border border-gray-200 dark:border-slate-700 w-1/4">Категория клиента</th>
+                                    <th className="p-4 border border-gray-200 dark:border-slate-700 w-1/2">Шаблон рассылки</th>
+                                    <th className="p-4 border border-gray-200 dark:border-slate-700 w-1/4">Переменные</th>
+                                </tr>
+                            </thead>
+                            <tbody 
+                                className="bg-white dark:bg-slate-900/50 text-gray-700 dark:text-slate-300"
+                                onMouseLeave={() => setHoveredRowIndex(null)}
+                            >
+                                {templateExamples.map((item, index) => {
+                                    const isHovered = hoveredRowIndex === index;
+                                    return (
+                                        <tr 
+                                            key={index} 
+                                            className="border-b dark:border-slate-700 last:border-b-0 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-slate-800/50"
+                                            onMouseEnter={() => setHoveredRowIndex(index)}
+                                            title="Наведите, чтобы увидеть пример"
+                                        >
+                                            <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-semibold">{item.category}</td>
+                                            <td className="p-4 border-x border-gray-200 dark:border-slate-700">
+                                                <div className="grid">
+                                                    <span 
+                                                        className={`col-start-1 row-start-1 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}
+                                                        aria-hidden={isHovered}
+                                                    >
+                                                        {item.template}
+                                                    </span>
+                                                    <span 
+                                                        className={`col-start-1 row-start-1 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+                                                        aria-hidden={!isHovered}
+                                                    >
+                                                        {item.example}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-mono text-sm">
+                                                <div className="grid">
+                                                    <span 
+                                                        className={`col-start-1 row-start-1 transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}
+                                                        aria-hidden={isHovered}
+                                                    >
+                                                        {item.variables}
+                                                    </span>
+                                                    <span 
+                                                        className={`col-start-1 row-start-1 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+                                                        aria-hidden={!isHovered}
+                                                    >
+                                                        {item.exampleVars}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
 
                 <section id="analytics" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<ChartBarIcon className="w-8 h-8" />}
-                        title="10. Эффективность и аналитика"
+                        title="9. Эффективность и аналитика"
                         subtitle="Ключевые метрики, демонстрирующие эффективность системы до и после внедрения."
                     />
-                    <Table 
-                        headers={['Показатель', 'До внедрения', 'После внедрения', 'Изменение']}
-                        data={[
-                            ['Автоматизация рассылок', '~20 %', '100 %', '▲ +80 п.п.'],
-                            ['Средняя себестоимость рассылки', '1.0 ₽ / сообщение', '0.15 ₽ / сообщение', '▼ −85 %'],
-                            ['Время подготовки кампании', '2–3 ч', '< 10 мин', '▼ −95 %'],
-                            ['Количество ошибок (логов)', '15–20 / нед', '< 3 / нед', '▼ −80 %'],
-                        ]}
-                    />
+                     <div className="overflow-x-auto my-4 not-prose">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="text-base font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
+                                <tr>
+                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Показатель</th>
+                                    <th className="p-3 border border-gray-200 dark:border-slate-700">До внедрения</th>
+                                    <th className="p-3 border border-gray-200 dark:border-slate-700">После внедрения</th>
+                                    <th className="p-3 border border-gray-200 dark:border-slate-700">Изменение</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white dark:bg-slate-900/50 text-gray-700 dark:text-slate-300">
+                                <tr className="border-b dark:border-slate-700">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Автоматизация рассылок</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">~20 %</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">100 %</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">▲ +80 п.п.</td>
+                                </tr>
+                                <tr className="border-b dark:border-slate-700">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Средняя себестоимость рассылки</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">1.0 ₽ / сообщение</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">0.15 ₽ / сообщение</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">▼ −85 %</td>
+                                </tr>
+                                <tr className="border-b dark:border-slate-700">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Время подготовки кампании</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">2–3 ч</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">&lt; 10 мин</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">▼ −95 %</td>
+                                </tr>
+                                <tr className="border-b dark:border-slate-700 last:border-b-0">
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">Количество ошибок (логов)</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">15–20 / нед</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">&lt; 3 / нед</td>
+                                    <td className="p-3 border-x border-gray-200 dark:border-slate-700">▼ −80 %</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <p>Система доказала высокую устойчивость и масштабируемость: алгоритм уверенно обрабатывает несколько тысяч записей визитов и формирует рассылки без задержек.</p>
                 </section>
 
                 <section id="conclusions" className="scroll-mt-24">
                      <SectionHeader 
                         icon={<MagnifyingGlassIcon className="w-8 h-8" />}
-                        title="11. Анализ и выводы"
+                        title="10. Анализ и выводы"
                         subtitle="Основные инсайты, полученные в ходе разработки и эксплуатации проекта."
                     />
                     <ul className="list-disc list-inside space-y-3">
-                        <li>Переход от <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm>-классификации к алгоритмической <b>снизил себестоимость почти в 10 раз.</b></li>
+                        <li>Переход от <TooltipTerm definition="Большая языковая модель — это тип искусственного интеллекта, обученный на огромных объемах текстовых данных для понимания, генерации и обработки человеческого языка на высоком уровне.">LLM</TooltipTerm>-классификации к алгоритмической снизил себестоимость почти на порядок.</li>
                         <li>Метод “<TooltipTerm definition="Высокоуровневый язык программирования общего назначения, известный своей простотой, читаемостью и обширной экосистемой библиотек.">Python</TooltipTerm> → <TooltipTerm definition="Google Apps Script — это облачная платформа для разработки скриптов на JavaScript, которая позволяет автоматизировать задачи и расширять функциональность приложений Google Workspace.">GAS</TooltipTerm>” позволил контролировать ошибки ещё до продакшена.</li>
                         <li>Шаблонная система с плейсхолдерами обеспечила персонализацию без увеличения нагрузки.</li>
                         <li>Код стал детерминированным — любые изменения предсказуемы и проверяемы.</li>
@@ -403,10 +502,10 @@ const ClientSegmentationReportPage: React.FC = () => {
                 <section id="summary" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<CheckBadgeIcon className="w-8 h-8" />}
-                        title="12. Заключение"
+                        title="11. Заключение"
                         subtitle="Итоговая оценка проекта: как умная логика стала эффективнее дорогих AI-моделей."
                     />
-                    <p>Проект SPA стал примером того, как можно выстроить эффективную систему маркетинговой автоматизации без дорогих моделей и серверов. Используя простые инструменты — <TooltipTerm definition="Высокоуровневый язык программирования общего назначения, известный своей простотой, читаемостью и обширной экосистемой библиотек.">Python</TooltipTerm>, <TooltipTerm definition="Google Apps Script — это облачная платформа для разработки скриптов на JavaScript, которая позволяет автоматизировать задачи и расширять функциональность приложений Google Workspace.">Google Apps Script</TooltipTerm> и таблицы — удалось добиться ключевых результатов:</p>
+                    <p>Проект «AI-маркетолог» стал примером того, как можно выстроить эффективную систему маркетинговой автоматизации без дорогих моделей и серверов. Используя простые инструменты — <TooltipTerm definition="Высокоуровневый язык программирования общего назначения, известный своей простотой, читаемостью и обширной экосистемой библиотек.">Python</TooltipTerm>, <TooltipTerm definition="Google Apps Script — это облачная платформа для разработки скриптов на JavaScript, которая позволяет автоматизировать задачи и расширять функциональность приложений Google Workspace.">Google Apps Script</TooltipTerm> и таблицы — удалось добиться ключевых результатов:</p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8 not-prose">
                         <div className="bg-green-50 dark:bg-green-900/30 p-6 rounded-lg border border-green-200 dark:border-green-800 text-center shadow-sm">
@@ -423,7 +522,7 @@ const ClientSegmentationReportPage: React.FC = () => {
                         </div>
                     </div>
 
-                    <p className="font-semibold text-slate-800 dark:text-slate-200">SPA доказала, что для интеллектуальной автоматизации правильно спроектированная логика — это более мощный и экономичный инструмент, чем универсальный искусственный интеллект.</p>
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">Проект «AI-маркетолог» доказал, что для интеллектуальной автоматизации правильно спроектированная логика — это более мощный и экономичный инструмент, чем универсальный искусственный интеллект.</p>
                 </section>
             </div>
         </DocumentationPageLayout>

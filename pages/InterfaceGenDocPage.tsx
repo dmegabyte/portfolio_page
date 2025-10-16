@@ -205,6 +205,24 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
         },
     };
 
+    const miniDiagramModalDescriptions = {
+        css: {
+            step1: { title: "CSS-режим: 1. Анализ запроса", content: <p>Система ищет в запросе пользователя явный CSS-селектор (например, `.card`, `#header`) и ключевые слова, связанные со стилями («цвет», «тень», «размер»).</p> },
+            step2: { title: "CSS-режим: 2. Определение свойств", content: <p>На основе найденных ключевых слов система определяет, какие именно CSS-свойства нужно изменить. Например, слово «тень» будет преобразовано в свойство `box-shadow`.</p> },
+            step3: { title: "CSS-режим: 3. Генерация кода", content: <p>Система формирует и возвращает чистый CSS-код, содержащий селектор и набор правил, готовый к вставке в таблицу стилей.</p> },
+        },
+        html: {
+            step1: { title: "HTML+JS: 1. Анализ описания", content: <p>Система анализирует текстовое описание, чтобы понять структуру (какие элементы нужны) и требуемое поведение (что должно происходить при взаимодействии).</p> },
+            step2: { title: "HTML+JS: 2. Генерация HTML", content: <p>Создается семантически корректная HTML-разметка для описанных элементов. Система использует стандартные теги (`div`, `button`, `img`) и добавляет необходимые классы для стилизации.</p> },
+            step3: { title: "HTML+JS: 3. Добавление JS", content: <p>Внутри тега `<script>` генерируется `vanilla JS` код, который добавляет обработчики событий (`addEventListener`) и реализует описанную интерактивность (например, переключение классов для аккордеона).</p> },
+        },
+        json: {
+            step1: { title: "JSON-режим: 1. Получение JSON", content: <p>Система принимает на вход строго структурированный JSON-запрос. Ключевые поля `module` и `template` используются для точной фильтрации данных.</p> },
+            step2: { title: "JSON-режим: 2. Поиск в базе", content: <p>На основе данных из запроса система выполняет поиск по «Корпусу контекста» — базе знаний, где хранятся все системные коды и их описания.</p> },
+            step3: { title: "JSON-режим: 3. Возврат JSON", content: <p>Система формирует и возвращает JSON-объект, содержащий два массива: `system_codes` (найденные коды) и `descriptions` (их текстовые описания).</p> },
+        }
+    };
+
   return (
     <DocumentationPageLayout title="AI-генератор UI">
         <div className="space-y-16">
@@ -367,7 +385,7 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
 
                 <div className="not-prose overflow-x-auto my-6">
                     <table className="w-full text-left border-collapse">
-                        <thead className="text-sm font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
+                        <thead className="text-base font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
                             <tr>
                                 <th className="p-4 border border-gray-200 dark:border-slate-700">Тип задачи</th>
                                 <th className="p-4 border border-gray-200 dark:border-slate-700">Рекомендуемый режим</th>
@@ -409,53 +427,33 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
 
                         <h4 className="font-bold text-lg mt-8 mb-4">Как это работает?</h4>
                         <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
-                            <div className="flex flex-col items-center w-40"><MagnifyingGlassIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>1. Анализ запроса</strong><p className="text-sm text-gray-500 dark:text-slate-400">Поиск CSS-селектора</p></div>
+                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.css.step1)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><MagnifyingGlassIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>1. Анализ запроса</strong><p className="text-sm text-gray-500 dark:text-slate-400">Поиск CSS-селектора</p></button>
                             <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <div className="flex flex-col items-center w-40"><PaintBrushIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>2. Определение свойств</strong><p className="text-sm text-gray-500 dark:text-slate-400">Что нужно изменить</p></div>
+                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.css.step2)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><PaintBrushIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>2. Определение свойств</strong><p className="text-sm text-gray-500 dark:text-slate-400">Что нужно изменить</p></button>
                              <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <div className="flex flex-col items-center w-40"><CodeBracketSquareIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>3. Генерация кода</strong><p className="text-sm text-gray-500 dark:text-slate-400">Вывод чистого CSS</p></div>
+                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.css.step3)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><CodeBracketSquareIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>3. Генерация кода</strong><p className="text-sm text-gray-500 dark:text-slate-400">Вывод чистого CSS</p></button>
                         </div>
 
                         <h4 className="font-bold text-lg mt-8 mb-4">Лучшие практики для запросов</h4>
-                        <div className="space-y-4 text-base not-prose">
-                            <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                <CheckIcon className="w-6 h-6 mt-1 flex-shrink-0 text-green-600 dark:text-green-400" />
-                                <div>
-                                    <h5 className="font-semibold text-gray-800 dark:text-slate-200">Указывайте селектор</h5>
-                                    <p className="text-gray-600 dark:text-slate-400">Четко определите, к какому элементу применяются стили (например, <TooltipTerm definition="Строка, которая определяет, к какому HTML-элементу или элементам применяются CSS-правила.">CSS-селектор</TooltipTerm> `.btn-primary`, `#header nav`).</p>
-                                </div>
+                        <div className="grid md:grid-cols-2 gap-4 text-base not-prose">
+                            <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                                <h5 className="font-semibold flex items-center gap-2 text-green-800 dark:text-green-300"><CheckIcon className="w-5 h-5"/>Рекомендуется</h5>
+                                <ul className="list-disc list-inside mt-2 space-y-2 text-green-900 dark:text-green-200">
+                                    <li><b>Указывайте селектор:</b> Четко определите, к какому элементу применяются стили (`.btn-primary`, `#header nav`).</li>
+                                    <li><b>Будьте конкретны:</b> Вместо "сделай красиво" используйте "сделай кнопку синей (#3b82f6) с белым текстом".</li>
+                                    <li><b>Описывайте состояния:</b> Не забывайте про `:hover` или `:focus`.</li>
+                                </ul>
                             </div>
-                            <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                <CheckIcon className="w-6 h-6 mt-1 flex-shrink-0 text-green-600 dark:text-green-400" />
-                                <div>
-                                    <h5 className="font-semibold text-gray-800 dark:text-slate-200">Будьте конкретны</h5>
-                                    <p className="text-gray-600 dark:text-slate-400">Вместо "сделай кнопку красивой" используйте "сделай кнопку синей (#3b82f6) с белым текстом и скруглением 8px".</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                <CheckIcon className="w-6 h-6 mt-1 flex-shrink-0 text-green-600 dark:text-green-400" />
-                                <div>
-                                    <h5 className="font-semibold text-gray-800 dark:text-slate-200">Описывайте состояния</h5>
-                                    <p className="text-gray-600 dark:text-slate-400">Не забывайте про интерактивные состояния, такие как <TooltipTerm definition="Псевдокласс CSS, который применяется, когда пользователь наводит курсор на элемент.">:hover</TooltipTerm> или <TooltipTerm definition="Псевдокласс CSS, который применяется, когда элемент получает фокус (например, при клике или навигации с клавиатуры).">:focus</TooltipTerm>.</p>
-                                </div>
-                            </div>
-                             <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                <NoSymbolIcon className="w-6 h-6 mt-1 flex-shrink-0 text-red-600 dark:text-red-400" />
-                                <div>
-                                    <h5 className="font-semibold text-gray-800 dark:text-slate-200">Избегайте общих фраз</h5>
-                                    <p className="text-gray-600 dark:text-slate-400">Запросы вроде "сделай красиво" или "улучши дизайн" слишком субъективны и не дадут предсказуемого результата.</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
-                                <NoSymbolIcon className="w-6 h-6 mt-1 flex-shrink-0 text-red-600 dark:text-red-400" />
-                                <div>
-                                    <h5 className="font-semibold text-gray-800 dark:text-slate-200">Не запрашивайте изменение HTML</h5>
-                                    <p className="text-gray-600 dark:text-slate-400">Этот режим не может добавлять, удалять или изменять HTML-элементы. Запросы типа "добавь иконку к кнопке" будут проигнорированы.</p>
-                                </div>
+                             <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                                <h5 className="font-semibold flex items-center gap-2 text-red-800 dark:text-red-300"><NoSymbolIcon className="w-5 h-5"/>Не рекомендуется</h5>
+                                 <ul className="list-disc list-inside mt-2 space-y-2 text-red-900 dark:text-red-200">
+                                     <li><b>Избегать общих фраз:</b> Запросы "улучши дизайн" слишком субъективны.</li>
+                                     <li><b>Запрашивать изменение HTML:</b> Этот режим не может добавлять, удалять или изменять HTML-элементы.</li>
+                                </ul>
                             </div>
                         </div>
 
-                        <CollapsibleSection title="Показать пример ввода/вывода для CSS-режима">
+                        <CollapsibleSection title="Пример ввода/вывода (CSS)">
                             <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС:
 // "Для ссылок в футере (footer a) убери подчеркивание, а при наведении делай его синим."
 
@@ -481,11 +479,11 @@ footer a:hover {
                         
                         <h4 className="font-bold text-lg mt-6 mb-4">Как это работает?</h4>
                         <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
-                            <div className="flex flex-col items-center w-40"><PencilSquareIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>1. Анализ описания</strong><p className="text-sm text-gray-500 dark:text-slate-400">Структура и поведение</p></div>
+                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.html.step1)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><PencilSquareIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>1. Анализ описания</strong><p className="text-sm text-gray-500 dark:text-slate-400">Структура и поведение</p></button>
                             <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <div className="flex flex-col items-center w-40"><CodeBracketIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>2. Генерация HTML</strong><p className="text-sm text-gray-500 dark:text-slate-400">Создание разметки</p></div>
+                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.html.step2)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><CodeBracketIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>2. Генерация HTML</strong><p className="text-sm text-gray-500 dark:text-slate-400">Создание разметки</p></button>
                              <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <div className="flex flex-col items-center w-40"><BoltIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>3. Добавление JS</strong><p className="text-sm text-gray-500 dark:text-slate-400">Реализация интерактивности</p></div>
+                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.html.step3)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><BoltIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>3. Добавление JS</strong><p className="text-sm text-gray-500 dark:text-slate-400">Реализация интерактивности</p></button>
                         </div>
 
                         <h4 className="font-bold text-lg mt-8 mb-4">Лучшие практики для запросов</h4>
@@ -511,7 +509,7 @@ footer a:hover {
                            <p>Режим работает <strong>только на стороне клиента</strong>. Он не генерирует серверную логику (PHP, Python, Node.js). Места, где она может понадобиться, помечаются комментарием `// TODO`.</p>
                         </InfoCard>
 
-                        <CollapsibleSection title="Показать пример ввода/вывода для HTML + JS режима">
+                        <CollapsibleSection title="Пример ввода/вывода (HTML + JS)">
                              <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС:
 // "Создай вкладки (tabs) 'Профиль' и 'Настройки'. При клике на вкладку должен показываться соответствующий контент."
 
@@ -539,22 +537,22 @@ footer a:hover {
                         <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `system_code_parser`</i></p>
 
                         <h4 className="font-bold text-lg mt-6 mb-4">Как это работает?</h4>
-                         <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
-                            <div className="flex flex-col items-center w-40"><InboxStackIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>1. Получение JSON</strong><p className="text-sm text-gray-500 dark:text-slate-400">Прием структурированного запроса</p></div>
+                         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center not-prose">
+                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.json.step1)} className="flex flex-col items-center flex-1 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><InboxStackIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>1. Получение JSON</strong><p className="text-sm text-gray-500 dark:text-slate-400">Прием структурированного запроса</p></button>
                             <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <div className="flex flex-col items-center w-40"><CircleStackIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>2. Поиск в базе</strong><p className="text-sm text-gray-500 dark:text-slate-400">Поиск в «Корпусе контекста»</p></div>
+                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.json.step2)} className="flex flex-col items-center flex-1 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><CircleStackIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>2. Поиск в базе</strong><p className="text-sm text-gray-500 dark:text-slate-400">Поиск в «Корпусе контекста»</p></button>
                              <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <div className="flex flex-col items-center w-40"><DocumentTextIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>3. Возврат JSON</strong><p className="text-sm text-gray-500 dark:text-slate-400">Отправка найденных кодов</p></div>
+                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.json.step3)} className="flex flex-col items-center flex-1 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><DocumentTextIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>3. Возврат JSON</strong><p className="text-sm text-gray-500 dark:text-slate-400">Отправка найденных кодов</p></button>
                         </div>
 
                         <h4 className="font-bold text-lg mt-8 mb-4">Формат ввода</h4>
                         <p className="text-base">Запрос должен быть в строгом <TooltipTerm definition="Текстовый формат обмена данными, основанный на JavaScript. Легко читается людьми и легко парсится машинами.">JSON-формате</TooltipTerm> и содержать следующие поля:</p>
-                        <div className="text-sm my-2 not-prose">
-                            <ul className="list-disc list-inside bg-white dark:bg-slate-800 p-4 rounded-md border dark:border-slate-700">
-                                <li>`module` (string): Имя модуля (например, "E-commerce Store").</li>
-                                <li>`template` (string): Контекст или имя шаблона (например, "Product page").</li>
-                                <li>`question` (string): Уточняющий вопрос на естественном языке.</li>
-                                <li>`filename` (string, опционально): Имя файла для трассировки.</li>
+                        <div className="text-base my-4 not-prose">
+                            <ul className="list-disc list-inside bg-white dark:bg-slate-800 p-4 rounded-lg border dark:border-slate-700 space-y-2">
+                                <li><code>module</code> (string): Имя модуля (например, "E-commerce Store").</li>
+                                <li><code>template</code> (string): Контекст или имя шаблона (например, "Product page").</li>
+                                <li><code>question</code> (string): Уточняющий вопрос на естественном языке.</li>
+                                <li><code>filename</code> (string, опционально): Имя файла для трассировки.</li>
                             </ul>
                         </div>
                         
@@ -562,8 +560,11 @@ footer a:hover {
                            <p>Система возвращает **не более 3** наиболее релевантных системных кодов за один запрос.</p>
                         </InfoCard>
 
-                        <CollapsibleSection title="Показать пример ввода/вывода для JSON-режима">
-                            <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС (в виде JSON):
+                        <CollapsibleSection title="Пример ввода/вывода (JSON)">
+                            <CodeBlockWithCopy 
+                                title="Пример"
+                                language="json"
+                                code={`// ЗАПРОС (в виде JSON):
 {
   "module": "E-commerce Store",
   "template": "Product page",
@@ -572,8 +573,8 @@ footer a:hover {
 
 // РЕЗУЛЬТАТ (в виде JSON):
 {
-  "system_codes": ["$GLOBAL_PROMO$", "$GLOBAL_FAQ$"],
-  "descriptions": ["Глобальный промо-блок", "Глобальный блок FAQ"]
+  "system_codes": ["$GLOBAL_PROMOS$", "$GLOBAL_FAQS$"],
+  "descriptions": ["Глобальный промо-блок для всех товаров", "Глобальный блок с часто задаваемыми вопросами"]
 }`} />
                         </CollapsibleSection>
                     </div>

@@ -1,138 +1,274 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm } from '../components/DocumentationUIComponents';
-import { ShieldCheckIcon, EnvelopeOpenIcon, CodeBracketIcon, CogIcon, CheckBadgeIcon } from '@heroicons/react/24/outline';
+import { SectionHeader, InfoCard, JsonReportViewer, TooltipTerm, StatusBadge } from '../components/DocumentationUIComponents';
+import { 
+    ShieldCheckIcon, EnvelopeOpenIcon, CodeBracketIcon, CogIcon, CheckBadgeIcon, 
+    WrenchScrewdriverIcon, LightBulbIcon, PuzzlePieceIcon, ArrowPathIcon,
+    ExclamationTriangleIcon, BeakerIcon, EyeIcon, LinkIcon, PaintBrushIcon
+} from '@heroicons/react/24/outline';
+import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
+
 
 const EmailSafetyPipelineDocumentationPage: React.FC = () => {
+    const workflowRef = useRef<HTMLDivElement>(null);
+    useAnimateOnScroll(workflowRef, { targetSelector: '.workflow-stage' });
+
+    const workflowStages = [
+        {
+            icon: <ShieldCheckIcon className="w-7 h-7" />,
+            title: "1. Анализ репутации (Reputation)",
+            content: "Первый фильтр. Система проверяет отправителя, его домен и email на доверие, используя DNS-записи (SPF, DKIM) и черные списки. Вердикт: Red, Yellow или Green."
+        },
+        {
+            icon: <BeakerIcon className="w-7 h-7" />,
+            title: "2. Анализ контента (Content)",
+            content: "Глубокий анализ HTML-кода, текста и ссылок. Система ищет спам-триггеры, фишинговые паттерны и проверяет все URL через Google Safe Browsing API."
+        },
+        {
+            icon: <PaintBrushIcon className="w-7 h-7" />,
+            title: "3. Анализ рендеринга (Rendering)",
+            content: "Эмуляция открытия письма в разных почтовых клиентах (десктоп, мобайл) с помощью Puppeteer для создания скриншотов и выявления проблем с версткой."
+        },
+        {
+            icon: <CheckBadgeIcon className="w-7 h-7" />,
+            title: "4. Финальное решение (Final Verdict)",
+            content: "Агрегация результатов всех этапов. Система выносит итоговое решение: GO (разрешить) или STOP (заблокировать), формируя детальный JSON-отчет."
+        }
+    ];
+
+    const reportData = {
+        final_verdict: "STOP" as const,
+        reputation_check: {
+            status: "green",
+            details: "SPF, DKIM, DMARC records are valid. Not found in major blacklists."
+        },
+        content_check: {
+            status: "red",
+            flags: [
+                { risk: "yellow", comment: "Обнаружены слова срочности и давления ('только сегодня', 'последний шанс')." },
+                { risk: "red", comment: "Обнаружены нереалистичные финансовые обещания ('гарантированный доход')." },
+                { risk: "red", comment: "Обнаружен агрессивный призыв к действию." },
+                { risk: "yellow", comment: "Тематика классифицирована как 'Гэмблинг и розыгрыши' с уверенностью 0.95." }
+            ]
+        },
+        rendering_check: {
+            status: "green",
+            details: "No significant layout issues detected on mobile or desktop."
+        }
+    };
+
   return (
     <DocumentationPageLayout title="Пайплайн безопасности email">
-        <div className="space-y-12">
-            <section id="overview" className="scroll-mt-24">
+        <div className="space-y-16">
+            <section id="concept" className="scroll-mt-24">
                 <SectionHeader 
                     icon={<ShieldCheckIcon className="w-8 h-8" />}
-                    title="Обзор проекта"
-                    subtitle="Автоматизированный конвейер для всесторонней проверки HTML-шаблонов email-сообщений."
+                    title="1. Концепция: Автоматический аудитор email-кампаний"
+                    subtitle="Создание автоматизированного конвейера для всесторонней проверки HTML-шаблонов email-сообщений перед отправкой, чтобы защитить репутацию бренда и повысить доставляемость."
                 />
-                <p>
-                    Этот проект представляет собой автоматизированный конвейер (пайплайн) для всесторонней проверки <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm>-шаблонов email-сообщений. Система состоит из трёх этапов, каждый из которых анализирует разные аспекты письма — от репутации отправителя до контента, — и выносит итоговое решение: <span className="font-semibold text-green-600 dark:text-green-400">GO</span> (разрешить) или <span className="font-semibold text-red-600 dark:text-red-400">STOP</span> (блокировать).
-                </p>
-                <div className="my-6 not-prose overflow-hidden">
-                    <svg viewBox="0 0 1000 200" xmlns="http://www.w3.org/2000/svg" aria-labelledby="title_pipeline" role="img" className="w-full h-auto">
-                      <title id="title_pipeline">Диаграмма пайплайна анализа email</title>
-                      <defs>
-                        <style>
-                          {`
-                            .box {
-                                fill: #FFFFFF;
-                                stroke: #E2E8F0;
-                                stroke-width: 1.5;
-                                rx: 12;
-                                ry: 12;
-                            }
-                            .dark .box {
-                                fill: #1e293b;
-                                stroke: #334155;
-                            }
-                            .h { font: 600 18px ui-sans-serif, system-ui, sans-serif; fill: #1E293B; }
-                            .dark .h { fill: #F1F5F9; }
-                            .t { font: 400 14px ui-sans-serif, system-ui, sans-serif; fill: #475569; }
-                            .dark .t { fill: #94A3B8; }
-                            .arrow { stroke: #64748B; stroke-width: 2.5; marker-end: url(#arrowhead); }
-                            .dark .arrow { stroke: #94A3B8; }
-                          `}
-                        </style>
-                        <marker id="arrowhead" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                          <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-                        </marker>
-                      </defs>
-                      
-                      {/* Stage 1 */}
-                      <rect className="box" x="20" y="40" width="280" height="120" />
-                      <text x="160" y="75" textAnchor="middle" className="h">Stage 1 — Reputation</text>
-                      <text x="160" y="100" textAnchor="middle" className="t">Проверка репутации отправителя</text>
-                      <text x="160" y="125" textAnchor="middle" className="t font-bold text-red-500 dark:text-red-400">Вердикт: red / yellow / green</text>
-                      
-                      {/* Arrow 1 */}
-                      <line x1="310" y1="100" x2="350" y2="100" className="arrow" />
-                      
-                      {/* Stage 2 */}
-                      <rect className="box" x="360" y="40" width="280" height="120" />
-                      <text x="500" y="75" textAnchor="middle" className="h">Stage 2 — Content</text>
-                      <text x="500" y="100" textAnchor="middle" className="t">Анализ HTML, темы, ссылок</text>
-                      <text x="500" y="125" textAnchor="middle" className="t font-bold text-yellow-500 dark:text-yellow-400">Флаги: high-risk / ambiguous</text>
-                      
-                       {/* Arrow 2 */}
-                      <line x1="650" y1="100" x2="690" y2="100" className="arrow" />
-                      
-                      {/* Stage 3 */}
-                      <rect className="box" x="700" y="40" width="280" height="120" />
-                      <text x="840" y="75" textAnchor="middle" className="h">Stage 3 — Final</text>
-                      <text x="840" y="100" textAnchor="middle" className="t">Агрегация Stage 1 + 2</text>
-                      <text x="840" y="125" textAnchor="middle" className="t font-bold text-green-500 dark:text-green-400">Решение: GO / STOP</text>
-                    </svg>
+                <InfoCard icon={<LightBulbIcon className="w-8 h-8" />} title="Ключевые выводы (Key Takeaways)">
+                    <ul className="list-disc list-inside space-y-2 text-base">
+                        <li><b>Многоуровневая проверка:</b> Система анализирует email по трём ключевым направлениям: репутация отправителя, безопасность контента и корректность отображения.</li>
+                        <li><b>Предотвращение рисков:</b> Автоматически обнаруживает спам-триггеры, фишинговые ссылки и проблемы с версткой до того, как письмо увидят клиенты.</li>
+                        <li><b>Защита репутации:</b> Снижает риск попадания домена в черные списки почтовых провайдеров.</li>
+                        <li><b>Полная автоматизация:</b> Весь процесс от получения шаблона до финального отчета выполняется без участия человека.</li>
+                    </ul>
+                </InfoCard>
+            </section>
+
+            <section id="problem-solution" className="scroll-mt-24">
+                <SectionHeader 
+                    icon={<WrenchScrewdriverIcon className="w-8 h-8" />}
+                    title="2. Проблема и Решение"
+                    subtitle="Как перейти от ручной проверки к автоматизированному контролю качества."
+                />
+                <div className="grid md:grid-cols-2 gap-8 items-start not-prose">
+                    <div className="bg-red-50 dark:bg-red-900/30 rounded-lg p-6 border border-red-200 dark:border-red-800 h-full">
+                        <h3 className="text-xl font-bold text-red-800 dark:text-red-300 mt-0 flex items-center gap-3">
+                           <ExclamationTriangleIcon className="w-7 h-7" />
+                           Проблема: «Человеческий фактор»
+                        </h3>
+                        <p className="mt-4 text-base text-red-900 dark:text-red-200">
+                            Ручная проверка email-шаблонов маркетологом — это медленно, дорого и ненадежно. Легко пропустить скрытую фишинговую ссылку, не заметить спам-слово или не учесть, что верстка "поедет" на мобильных устройствах. Одна ошибка может стоить репутации домена и лояльности клиентов.
+                        </p>
+                    </div>
+                    <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-6 border border-green-200 dark:border-green-800 h-full">
+                        <h3 className="text-xl font-bold text-green-800 dark:text-green-300 mt-0 flex items-center gap-3">
+                            <CogIcon className="w-7 h-7" />
+                            Решение: «Автоматический контролёр»
+                        </h3>
+                        <p className="mt-4 text-base text-green-900 dark:text-green-200">
+                           Пайплайн работает как неутомимый цифровой аудитор. Он за секунды проводит комплексную проверку, которую человек делал бы часами. Система автоматически анализирует технические заголовки, каждую ссылку, каждое слово и даже то, как письмо будет выглядеть на экране смартфона, вынося четкий вердикт: GO или STOP.
+                        </p>
+                    </div>
                 </div>
             </section>
-            
-            <section id="stages" className="scroll-mt-24">
-                 <SectionHeader 
-                    icon={<CogIcon className="w-8 h-8" />}
-                    title="Этапы анализа"
-                    subtitle="Как пайплайн анализирует email-шаблон."
+
+             <section id="architecture" className="scroll-mt-24">
+                <SectionHeader 
+                    icon={<PuzzlePieceIcon className="w-8 h-8" />}
+                    title="3. Архитектура и технологии"
+                    subtitle="Обзор технологического стека, лежащего в основе пайплайна."
                 />
-                <div className="space-y-6">
-                    <InfoCard icon={<ShieldCheckIcon className="w-8 h-8"/>} title="Stage 1 — Reputation Analyzer">
-                        <p>Оценивает доверие к источнику письма (email, домен, комментарии, аудит). Возвращает один из статусов: <span className="font-semibold text-red-600">Red</span>, <span className="font-semibold text-yellow-600">Yellow</span>, <span className="font-semibold text-green-600">Green</span>.</p>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 not-prose">
+                    <InfoCard icon={<CodeBracketIcon className="w-8 h-8"/>} title="Node.js + Express">
+                        <p>Ядро системы. Создает <TooltipTerm definition="Программный интерфейс приложения — это набор правил и инструментов, который позволяет различным программным приложениям взаимодействовать друг с другом.">API</TooltipTerm>-эндпоинт, который принимает HTML-шаблон и управляет всем процессом проверки, координируя работу других модулей.</p>
                     </InfoCard>
-                    <InfoCard icon={<EnvelopeOpenIcon className="w-8 h-8"/>} title="Stage 2 — ESP Email Safety Checker">
-                        <p>Глубокий анализ <TooltipTerm definition="Язык гипертекстовой разметки — это стандартный язык разметки для создания веб-страниц и веб-приложений. Он определяет структуру и содержание веб-страницы.">HTML</TooltipTerm>, темы, текста и вложений. Находит признаки фишинга, скама и манипуляций. Сигналы классифицируются как <span className="font-semibold text-red-600">High-risk</span> или <span className="font-semibold text-yellow-600">Ambiguous</span>.</p>
+                    <InfoCard icon={<EnvelopeOpenIcon className="w-8 h-8"/>} title="SpamAssassin API">
+                        <p>Внешний сервис, используемый для глубокого анализа текста письма на наличие спам-триггеров. Он оценивает контент по сотням правил и возвращает оценку "спамности".</p>
                     </InfoCard>
-                    <InfoCard icon={<CheckBadgeIcon className="w-8 h-8" />} title="Stage 3 — Combined Final Analyzer">
-                        <p>Объединяет результаты Stage 1 и Stage 2. Выносит итоговое решение: <span className="font-semibold text-green-600">GO</span> (разрешить) или <span className="font-semibold text-red-600">STOP</span> (заблокировать), формируя отчет в человеко-читаемом виде.</p>
+                    <InfoCard icon={<PaintBrushIcon className="w-8 h-8"/>} title="Puppeteer">
+                        <p>Инструмент для управления браузером Chrome в headless-режиме. Используется на этапе анализа рендеринга для создания скриншотов HTML-шаблона в различных разрешениях (десктоп/мобайл).</p>
                     </InfoCard>
+                     <InfoCard icon={<LinkIcon className="w-8 h-8"/>} title="Google Safe Browsing API">
+                        <p>Сервис от Google для проверки URL-адресов на наличие фишинга, вредоносного ПО и других угроз. Пайплайн извлекает все ссылки из письма и проверяет каждую через этот <TooltipTerm definition="Программный интерфейс приложения — это набор правил и инструментов, который позволяет различным программным приложениям взаимодействовать друг с другом.">API</TooltipTerm>.</p>
+                    </InfoCard>
+                     <InfoCard icon={<CogIcon className="w-8 h-8"/>} title="Docker">
+                        <p>Вся система упакована в Docker-контейнер. Это обеспечивает простоту развертывания и гарантирует, что все зависимости (включая SpamAssassin) будут работать в изолированной и предсказуемой среде.</p>
+                    </InfoCard>
+                </div>
+            </section>
+
+            <section id="workflow" className="scroll-mt-24">
+                 <SectionHeader 
+                    icon={<ArrowPathIcon className="w-8 h-8" />}
+                    title="4. Детальный флоу работы"
+                    subtitle="Пошаговый конвейер анализа: от получения шаблона до финального вердикта."
+                />
+                <div ref={workflowRef} className="relative mt-8 not-prose">
+                    <div className="absolute left-6 top-0 h-full w-0.5 bg-gray-200 dark:bg-slate-700" aria-hidden="true"></div>
+                    <div className="space-y-12">
+                        {workflowStages.map((stage, index) => (
+                            <div key={index} className="workflow-stage relative pl-16" style={{ transitionDelay: `${index * 150}ms` }}>
+                                <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500 text-white shadow-md">
+                                    {stage.icon}
+                                </div>
+                                <div className="bg-gray-50 dark:bg-slate-900/50 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-0">{stage.title}</h3>
+                                    <p className="mt-2 text-base text-slate-700 dark:text-slate-300">{stage.content}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+             <section id="analyzers-deep-dive" className="scroll-mt-24">
+                <SectionHeader 
+                    icon={<EyeIcon className="w-8 h-8" />}
+                    title="5. Под капотом: что проверяют анализаторы"
+                    subtitle="Детальный разбор того, какие именно проверки выполняет система на каждом этапе."
+                />
+                <div className="space-y-8">
+                    {/* Reputation Analyzer Card */}
+                    <div className="bg-white dark:bg-slate-800/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm not-prose">
+                        <div className="flex items-center gap-4 mb-3">
+                            <div className="flex-shrink-0 w-12 h-12 bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 rounded-lg flex items-center justify-center">
+                                <ShieldCheckIcon className="w-8 h-8"/>
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-900 dark:text-slate-200 mt-0">Stage 1 — Reputation Analyzer</h3>
+                        </div>
+                        <p className="text-gray-700 dark:text-slate-300">Оценивает доверие к источнику письма. Основные проверки:</p>
+                        <table className="w-full mt-4 text-left text-base">
+                            <tbody>
+                                <tr className="border-b border-gray-200 dark:border-slate-700">
+                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Аутентификация</td>
+                                    <td className="py-2 text-slate-700 dark:text-slate-300">
+                                        Проверка DNS-записей: <TooltipTerm definition="Стандарт, позволяющий владельцу домена указать, с каких IP-адресов разрешена отправка почты от его имени.">SPF</TooltipTerm>, <TooltipTerm definition="Технология, позволяющая удостовериться, что письмо действительно было отправлено с заявленного домена и не было изменено в пути.">DKIM</TooltipTerm>, <TooltipTerm definition="Политика, которая объединяет SPF и DKIM и указывает почтовым серверам, что делать с письмами, не прошедшими проверку.">DMARC</TooltipTerm>.
+                                    </td>
+                                    <td className="py-2 text-right">
+                                        <StatusBadge status="green">Green</StatusBadge>
+                                    </td>
+                                </tr>
+                                <tr className="border-b border-gray-200 dark:border-slate-700 last:border-b-0">
+                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Черные списки</td>
+                                    <td className="py-2 text-slate-700 dark:text-slate-300">
+                                        Проверка домена и IP по базам <TooltipTerm definition="Международная организация, отслеживающая спам-активность и ведущая черные списки IP-адресов и доменов.">Spamhaus</TooltipTerm> и др.
+                                    </td>
+                                    <td className="py-2 text-right">
+                                        <StatusBadge status="red">Red</StatusBadge>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Content Analyzer Card */}
+                    <div className="bg-white dark:bg-slate-800/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm not-prose">
+                        <div className="flex items-center gap-4 mb-3">
+                            <div className="flex-shrink-0 w-12 h-12 bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 rounded-lg flex items-center justify-center">
+                                <EnvelopeOpenIcon className="w-8 h-8"/>
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-900 dark:text-slate-200 mt-0">Stage 2 — Content Analyzer</h3>
+                        </div>
+                        <p className="text-gray-700 dark:text-slate-300">Глубокий анализ содержимого. Основные проверки:</p>
+                        <table className="w-full mt-4 text-left text-base">
+                            <tbody>
+                                <tr className="border-b border-gray-200 dark:border-slate-700">
+                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Спам-триггеры</td>
+                                    <td className="py-2 text-slate-700 dark:text-slate-300">Поиск стоп-слов ("бесплатно", "гарантированный доход").</td>
+                                    <td className="py-2 text-right space-x-1.5">
+                                        <StatusBadge status="yellow">Yellow</StatusBadge>
+                                        <StatusBadge status="red">Red</StatusBadge>
+                                    </td>
+                                </tr>
+                                <tr className="border-b border-gray-200 dark:border-slate-700">
+                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Безопасность ссылок</td>
+                                    <td className="py-2 text-slate-700 dark:text-slate-300">Проверка всех URL через <TooltipTerm definition="Сервис от Google для проверки URL-адресов на наличие фишинга, вредоносного ПО и других онлайн-угроз.">Google Safe Browsing API</TooltipTerm>.</td>
+                                    <td className="py-2 text-right">
+                                        <StatusBadge status="red">Red</StatusBadge>
+                                    </td>
+                                </tr>
+                                <tr className="border-b border-gray-200 dark:border-slate-700 last:border-b-0">
+                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Техники маскировки</td>
+                                    <td className="py-2 text-slate-700 dark:text-slate-300">Поиск скрытого текста, нерелевантных анкоров ссылок.</td>
+                                    <td className="py-2 text-right">
+                                        <StatusBadge status="yellow">Yellow</StatusBadge>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Rendering Analyzer Card */}
+                    <div className="bg-white dark:bg-slate-800/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm not-prose">
+                        <div className="flex items-center gap-4 mb-3">
+                            <div className="flex-shrink-0 w-12 h-12 bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 rounded-lg flex items-center justify-center">
+                                <PaintBrushIcon className="w-8 h-8"/>
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-900 dark:text-slate-200 mt-0">Stage 3 — Rendering Analyzer</h3>
+                        </div>
+                        <p className="text-gray-700 dark:text-slate-300">Проверка корректности отображения. Основные проверки:</p>
+                        <table className="w-full mt-4 text-left text-base">
+                            <tbody>
+                                <tr className="border-b border-gray-200 dark:border-slate-700">
+                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Mobile & Desktop</td>
+                                    <td className="py-2 text-slate-700 dark:text-slate-300">Создание скриншотов в разрешениях 375x667 и 1280x800.</td>
+                                    <td className="py-2 text-right">
+                                        <StatusBadge status="green">Green</StatusBadge>
+                                    </td>
+                                </tr>
+                                <tr className="border-b border-gray-200 dark:border-slate-700 last:border-b-0">
+                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Сдвиг верстки</td>
+                                    <td className="py-2 text-slate-700 dark:text-slate-300">Поиск "разъехавшихся" элементов или нечитаемого текста.</td>
+                                    <td className="py-2 text-right">
+                                        <StatusBadge status="yellow">Yellow</StatusBadge>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <section id="report-example" className="scroll-mt-24">
                  <SectionHeader 
                     icon={<CodeBracketIcon className="w-8 h-8" />}
-                    title="Пример отчёта"
-                    subtitle="Фрагмент итогового отчета по агрессивному маркетинговому письму."
+                    title="6. Пример отчёта"
+                    subtitle="Визуализированный итоговый отчет по агрессивному маркетинговому письму, которое было заблокировано системой."
                 />
-                <CodeBlockWithCopy
-                    title="report_example.json"
-                    code={`
-{
-  "verdict": "red",
-  "reasons": [
-    {
-      "field": "html",
-      "flag": "yellow",
-      "comment": "Слова срочности и давления"
-    },
-    {
-      "field": "html",
-      "flag": "red",
-      "comment": "Нереалистичные финансовые обещания"
-    },
-    {
-      "field": "html",
-      "flag": "red",
-      "comment": "Агрессивный призыв к действию"
-    },
-    {
-      "field": "html",
-      "flag": "red",
-      "comment": "Манипулятивный тон письма"
-    },
-    {
-      "field": "html",
-      "flag": "yellow",
-      "comment": "Тематика: Гэмблинг и розыгрыши (conf=0.95)"
-    }
-  ]
-}
-                    `}
-                />
+                <p>Вместо простого JSON-файла, система генерирует наглядный отчет. Финальный вердикт **STOP** означает, что письмо заблокировано. Цветные флаги (`red`, `yellow`) указывают на конкретные проблемы, обнаруженные на этапе анализа контента, и позволяют маркетологу быстро понять причину блокировки.</p>
+                <JsonReportViewer data={reportData} />
             </section>
         </div>
     </DocumentationPageLayout>
