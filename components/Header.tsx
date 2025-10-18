@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -29,6 +28,28 @@ const Header: React.FC = () => {
     };
   }, [isOpen]);
 
+  const handleBackClick = () => {
+    const { pathname } = location;
+
+    // From a documentation or report page, go to the corresponding project page.
+    if (pathname.startsWith('/documentation/') || pathname.startsWith('/report/')) {
+      const slug = pathname.split('/')[2];
+      if (slug) {
+        navigate(`/project/${slug}`);
+      } else {
+        // Fallback to homepage if slug is missing
+        navigate('/'); 
+      }
+    } else if (pathname.startsWith('/project/')) {
+      // From any project page, "Back" should go to the main project list (homepage)
+      navigate('/');
+    } else {
+      // This case should not be reached given the button's visibility condition,
+      // but it serves as a safe fallback.
+      navigate(-1);
+    }
+  };
+
   const baseClasses = "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300";
   const activeClasses = "bg-slate-900 dark:bg-slate-700 text-white";
   const inactiveClasses = "text-gray-300 hover:bg-slate-700 dark:hover:bg-slate-700 hover:text-white";
@@ -52,7 +73,7 @@ const Header: React.FC = () => {
           <div className="flex items-center gap-2">
             {isProjectOrDocPage ? (
               <button
-                onClick={() => navigate(-1)}
+                onClick={handleBackClick}
                 className="border border-slate-600 text-slate-300 px-4 py-2 rounded-md text-sm font-semibold hover:bg-slate-700 hover:text-white transition-all duration-300 flex items-center transform hover:-translate-y-px focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50"
                 aria-label="Вернуться назад"
               >
