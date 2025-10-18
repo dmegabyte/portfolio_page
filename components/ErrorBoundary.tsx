@@ -1,5 +1,4 @@
-// FIX: Corrected the React import to a namespace import to ensure component properties like 'props' and 'state' are correctly resolved from the base React.Component class.
-import * as React from 'react';
+import React from 'react';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 interface Props {
@@ -10,13 +9,12 @@ interface State {
   hasError: boolean;
 }
 
-// FIX: The class must extend React.Component to be a valid React component and have access to `props` and `state`, resolving the "property does not exist" errors.
 class ErrorBoundary extends React.Component<Props, State> {
-  // FIX: Initialized state within the constructor to ensure `this.state` is available, resolving the "Property 'state' does not exist" error.
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
-  }
+  // FIX: The original implementation caused several TypeScript errors related to `this.state` and `this.props`
+  // not being recognized on the component type. Refactoring to use a class property for state initialization
+  // is a more modern and robust syntax that resolves these type inference issues.
+  // The constructor is no longer needed, and the React import is now consistent with other project files.
+  state: State = { hasError: false };
 
   static getDerivedStateFromError(_: Error): State {
     return { hasError: true };
@@ -32,7 +30,6 @@ class ErrorBoundary extends React.Component<Props, State> {
   };
 
   render() {
-    // FIX: Check `this.state.hasError`. This is now valid as `state` is properly initialized on the component instance.
     if (this.state.hasError) {
       return (
         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 sm:p-8 lg:p-12 animate-fade-in border border-red-200 dark:border-red-700 text-center">
@@ -53,7 +50,6 @@ class ErrorBoundary extends React.Component<Props, State> {
       );
     }
 
-    // FIX: Return `this.props.children`. This is now valid as `props` are correctly passed to the component.
     return this.props.children;
   }
 }
