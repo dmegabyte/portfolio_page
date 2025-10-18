@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { projects } from '../data/projects';
@@ -14,7 +13,8 @@ const HomePage: React.FC = () => {
           Здесь представлены некоторые из моих последних проектов. Нажмите на любой проект, чтобы узнать больше.
         </p>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+      {/* UPDATED: Changed grid to be 1-col on mobile, 2-col on sm, 3-col on lg */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         {projects.map((project) => (
           <Link 
             to={`/project/${project.slug}`} 
@@ -23,7 +23,7 @@ const HomePage: React.FC = () => {
                        md:transform md:hover:-translate-y-1 md:hover:scale-105"
             aria-label={`Подробнее о проекте ${project.title}`}
           >
-            {/* --- Image Container: aspect-square on mobile, aspect-video on desktop --- */}
+            {/* Image Container: aspect-square on mobile, aspect-video on desktop */}
             <div className="overflow-hidden aspect-square md:aspect-video">
               <img
                 src={project.imageUrl}
@@ -36,13 +36,15 @@ const HomePage: React.FC = () => {
               />
             </div>
             
-            {/* --- Mobile Overlay & Title (hidden on md and up) --- */}
-            <div className="md:hidden absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" aria-hidden="true" />
-            <div className="md:hidden absolute bottom-0 left-0 right-0 p-3">
-                <h2 className="font-bold text-white text-base leading-tight truncate">{project.title}</h2>
+            {/* Mobile Overlay & Title (hidden on md and up) */}
+            <div className="md:hidden absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" aria-hidden="true" />
+            {/* UPDATED: Increased padding */}
+            <div className="md:hidden absolute bottom-0 left-0 right-0 p-4">
+                {/* UPDATED: Removed truncate, increased font size */}
+                <h2 className="font-bold text-white text-lg leading-tight text-shadow-strong">{project.title}</h2>
             </div>
 
-            {/* --- Desktop Text (hidden on mobile) --- */}
+            {/* Desktop Text (hidden on mobile) */}
             <div className="hidden md:block p-6">
               <h2 className="text-xl font-bold text-slate-900 dark:text-slate-200 mb-2">{project.title}</h2>
               <p className="text-slate-600 dark:text-slate-400 text-sm">{project.summary}</p>
