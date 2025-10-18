@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -36,7 +37,7 @@ const Header: React.FC = () => {
     `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
   
   const getMobileNavLinkClasses = ({ isActive }: { isActive: boolean }) => 
-    `${baseClasses} ${isActive ? activeClasses : inactiveClasses} block`;
+    `block text-base ${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
 
   return (
     <header className="bg-slate-800 dark:bg-slate-900 shadow-lg sticky top-0 z-50 border-b border-slate-700 dark:border-slate-800">
@@ -63,9 +64,11 @@ const Header: React.FC = () => {
             ) : (
               <>
                 {/* --- Desktop Navigation --- */}
-                {/* This block is visible only on medium screens and larger (md:block) and hidden on smaller screens (hidden). */}
                 <div className="hidden md:block">
                   <div className="ml-4 flex items-baseline space-x-4">
+                    <NavLink to="/" className={getNavLinkClasses} end>
+                      Главная
+                    </NavLink>
                     <NavLink to="/about" className={getNavLinkClasses}>
                       Обо мне
                     </NavLink>
@@ -76,7 +79,6 @@ const Header: React.FC = () => {
                 </div>
 
                 {/* --- Mobile Menu Button (Burger) --- */}
-                {/* This block is visible only on small screens (flex) and hidden on medium screens and larger (md:hidden). */}
                 <div className="flex md:hidden">
                   <button
                     onClick={() => setIsOpen(!isOpen)}
@@ -121,6 +123,9 @@ const Header: React.FC = () => {
         aria-label="Мобильное меню"
       >
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <NavLink to="/" className={getMobileNavLinkClasses} end>
+            Главная
+          </NavLink>
           <NavLink to="/about" className={getMobileNavLinkClasses}>
             Обо мне
           </NavLink>
