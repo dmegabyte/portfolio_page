@@ -1,5 +1,4 @@
 
-
 import React, { ReactNode, useEffect, useState, useRef, useMemo } from 'react';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 
@@ -102,7 +101,7 @@ const DocumentationPageLayout: React.FC<DocumentationPageLayoutProps> = ({ child
                 </aside>
 
                  {/* Main Content */}
-                <div className="flex-grow p-6 sm:p-8 lg:p-12 min-w-0">
+                <div className="flex-grow px-4 py-8 sm:p-8 lg:p-12 min-w-0">
                     <header className="mb-12 not-prose">
                         <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-slate-200 leading-tight">
                             {title}

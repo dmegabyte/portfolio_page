@@ -1,5 +1,6 @@
 
 
+
 import React, { useRef, useState, useEffect } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
 import { SectionHeader, SimpleCodeBlock, TooltipTerm, InfoCard } from '../components/DocumentationUIComponents';
@@ -85,57 +86,35 @@ const ClientSegmentationReportPage: React.FC = () => {
     ];
 
     const historySectionRef = useRef<HTMLElement>(null);
-    const [isHistoryVisible, setIsHistoryVisible] = useState(false);
-
     const algorithmSectionRef = useRef<HTMLElement>(null);
-    const [isAlgorithmVisible, setIsAlgorithmVisible] = useState(false);
-
+    const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsHistoryVisible(true);
-                    observer.unobserve(entry.target);
-                }
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setVisibleSections(prev => new Set(prev).add(entry.target.id));
+                        observer.unobserve(entry.target);
+                    }
+                });
             },
             { threshold: 0.1 }
         );
 
-        const currentRef = historySectionRef.current;
-        if (currentRef) {
-            observer.observe(currentRef);
-        }
+        const elementsToObserve = [historySectionRef.current, algorithmSectionRef.current].filter(Boolean);
+        elementsToObserve.forEach(el => observer.observe(el!));
 
         return () => {
-            if (currentRef) {
-                observer.unobserve(currentRef);
-            }
+            elementsToObserve.forEach(el => {
+                if (el) observer.unobserve(el);
+            });
         };
     }, []);
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsAlgorithmVisible(true);
-                    observer.unobserve(entry.target);
-                }
-            },
-            { threshold: 0.1 }
-        );
+    const isHistoryVisible = visibleSections.has('history');
+    const isAlgorithmVisible = visibleSections.has('algorithm');
 
-        const currentRef = algorithmSectionRef.current;
-        if (currentRef) {
-            observer.observe(currentRef);
-        }
-
-        return () => {
-            if (currentRef) {
-                observer.unobserve(currentRef);
-            }
-        };
-    }, []);
 
     const historyStages: WorkflowStage[] = [
         {
