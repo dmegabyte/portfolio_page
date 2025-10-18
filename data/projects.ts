@@ -57,7 +57,7 @@ export const projects: Project[] = [
     title: 'GPT-ассистент с RAG',
     summary: 'Чат-бот с кастомной базой знаний, использующий Retrieval-Augmented Generation.',
     description: 'Разработка ассистента на базе GPT-моделей, который может отвечать на вопросы, используя предоставленную документацию. Реализована векторизация текстов, поиск по семантической близости и интеграция с Telegram Bot API.',
-    imageUrl: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=800&q=80&auto=format&fit=crop',
+    imageUrl: 'https://images.unsplash.com/photo-1677756119517-756a188d2d94?w=800&q=80&auto=format&fit=crop',
     technologies: ['gpttunel', 'Vector Databases', 'Omnidesk API'],
     keyFeatures: [
         'Ответы на вопросы на основе кастомной базы знаний.',

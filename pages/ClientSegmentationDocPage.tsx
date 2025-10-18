@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, DefinitionList } from '../components/DocumentationUIComponents';
+import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, InteractiveGlossary } from '../components/DocumentationUIComponents';
 import {
     UsersIcon,
     TableCellsIcon,
@@ -23,7 +23,6 @@ import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
 
 
 const ClientSegmentationDocumentationPage: React.FC = () => {
-    const glossaryItems = Object.entries(glossary).map(([term, definition]) => ({ term, definition }));
     const workflowRef = useRef<HTMLDivElement>(null);
     useAnimateOnScroll(workflowRef, { targetSelector: '.workflow-stage' });
 
@@ -205,9 +204,9 @@ if (client.activityId === 1 && client.loyaltyId === 2) {
                     <SectionHeader
                         icon={<BookOpenIcon className="w-8 h-8" />}
                         title="6. Терминология (Глоссарий)"
-                        subtitle="Словарь ключевых терминов, используемых в системе, для единого понимания всеми участниками процесса."
+                        subtitle="Интерактивный словарь ключевых терминов системы. Используйте поиск или фильтры по категориям для быстрого доступа к определениям."
                     />
-                    <DefinitionList items={glossaryItems} />
+                    <InteractiveGlossary items={glossary} />
                 </section>
 
             </div>

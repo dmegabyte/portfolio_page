@@ -50,20 +50,20 @@ const Header: React.FC = () => {
           
           <div className="flex items-center gap-2">
             {isProjectOrDocPage ? (
-              <div>
-                <button
-                  onClick={() => navigate(-1)}
-                  className="border border-slate-600 text-slate-300 px-4 py-2 rounded-md text-sm font-semibold hover:bg-slate-700 hover:text-white transition-all duration-300 flex items-center transform hover:-translate-y-px focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50"
-                  aria-label="Вернуться назад"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-                  </svg>
-                  Назад
-                </button>
-              </div>
+              <button
+                onClick={() => navigate(-1)}
+                className="border border-slate-600 text-slate-300 px-4 py-2 rounded-md text-sm font-semibold hover:bg-slate-700 hover:text-white transition-all duration-300 flex items-center transform hover:-translate-y-px focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50"
+                aria-label="Вернуться назад"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                </svg>
+                Назад
+              </button>
             ) : (
               <>
+                {/* --- Desktop Navigation --- */}
+                {/* This block is visible only on medium screens and larger (md:block) and hidden on smaller screens (hidden). */}
                 <div className="hidden md:block">
                   <div className="ml-4 flex items-baseline space-x-4">
                     <NavLink to="/about" className={getNavLinkClasses}>
@@ -74,6 +74,9 @@ const Header: React.FC = () => {
                     </NavLink>
                   </div>
                 </div>
+
+                {/* --- Mobile Menu Button (Burger) --- */}
+                {/* This block is visible only on small screens (flex) and hidden on medium screens and larger (md:hidden). */}
                 <div className="flex md:hidden">
                   <button
                     onClick={() => setIsOpen(!isOpen)}

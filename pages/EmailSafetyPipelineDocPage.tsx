@@ -1,12 +1,141 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, ReactNode } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
 import { SectionHeader, InfoCard, JsonReportViewer, TooltipTerm, StatusBadge } from '../components/DocumentationUIComponents';
 import { 
     ShieldCheckIcon, EnvelopeOpenIcon, CodeBracketIcon, CogIcon, CheckBadgeIcon, 
     WrenchScrewdriverIcon, LightBulbIcon, PuzzlePieceIcon, ArrowPathIcon,
-    ExclamationTriangleIcon, BeakerIcon, EyeIcon, LinkIcon, PaintBrushIcon
+    ExclamationTriangleIcon, BeakerIcon, EyeIcon, LinkIcon, PaintBrushIcon,
+    ServerStackIcon, KeyIcon, GlobeAltIcon, DocumentTextIcon, PhotoIcon
 } from '@heroicons/react/24/outline';
 import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
+
+
+const AnalyzerDashboard: React.FC = () => {
+    const [activeTab, setActiveTab] = useState(0);
+    const dashboardRef = useRef<HTMLDivElement>(null);
+    useAnimateOnScroll(dashboardRef, { targetSelector: '.analyzer-item' });
+
+    const analyzers = [
+        {
+            name: 'Reputation',
+            icon: ShieldCheckIcon,
+            description: 'Оценивает доверие к источнику письма.',
+            checks: [
+                {
+                    icon: ServerStackIcon,
+                    name: 'Аутентификация отправителя',
+                    description: () => <>Проверка DNS-записей: <TooltipTerm definition="Стандарт, позволяющий владельцу домена указать, с каких IP-адресов разрешена отправка почты от его имени.">SPF</TooltipTerm>, <TooltipTerm definition="Технология, позволяющая удостовериться, что письмо действительно было отправлено с заявленного домена и не было изменено в пути.">DKIM</TooltipTerm>, <TooltipTerm definition="Политика, которая объединяет SPF и DKIM и указывает почтовым серверам, что делать с письмами, не прошедшими проверку.">DMARC</TooltipTerm>.</>,
+                    statuses: ['green']
+                },
+                {
+                    icon: GlobeAltIcon,
+                    name: 'Репутация домена и IP',
+                    description: () => <>Проверка домена и IP-адреса по глобальным черным спискам (например, <TooltipTerm definition="Международная организация, отслеживающая спам-активность и ведущая черные списки IP-адресов и доменов.">Spamhaus</TooltipTerm>).</>,
+                    statuses: ['red']
+                },
+            ]
+        },
+        {
+            name: 'Content',
+            icon: EnvelopeOpenIcon,
+            description: 'Глубокий анализ содержимого письма.',
+            checks: [
+                {
+                    icon: DocumentTextIcon,
+                    name: 'Спам-триггеры и стоп-слова',
+                    description: 'Поиск слов и фраз, характерных для спама ("бесплатно", "гарантированный доход", "только сегодня").',
+                    statuses: ['yellow', 'red']
+                },
+                {
+                    icon: LinkIcon,
+                    name: 'Безопасность ссылок',
+                    description: () => <>Проверка каждого URL-адреса через <TooltipTerm definition="Сервис от Google для проверки URL-адресов на наличие фишинга, вредоносного ПО и других онлайн-угроз.">Google Safe Browsing API</TooltipTerm> на наличие угроз.</>,
+                    statuses: ['red']
+                },
+                 {
+                    icon: KeyIcon,
+                    name: 'Техники маскировки',
+                    description: 'Поиск скрытого текста, нерелевантных анкоров ссылок, вводящих в заблуждение, и других фишинговых техник.',
+                    statuses: ['yellow']
+                },
+            ]
+        },
+        {
+            name: 'Rendering',
+            icon: PaintBrushIcon,
+            description: 'Проверка корректности отображения.',
+             checks: [
+                {
+                    icon: PhotoIcon,
+                    name: 'Mobile & Desktop снимки',
+                    description: 'Создание скриншотов в разрешениях 375x667 (Mobile) и 1280x800 (Desktop) для визуального контроля.',
+                    statuses: ['green']
+                },
+                {
+                    icon: ExclamationTriangleIcon,
+                    name: 'Выявление сдвигов верстки',
+                    description: 'Автоматический поиск "разъехавшихся" элементов, нечитаемого текста или проблем с отображением изображений.',
+                    statuses: ['yellow']
+                },
+            ]
+        }
+    ];
+
+    return (
+        <div ref={dashboardRef} className="not-prose my-6 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-700 shadow-lg overflow-hidden">
+            <div className="flex border-b border-gray-200 dark:border-slate-700">
+                {analyzers.map((analyzer, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setActiveTab(index)}
+                        className={`flex-1 p-4 text-center font-semibold transition-all duration-300 flex items-center justify-center gap-3 border-b-4 focus:outline-none focus-visible:bg-indigo-50 dark:focus-visible:bg-slate-800
+                            ${activeTab === index
+                                ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-slate-800'
+                                : 'border-transparent text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800/50'
+                            }`
+                        }
+                        role="tab"
+                        aria-selected={activeTab === index}
+                    >
+                        <analyzer.icon className="w-6 h-6" />
+                        <span>Stage {index + 1} — {analyzer.name}</span>
+                    </button>
+                ))}
+            </div>
+            <div className="p-6">
+                {analyzers.map((analyzer, index) => (
+                    <div key={index} className={activeTab === index ? 'block' : 'hidden'} role="tabpanel">
+                        <p className="text-lg text-slate-700 dark:text-slate-300 mb-6">{analyzer.description}</p>
+                        <div className="space-y-4">
+                            {analyzer.checks.map((check, checkIndex) => (
+                                <div 
+                                    key={checkIndex}
+                                    className="analyzer-item flex items-start gap-4 p-4 bg-white dark:bg-slate-800/50 rounded-lg border border-gray-200 dark:border-slate-700"
+                                    style={{ transitionDelay: `${checkIndex * 100}ms` }}
+                                >
+                                    <div className="flex-shrink-0 w-10 h-10 bg-indigo-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 rounded-lg flex items-center justify-center">
+                                        <check.icon className="w-6 h-6" />
+                                    </div>
+                                    <div className="flex-grow">
+                                        <h4 className="font-bold text-slate-900 dark:text-slate-200">{check.name}</h4>
+                                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                                            {typeof check.description === 'function' ? check.description() : check.description}
+                                        </p>
+                                    </div>
+                                    <div className="flex-shrink-0 flex items-center gap-2">
+                                        {check.statuses.map(status => (
+                                            <StatusBadge key={status} status={status as any}>{status.toUpperCase()}</StatusBadge>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
 
 
 const EmailSafetyPipelineDocumentationPage: React.FC = () => {
@@ -159,106 +288,7 @@ const EmailSafetyPipelineDocumentationPage: React.FC = () => {
                     title="5. Под капотом: что проверяют анализаторы"
                     subtitle="Детальный разбор того, какие именно проверки выполняет система на каждом этапе."
                 />
-                <div className="space-y-8">
-                    {/* Reputation Analyzer Card */}
-                    <div className="bg-white dark:bg-slate-800/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm not-prose">
-                        <div className="flex items-center gap-4 mb-3">
-                            <div className="flex-shrink-0 w-12 h-12 bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 rounded-lg flex items-center justify-center">
-                                <ShieldCheckIcon className="w-8 h-8"/>
-                            </div>
-                            <h3 className="font-bold text-lg text-slate-900 dark:text-slate-200 mt-0">Stage 1 — Reputation Analyzer</h3>
-                        </div>
-                        <p className="text-gray-700 dark:text-slate-300">Оценивает доверие к источнику письма. Основные проверки:</p>
-                        <table className="w-full mt-4 text-left text-base">
-                            <tbody>
-                                <tr className="border-b border-gray-200 dark:border-slate-700">
-                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Аутентификация</td>
-                                    <td className="py-2 text-slate-700 dark:text-slate-300">
-                                        Проверка DNS-записей: <TooltipTerm definition="Стандарт, позволяющий владельцу домена указать, с каких IP-адресов разрешена отправка почты от его имени.">SPF</TooltipTerm>, <TooltipTerm definition="Технология, позволяющая удостовериться, что письмо действительно было отправлено с заявленного домена и не было изменено в пути.">DKIM</TooltipTerm>, <TooltipTerm definition="Политика, которая объединяет SPF и DKIM и указывает почтовым серверам, что делать с письмами, не прошедшими проверку.">DMARC</TooltipTerm>.
-                                    </td>
-                                    <td className="py-2 text-right">
-                                        <StatusBadge status="green">Green</StatusBadge>
-                                    </td>
-                                </tr>
-                                <tr className="border-b border-gray-200 dark:border-slate-700 last:border-b-0">
-                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Черные списки</td>
-                                    <td className="py-2 text-slate-700 dark:text-slate-300">
-                                        Проверка домена и IP по базам <TooltipTerm definition="Международная организация, отслеживающая спам-активность и ведущая черные списки IP-адресов и доменов.">Spamhaus</TooltipTerm> и др.
-                                    </td>
-                                    <td className="py-2 text-right">
-                                        <StatusBadge status="red">Red</StatusBadge>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Content Analyzer Card */}
-                    <div className="bg-white dark:bg-slate-800/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm not-prose">
-                        <div className="flex items-center gap-4 mb-3">
-                            <div className="flex-shrink-0 w-12 h-12 bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 rounded-lg flex items-center justify-center">
-                                <EnvelopeOpenIcon className="w-8 h-8"/>
-                            </div>
-                            <h3 className="font-bold text-lg text-slate-900 dark:text-slate-200 mt-0">Stage 2 — Content Analyzer</h3>
-                        </div>
-                        <p className="text-gray-700 dark:text-slate-300">Глубокий анализ содержимого. Основные проверки:</p>
-                        <table className="w-full mt-4 text-left text-base">
-                            <tbody>
-                                <tr className="border-b border-gray-200 dark:border-slate-700">
-                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Спам-триггеры</td>
-                                    <td className="py-2 text-slate-700 dark:text-slate-300">Поиск стоп-слов ("бесплатно", "гарантированный доход").</td>
-                                    <td className="py-2 text-right space-x-1.5">
-                                        <StatusBadge status="yellow">Yellow</StatusBadge>
-                                        <StatusBadge status="red">Red</StatusBadge>
-                                    </td>
-                                </tr>
-                                <tr className="border-b border-gray-200 dark:border-slate-700">
-                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Безопасность ссылок</td>
-                                    <td className="py-2 text-slate-700 dark:text-slate-300">Проверка всех URL через <TooltipTerm definition="Сервис от Google для проверки URL-адресов на наличие фишинга, вредоносного ПО и других онлайн-угроз.">Google Safe Browsing API</TooltipTerm>.</td>
-                                    <td className="py-2 text-right">
-                                        <StatusBadge status="red">Red</StatusBadge>
-                                    </td>
-                                </tr>
-                                <tr className="border-b border-gray-200 dark:border-slate-700 last:border-b-0">
-                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Техники маскировки</td>
-                                    <td className="py-2 text-slate-700 dark:text-slate-300">Поиск скрытого текста, нерелевантных анкоров ссылок.</td>
-                                    <td className="py-2 text-right">
-                                        <StatusBadge status="yellow">Yellow</StatusBadge>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Rendering Analyzer Card */}
-                    <div className="bg-white dark:bg-slate-800/50 rounded-lg p-6 border border-gray-200 dark:border-slate-700 shadow-sm not-prose">
-                        <div className="flex items-center gap-4 mb-3">
-                            <div className="flex-shrink-0 w-12 h-12 bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 rounded-lg flex items-center justify-center">
-                                <PaintBrushIcon className="w-8 h-8"/>
-                            </div>
-                            <h3 className="font-bold text-lg text-slate-900 dark:text-slate-200 mt-0">Stage 3 — Rendering Analyzer</h3>
-                        </div>
-                        <p className="text-gray-700 dark:text-slate-300">Проверка корректности отображения. Основные проверки:</p>
-                        <table className="w-full mt-4 text-left text-base">
-                            <tbody>
-                                <tr className="border-b border-gray-200 dark:border-slate-700">
-                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Mobile & Desktop</td>
-                                    <td className="py-2 text-slate-700 dark:text-slate-300">Создание скриншотов в разрешениях 375x667 и 1280x800.</td>
-                                    <td className="py-2 text-right">
-                                        <StatusBadge status="green">Green</StatusBadge>
-                                    </td>
-                                </tr>
-                                <tr className="border-b border-gray-200 dark:border-slate-700 last:border-b-0">
-                                    <td className="py-2 pr-4 font-semibold text-slate-800 dark:text-slate-200">Сдвиг верстки</td>
-                                    <td className="py-2 text-slate-700 dark:text-slate-300">Поиск "разъехавшихся" элементов или нечитаемого текста.</td>
-                                    <td className="py-2 text-right">
-                                        <StatusBadge status="yellow">Yellow</StatusBadge>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <AnalyzerDashboard />
             </section>
 
             <section id="report-example" className="scroll-mt-24">

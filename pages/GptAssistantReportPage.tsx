@@ -15,6 +15,7 @@ import {
     ExclamationCircleIcon,
     ArrowLongDownIcon,
     CheckCircleIcon,
+    ForwardIcon,
 } from '@heroicons/react/24/outline';
 import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
 
@@ -103,7 +104,38 @@ const GptAssistantReportPage: React.FC = () => {
                         title="1. Введение и цели проекта"
                         subtitle="Обзор проекта по автоматизации службы поддержки с помощью GPT-ассистента, его ключевые задачи и бизнес-цели."
                     />
-                    <p>Проект **GPT-ассистента** был инициирован с целью снижения операционной нагрузки на службу поддержки. Главная бизнес-задача — автоматизировать ответы на часто задаваемые вопросы, сохранив при этом высокое качество коммуникации с клиентами. Техническая цель — создать масштабируемую систему на базе <TooltipTerm definition="Retrieval-Augmented Generation — это архитектура, которая объединяет мощь большой языковой модели (LLM) с внешней, постоянно обновляемой базой знаний.">RAG</TooltipTerm>, способную работать с динамически пополняемой базой знаний.</p>
+                    <div className="grid md:grid-cols-2 gap-8 items-start not-prose mt-8">
+                        {/* Business Goals Card */}
+                        <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-6 border border-green-200 dark:border-green-800 h-full shadow-sm hover:shadow-lg transition-shadow duration-300">
+                            <h3 className="text-xl font-bold text-green-800 dark:text-green-300 mt-0 flex items-center gap-3">
+                                <ChartBarIcon className="w-7 h-7" />
+                                Бизнес-цели
+                            </h3>
+                            <p className="mt-4 text-base text-green-900 dark:text-green-200">
+                                Главная бизнес-задача — автоматизировать ответы на часто задаваемые вопросы, чтобы:
+                            </p>
+                            <ul className="list-disc list-inside space-y-2 mt-4 text-green-900 dark:text-green-200">
+                                <li>Снизить операционную нагрузку на службу поддержки.</li>
+                                <li>Сохранить высокое качество коммуникации с клиентами.</li>
+                                <li>Ускорить время ответа на типовые запросы.</li>
+                            </ul>
+                        </div>
+                        {/* Technical Goals Card */}
+                        <div className="bg-sky-50 dark:bg-sky-900/30 rounded-lg p-6 border border-sky-200 dark:border-sky-800 h-full shadow-sm hover:shadow-lg transition-shadow duration-300">
+                            <h3 className="text-xl font-bold text-sky-800 dark:text-sky-300 mt-0 flex items-center gap-3">
+                                <CpuChipIcon className="w-7 h-7" />
+                                Технические цели
+                            </h3>
+                            <p className="mt-4 text-base text-sky-900 dark:text-sky-200">
+                                Техническая цель — создать масштабируемую и надежную систему, которая:
+                            </p>
+                            <ul className="list-disc list-inside space-y-2 mt-4 text-sky-900 dark:text-sky-200">
+                                <li>Работает на базе <TooltipTerm definition="Retrieval-Augmented Generation — это архитектура, которая объединяет мощь большой языковой модели (LLM) с внешней, постоянно обновляемой базой знаний.">RAG</TooltipTerm>-архитектуры.</li>
+                                <li>Способна работать с динамически пополняемой базой знаний.</li>
+                                <li>Обеспечивает предсказуемость и контроль качества ответов.</li>
+                            </ul>
+                        </div>
+                    </div>
                 </section>
 
                 <section id="problem" className="scroll-mt-24 fade-in-section">
@@ -210,17 +242,26 @@ const GptAssistantReportPage: React.FC = () => {
                     />
                     <div className="grid md:grid-cols-2 gap-6 not-prose">
                         <InfoCard icon={<CpuChipIcon className="w-7 h-7" />} title="Технические выводы">
-                            <ul className="list-disc list-inside space-y-2 text-base">
-                                <li>**RAG — это стандарт:** Для задач, требующих точности, RAG-архитектура является обязательной.</li>
-                                <li>**Данные важнее модели:** Качество и чистота входящих данных и базы знаний влияют на результат сильнее, чем выбор конкретной LLM.</li>
-                                <li>**Единая модель эффективнее:** Одна мощная, "рассуждающая" модель (`Gemini 2.5 Pro`) оказалась производительнее и предсказуемее каскада из нескольких специализированных моделей.</li>
+                            <ul className="list-disc list-inside space-y-3 text-base">
+                                <li><strong>RAG как индустриальный стандарт:</strong> Для задач, требующих высокой точности и контекстуальной осведомленности, RAG-архитектура является не просто опцией, а необходимым стандартом.</li>
+                                <li><strong>Приоритет данных над моделью (Data-Centric AI):</strong> Ключевой инсайт проекта: инвестиции в качество и чистоту базы знаний дают значительно больший прирост производительности, чем простое переключение на более дорогие LLM.</li>
+                                <li><strong>Эффективность единой модели:</strong> Одна мощная, "рассуждающая" модель (Gemini 2.5 Pro) оказалась производительнее, экономичнее и предсказуемее сложного каскада из нескольких специализированных моделей.</li>
                             </ul>
                         </InfoCard>
                         <InfoCard icon={<CurrencyDollarIcon className="w-7 h-7" />} title="Бизнес-выводы">
-                            <ul className="list-disc list-inside space-y-2 text-base">
-                                <li>**Снижение затрат:** Себестоимость обработки одного тикета была снижена в 5 раз (с 15 ₽ до 3 ₽).</li>
-                                <li>**Рост эффективности:** Уровень автоматизации вырос с 22% до 35%, при этом качество подсказок значительно повысилось.</li>
-                                <li>**Прозрачность и контроль:** Внедрение `score` и детальных логов сделало систему управляемой и позволило операторам доверять её результатам.</li>
+                            <ul className="list-disc list-inside space-y-3 text-base">
+                                <li><strong>Пятикратное снижение затрат:</strong> Целенаправленная оптимизация архитектуры и фокус на Data-Centric подходе позволили снизить себестоимость обработки одного тикета в 5 раз — с 15 ₽ до 3 ₽.</li>
+                                <li><strong>Измеримый рост эффективности:</strong> Уровень автоматизации вырос с 22% до 35% (+13 п.п.), при этом качество (`Точность` +2.9, `Стилистика` +3.7) и доверие к подсказкам значительно повысились.</li>
+                                <li><strong>Прозрачность и управляемость:</strong> Внедрение метрики `score` и детальных JSON-логов превратило "черный ящик" в управляемую систему, которой операторы могут доверять.</li>
+                            </ul>
+                        </InfoCard>
+                    </div>
+                    <div className="mt-8 not-prose">
+                        <InfoCard icon={<ForwardIcon className="w-7 h-7" />} title="Рекомендации и следующие шаги">
+                            <ul className="list-disc list-inside space-y-3 text-base">
+                                <li><strong>Непрерывное обогащение RAG-базы:</strong> Регулярно анализировать тикеты с низким `score` и использовать их для пополнения и уточнения базы знаний, создавая цикл самосовершенствования.</li>
+                                <li><strong>Внедрение проактивных подсказок:</strong> Использовать саммари из истории обращений для генерации проактивных предложений оператору (например, скидка для клиента с повторной проблемой).</li>
+                                <li><strong>Интеграция с CRM:</strong> Подключить ассистента к CRM для получения дополнительного контекста о клиенте (статус, история покупок), что позволит генерировать еще более персонализированные ответы.</li>
                             </ul>
                         </InfoCard>
                     </div>

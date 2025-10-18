@@ -1,6 +1,7 @@
 import React, { useState, ReactNode, useRef } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, DefinitionList, Modal, AnnotatedCodeBlock } from '../components/DocumentationUIComponents';
+// FIX: Removed unused 'DefinitionList' from import to resolve module export error.
+import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, Modal, AnnotatedCodeBlock } from '../components/DocumentationUIComponents';
 import { 
     ChatBubbleLeftRightIcon, BookOpenIcon, CpuChipIcon, MagnifyingGlassIcon,
     CircleStackIcon, DocumentTextIcon, ArrowDownCircleIcon, Cog6ToothIcon, LightBulbIcon,

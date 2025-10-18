@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
 import { SectionHeader, SimpleCodeBlock, TooltipTerm, InfoCard } from '../components/DocumentationUIComponents';
@@ -222,17 +223,35 @@ const ClientSegmentationReportPage: React.FC = () => {
                 <section id="initial-conditions" className="scroll-mt-24">
                     <SectionHeader 
                         icon={<WrenchScrewdriverIcon className="w-8 h-8" />}
-                        title="3. Исходные условия и предпосылки"
-                        subtitle="Описание начальной точки: линейный алгоритм рассылок и цели по внедрению гибкой системы сегментации."
+                        title="3. Проблема и Цели: Отправная точка"
+                        subtitle="Анализ исходной системы рассылок и определение ключевых задач для её трансформации."
                     />
-                    <p>Заказчик использовал связку <TooltipTerm definition="Популярная CRM-система для управления записями, клиентской базой и финансами в сфере услуг.">YClients</TooltipTerm> + <TooltipTerm definition="Сервис для автоматизации бизнес-рассылок и коммуникаций через WhatsApp API.">WAHelp</TooltipTerm>, через которую происходила отправка рекламных сообщений клиентам. Алгоритм был линейным и простым: спустя {`{n}`} дней после визита клиенту отправлялось однотипное сообщение с акцией или напоминанием. Такой подход работал, но не учитывал поведение и особенности клиентов.</p>
-                    <p>Цель заказчика — внедрить гибкую, многослойную систему сегментатации, которая учитывает:</p>
-                    <ul className="list-disc list-inside">
-                        <li>тип клиента (новый, постоянный, VIP);</li>
-                        <li>частоту и тип визитов;</li>
-                        <li>ценовой сегмент и предпочтения;</li>
-                        <li>персональные предложения и персонализированный текст.</li>
-                    </ul>
+                    <div className="grid md:grid-cols-2 gap-8 items-start not-prose">
+                        <div className="bg-amber-50 dark:bg-amber-900/30 rounded-lg p-6 border border-amber-200 dark:border-amber-800 h-full">
+                            <h3 className="text-xl font-bold text-amber-800 dark:text-amber-300 mt-0 flex items-center gap-3">
+                                <ExclamationTriangleIcon className="w-7 h-7" />
+                                Исходная ситуация: «Стрельба по воробьям»
+                            </h3>
+                            <p className="mt-4 text-base text-amber-900 dark:text-amber-200">
+                                Заказчик использовал связку <TooltipTerm definition="Популярная CRM-система для управления записями, клиентской базой и финансами в сфере услуг.">YClients</TooltipTerm> + <TooltipTerm definition="Сервис для автоматизации бизнес-рассылок и коммуникаций через WhatsApp API.">WAHelp</TooltipTerm>. Алгоритм был линейным и простым: спустя {`{n}`} дней после визита клиенту отправлялось однотипное сообщение. Такой подход не учитывал поведение и особенности клиентов, что приводило к выгоранию аудитории и низкой эффективности.
+                            </p>
+                        </div>
+                        <div className="bg-sky-50 dark:bg-sky-900/30 rounded-lg p-6 border border-sky-200 dark:border-sky-800 h-full">
+                            <h3 className="text-xl font-bold text-sky-800 dark:text-sky-300 mt-0 flex items-center gap-3">
+                                <CheckBadgeIcon className="w-7 h-7" />
+                                Поставленная цель: «Хирургическая точность»
+                            </h3>
+                            <p className="mt-4 text-base text-sky-900 dark:text-sky-200">
+                                Внедрить гибкую, многослойную систему сегментации, которая учитывает:
+                            </p>
+                            <ul className="list-disc list-inside space-y-2 mt-4 text-sky-900 dark:text-sky-200">
+                                <li>тип клиента (новый, постоянный, VIP);</li>
+                                <li>частоту и тип визитов;</li>
+                                <li>ценовой сегмент и предпочтения;</li>
+                                <li>персональные предложения и текст.</li>
+                            </ul>
+                        </div>
+                    </div>
                 </section>
 
                 <section id="concept" className="scroll-mt-24">

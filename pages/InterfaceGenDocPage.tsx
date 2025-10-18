@@ -1,11 +1,11 @@
 import React, { useState, ReactNode, useRef } from 'react';
 import DocumentationPageLayout from '../components/DocPageLayout';
-import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, CollapsibleSection, Modal } from '../components/DocumentationUIComponents';
+import { SectionHeader, InfoCard, CodeBlockWithCopy, TooltipTerm, CollapsibleSection, Modal, AnnotatedCodeBlock } from '../components/DocumentationUIComponents';
 import { 
     CubeTransparentIcon, CodeBracketIcon, BoltIcon, CommandLineIcon, QuestionMarkCircleIcon, 
     TableCellsIcon, DocumentTextIcon, ArchiveBoxIcon, ExclamationTriangleIcon, PlayIcon, 
     UserIcon, ArrowsRightLeftIcon, SparklesIcon, ArrowLongRightIcon, LightBulbIcon, WrenchScrewdriverIcon, ShieldExclamationIcon, PuzzlePieceIcon,
-    CheckBadgeIcon, MagnifyingGlassIcon, PaintBrushIcon, CodeBracketSquareIcon, HandRaisedIcon, NoSymbolIcon, CheckIcon, PencilSquareIcon, InboxStackIcon, CircleStackIcon, ArrowLongDownIcon
+    CheckBadgeIcon, MagnifyingGlassIcon, PaintBrushIcon, CodeBracketSquareIcon, HandRaisedIcon, NoSymbolIcon, CheckIcon, PencilSquareIcon, InboxStackIcon, CircleStackIcon, ArrowLongDownIcon, CpuChipIcon
 } from '@heroicons/react/24/outline';
 import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
 
@@ -222,6 +222,234 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
             step3: { title: "JSON-режим: 3. Возврат JSON", content: <p>Система формирует и возвращает JSON-объект, содержащий два массива: `system_codes` (найденные коды) и `descriptions` (их текстовые описания).</p> },
         }
     };
+    
+    // Page-specific component for guiding through CSS Mode
+    const CssModeGuide = () => (
+        <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 1: Стилизация (CSS)</h3>
+            <p className="mt-2 text-base"><b>Что это?</b> Используйте этот режим, когда вам нужно изменить внешний вид существующего элемента, не меняя его <TooltipTerm definition="Язык гипертекстовой разметки, который определяет структуру веб-страницы.">HTML-структуру</TooltipTerm>.</p>
+            <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `cssOnlyHandler`</i></p>
+
+            <h4 className="font-bold text-lg mt-8 mb-4">Как это работает?</h4>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
+                <button onClick={() => setModalContent(miniDiagramModalDescriptions.css.step1)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><MagnifyingGlassIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>1. Анализ запроса</strong><p className="text-sm text-gray-500 dark:text-slate-400">Поиск CSS-селектора</p></button>
+                <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                <button onClick={() => setModalContent(miniDiagramModalDescriptions.css.step2)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><PaintBrushIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>2. Определение свойств</strong><p className="text-sm text-gray-500 dark:text-slate-400">Что нужно изменить</p></button>
+                 <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                <button onClick={() => setModalContent(miniDiagramModalDescriptions.css.step3)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><CodeBracketSquareIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>3. Генерация кода</strong><p className="text-sm text-gray-500 dark:text-slate-400">Вывод чистого CSS</p></button>
+            </div>
+            
+            <div className="mt-6">
+                <InfoCard icon={<HandRaisedIcon className="w-6 h-6"/>} title="Ключевое ограничение">
+                   <p>Этот режим **не изменяет** <TooltipTerm definition="Язык гипертекстовой разметки, который определяет структуру веб-страницы.">HTML-структуру</TooltipTerm>. Он может только добавлять или изменять CSS-правила.</p>
+                </InfoCard>
+            </div>
+
+            <h4 className="font-bold text-lg mt-8 mb-4">Лучшие практики для запросов</h4>
+            <div className="grid md:grid-cols-2 gap-4 text-base not-prose">
+                <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                    <h5 className="font-semibold flex items-center gap-2 text-green-800 dark:text-green-300"><CheckIcon className="w-5 h-5"/>Рекомендуется</h5>
+                    <ul className="list-disc list-inside mt-2 space-y-2 text-green-900 dark:text-green-200">
+                        <li><b>Указывайте селектор:</b> Четко определите, к какому элементу применяются стили (`.btn-primary`, `#header nav`).</li>
+                        <li><b>Будьте конкретны:</b> Вместо "сделай красиво" используйте "сделай кнопку синей (#3b82f6) с белым текстом".</li>
+                        <li><b>Описывайте состояния:</b> Не забывайте про `:hover` или `:focus`.</li>
+                    </ul>
+                </div>
+                 <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                    <h5 className="font-semibold flex items-center gap-2 text-red-800 dark:text-red-300"><NoSymbolIcon className="w-5 h-5"/>Не рекомендуется</h5>
+                     <ul className="list-disc list-inside mt-2 space-y-2 text-red-900 dark:text-red-200">
+                         <li><b>Избегать общих фраз:</b> Запросы "улучши дизайн" слишком субъективны.</li>
+                         <li><b>Запрашивать изменение HTML:</b> Этот режим не может добавлять, удалять или изменять HTML-элементы.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <CollapsibleSection title="Пример ввода/вывода (CSS)">
+                <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС:
+// "Для ссылок в футере (footer a) убери подчеркивание, а при наведении делай его синим."
+
+// РЕЗУЛЬТАТ (чистый CSS):
+footer a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s;
+}
+
+footer a:hover {
+  text-decoration: underline;
+  color: #3b82f6; /* blue-500 */
+}`} />
+            </CollapsibleSection>
+        </div>
+    );
+
+    // Page-specific component for guiding through HTML+JS Mode
+    const HtmlJsModeGuide = () => (
+         <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 2: Создание интерфейса (HTML + JS)</h3>
+            <p className="mt-2 text-base"><b>Что это?</b> Основной режим для генерации новых компонентов, блоков или целых страниц.</p>
+            <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `generateHTMLJS`</i></p>
+            
+            <h4 className="font-bold text-lg mt-6 mb-4">Как это работает?</h4>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
+                <button onClick={() => setModalContent(miniDiagramModalDescriptions.html.step1)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><PencilSquareIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>1. Анализ описания</strong><p className="text-sm text-gray-500 dark:text-slate-400">Структура и поведение</p></button>
+                <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                <button onClick={() => setModalContent(miniDiagramModalDescriptions.html.step2)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><CodeBracketIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>2. Генерация HTML</strong><p className="text-sm text-gray-500 dark:text-slate-400">Создание разметки</p></button>
+                 <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                <button onClick={() => setModalContent(miniDiagramModalDescriptions.html.step3)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><BoltIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>3. Добавление JS</strong><p className="text-sm text-gray-500 dark:text-slate-400">Реализация интерактивности</p></button>
+            </div>
+
+            <h4 className="font-bold text-lg mt-8 mb-4">Лучшие практики для запросов</h4>
+             <div className="grid md:grid-cols-2 gap-4 text-base not-prose">
+                <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                    <h5 className="font-semibold flex items-center gap-2 text-green-800 dark:text-green-300"><CheckIcon className="w-5 h-5"/>Рекомендуется</h5>
+                    <ul className="list-disc list-inside mt-2 space-y-1 text-green-900 dark:text-green-200">
+                        <li><b>Описывайте структуру:</b> "карточка с картинкой сверху..."</li>
+                        <li><b>Описывайте интерактивность:</b> "при клике на заголовок..."</li>
+                        <li><b>Запрашивайте стили:</b> "используй темную тему"</li>
+                    </ul>
+                </div>
+                 <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                    <h5 className="font-semibold flex items-center gap-2 text-red-800 dark:text-red-300"><NoSymbolIcon className="w-5 h-5"/>Не рекомендуется</h5>
+                     <ul className="list-disc list-inside mt-2 space-y-1 text-red-900 dark:text-red-200">
+                        <li><b>Запрашивать серверную логику:</b> "сохрани в базу данных"</li>
+                        <li><b>Использовать неоднозначные термины</b></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div className="mt-6">
+                <InfoCard icon={<HandRaisedIcon className="w-6 h-6"/>} title="Ключевое ограничение">
+                   <p>Режим работает <strong>только на стороне клиента</strong>. Он не генерирует серверную логику (PHP, Python, Node.js). Места, где она может понадобиться, помечаются комментарием `// TODO`.</p>
+                </InfoCard>
+            </div>
+
+            <CollapsibleSection title="Примеры ввода/вывода (HTML + JS)">
+                 <CodeBlockWithCopy title="Пример №1: Интерактивные вкладки" code={`// ЗАПРОС:
+// "Создай вкладки (tabs) 'Профиль' и 'Настройки'. При клике на вкладку должен показываться соответствующий контент."
+
+// РЕЗУЛЬТАТ (HTML + JS):
+<div class="tabs">
+  <button class="tab-button active" data-tab="profile">Профиль</button>
+  <button class="tab-button" data-tab="settings">Настройки</button>
+</div>
+<div class="tab-content active" id="profile">...</div>
+<div class="tab-content" id="settings">...</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab-button');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => { /* ... логика переключения ... */ });
+  });
+<\/script>`} />
+                 <CodeBlockWithCopy
+                    title="Пример №2: Форма авторизации"
+                    code={`// ЗАПРОС:
+// "Создай форму авторизации с полями 'Логин' и 'Пароль', кнопкой 'Войти' и ссылкой 'Забыли пароль?'"
+
+// РЕЗУЛЬТАТ (HTML + JS):
+<div class="max-w-md mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8">
+  <h2 class="text-2xl font-bold text-center text-slate-900 dark:text-slate-200 mb-6">Авторизация</h2>
+  <form id="loginForm">
+    <div class="mb-4">
+      <label for="username" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Логин</label>
+      <input type="text" id="username" name="username" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700" required>
+    </div>
+    <div class="mb-6">
+      <label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Пароль</label>
+      <input type="password" id="password" name="password" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700" required>
+    </div>
+    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition">
+      Войти
+    </button>
+    <div class="text-center mt-4">
+      <a href="#" class="text-sm text-indigo-500 hover:underline dark:text-indigo-400">Забыли пароль?</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      // TODO: Реализовать логику отправки формы.
+      // Например, отправить данные на сервер.
+      alert('Форма отправлена для демонстрации!');
+    });
+  }
+<\/script>`}
+                />
+            </CollapsibleSection>
+        </div>
+    );
+    
+    // Page-specific component for guiding through JSON Mode
+    const JsonModeGuide = () => (
+        <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 3: Извлечение данных (JSON)</h3>
+            <p className="mt-2 text-base"><b>Что это?</b> Используется для получения информации (системных кодов и их описаний) из внутренней базы знаний.</p>
+            <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `system_code_parser`</i></p>
+
+            <h4 className="font-bold text-lg mt-8 mb-4">Как это работает?</h4>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
+                <button onClick={() => setModalContent(miniDiagramModalDescriptions.json.step1)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><InboxStackIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>1. Получение JSON</strong><p className="text-sm text-gray-500 dark:text-slate-400">Фильтрация по module/template</p></button>
+                <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                <button onClick={() => setModalContent(miniDiagramModalDescriptions.json.step2)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><CircleStackIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>2. Поиск в базе</strong><p className="text-sm text-gray-500 dark:text-slate-400">Поиск в «Корпусе контекста»</p></button>
+                <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
+                <button onClick={() => setModalContent(miniDiagramModalDescriptions.json.step3)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><CodeBracketSquareIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>3. Возврат JSON</strong><p className="text-sm text-gray-500 dark:text-slate-400">Вывод кодов и описаний</p></button>
+            </div>
+
+            <h4 className="font-bold text-lg mt-8 mb-4">Лучшие практики для запросов</h4>
+            <div className="grid md:grid-cols-2 gap-4 text-base not-prose">
+                <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                    <h5 className="font-semibold flex items-center gap-2 text-green-800 dark:text-green-300"><CheckIcon className="w-5 h-5"/>Рекомендуется</h5>
+                    <ul className="list-disc list-inside mt-2 space-y-2 text-green-900 dark:text-green-200">
+                        <li><b>Используйте строгий JSON:</b> Запрос должен быть валидным JSON-объектом.</li>
+                        <li><b>Указывайте `module` и `template`:</b> Эти поля обязательны для точного поиска в базе знаний.</li>
+                    </ul>
+                </div>
+                <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                    <h5 className="font-semibold flex items-center gap-2 text-red-800 dark:text-red-300"><NoSymbolIcon className="w-5 h-5"/>Не рекомендуется</h5>
+                    <ul className="list-disc list-inside mt-2 space-y-2 text-red-900 dark:text-red-200">
+                        <li><b>Отправлять свободный текст:</b> Этот режим не обрабатывает запросы на естественном языке.</li>
+                        <li><b>Ожидать генерацию кода:</b> Режим предназначен только для извлечения данных, а не для создания HTML или CSS.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div className="mt-6">
+                <InfoCard icon={<HandRaisedIcon className="w-6 h-6"/>} title="Ключевое ограничение">
+                    <p>Система спроектирована так, чтобы возвращать <strong>не более 3</strong> наиболее релевантных системных кодов за один запрос. Это сделано для обеспечения высокой точности и предотвращения "шума" в ответе.</p>
+                </InfoCard>
+            </div>
+            
+            <CollapsibleSection title="Пример ввода/вывода (JSON)">
+                <CodeBlockWithCopy 
+                    title="Пример" 
+                    language="json"
+                    code={`// ЗАПРОС:
+{
+  "module": "E-commerce Store",
+  "template": "Product page",
+  "question": "Нужны глобальные блоки",
+  "filename": "product_v3.tpl"
+}
+
+// РЕЗУЛЬТАТ (чистый JSON):
+{
+  "system_codes": [
+    "$GLOBAL_PROMOS$",
+    "$GLOBAL_FAQS$"
+  ],
+  "descriptions": [
+    "Глобальный промо-блок для всех товаров",
+    "Глобальный блок с часто задаваемыми вопросами"
+  ]
+}`} />
+            </CollapsibleSection>
+        </div>
+    );
 
   return (
     <DocumentationPageLayout title="AI-генератор UI">
@@ -382,202 +610,10 @@ const InterfaceGeneratorDocumentationPage: React.FC = () => {
                     title="5. Детальное руководство по режимам работы"
                     subtitle="Какой режим выбрать для вашей задачи, как правильно составить запрос и какие результаты ожидать."
                 />
-
-                <div className="not-prose overflow-x-auto my-6">
-                    <table className="w-full text-left border-collapse">
-                        <thead className="text-base font-semibold text-gray-800 dark:text-slate-200 bg-gray-100 dark:bg-slate-800">
-                            <tr>
-                                <th className="p-4 border border-gray-200 dark:border-slate-700">Тип задачи</th>
-                                <th className="p-4 border border-gray-200 dark:border-slate-700">Рекомендуемый режим</th>
-                                <th className="p-4 border border-gray-200 dark:border-slate-700">Ответственный промт</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
-                            <tr className="border-b dark:border-slate-700">
-                                <td className="p-4 border-x border-gray-200 dark:border-slate-700">Изменить внешний вид существующего элемента (цвет, тень, размер).</td>
-                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-semibold text-sky-700 dark:text-sky-400">Стилизация (CSS)</td>
-                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-mono">cssOnlyHandler</td>
-                            </tr>
-                            <tr className="border-b dark:border-slate-700">
-                                <td className="p-4 border-x border-gray-200 dark:border-slate-700">Создать новый компонент, блок или интерактивный элемент.</td>
-                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-semibold text-emerald-700 dark:text-emerald-400">Создание интерфейса (HTML + JS)</td>
-                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-mono">generateHTMLJS</td>
-                            </tr>
-                             <tr className="border-b dark:border-slate-700">
-                                <td className="p-4 border-x border-gray-200 dark:border-slate-700">Получить данные или системные коды из внутренней базы знаний.</td>
-                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-semibold text-amber-700 dark:text-amber-400">Извлечение данных (JSON)</td>
-                                <td className="p-4 border-x border-gray-200 dark:border-slate-700 font-mono">system_code_parser</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div className="space-y-12">
-                    {/* Mode 1: CSS (Reworked based on user feedback) */}
-                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 1: Стилизация (CSS)</h3>
-                        <p className="mt-2 text-base"><b>Что это?</b> Используйте этот режим, когда вам нужно изменить внешний вид существующего элемента, не меняя его <TooltipTerm definition="Язык гипертекстовой разметки, который определяет структуру веб-страницы.">HTML-структуру</TooltipTerm>.</p>
-                        <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `cssOnlyHandler`</i></p>
-
-                        <div className="mt-6">
-                            <InfoCard icon={<HandRaisedIcon className="w-6 h-6"/>} title="Ограничения">
-                               <p>Этот режим **не изменяет** <TooltipTerm definition="Язык гипертекстовой разметки, который определяет структуру веб-страницы.">HTML-структуру</TooltipTerm>. Он может только добавлять или изменять CSS-правила.</p>
-                            </InfoCard>
-                        </div>
-
-                        <h4 className="font-bold text-lg mt-8 mb-4">Как это работает?</h4>
-                        <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
-                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.css.step1)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><MagnifyingGlassIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>1. Анализ запроса</strong><p className="text-sm text-gray-500 dark:text-slate-400">Поиск CSS-селектора</p></button>
-                            <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.css.step2)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><PaintBrushIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>2. Определение свойств</strong><p className="text-sm text-gray-500 dark:text-slate-400">Что нужно изменить</p></button>
-                             <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.css.step3)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><CodeBracketSquareIcon className="w-10 h-10 mb-2 text-indigo-500"/><strong>3. Генерация кода</strong><p className="text-sm text-gray-500 dark:text-slate-400">Вывод чистого CSS</p></button>
-                        </div>
-
-                        <h4 className="font-bold text-lg mt-8 mb-4">Лучшие практики для запросов</h4>
-                        <div className="grid md:grid-cols-2 gap-4 text-base not-prose">
-                            <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
-                                <h5 className="font-semibold flex items-center gap-2 text-green-800 dark:text-green-300"><CheckIcon className="w-5 h-5"/>Рекомендуется</h5>
-                                <ul className="list-disc list-inside mt-2 space-y-2 text-green-900 dark:text-green-200">
-                                    <li><b>Указывайте селектор:</b> Четко определите, к какому элементу применяются стили (`.btn-primary`, `#header nav`).</li>
-                                    <li><b>Будьте конкретны:</b> Вместо "сделай красиво" используйте "сделай кнопку синей (#3b82f6) с белым текстом".</li>
-                                    <li><b>Описывайте состояния:</b> Не забывайте про `:hover` или `:focus`.</li>
-                                </ul>
-                            </div>
-                             <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg border border-red-200 dark:border-red-800">
-                                <h5 className="font-semibold flex items-center gap-2 text-red-800 dark:text-red-300"><NoSymbolIcon className="w-5 h-5"/>Не рекомендуется</h5>
-                                 <ul className="list-disc list-inside mt-2 space-y-2 text-red-900 dark:text-red-200">
-                                     <li><b>Избегать общих фраз:</b> Запросы "улучши дизайн" слишком субъективны.</li>
-                                     <li><b>Запрашивать изменение HTML:</b> Этот режим не может добавлять, удалять или изменять HTML-элементы.</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <CollapsibleSection title="Пример ввода/вывода (CSS)">
-                            <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС:
-// "Для ссылок в футере (footer a) убери подчеркивание, а при наведении делай его синим."
-
-// РЕЗУЛЬТАТ (чистый CSS):
-footer a {
-  text-decoration: none;
-  color: inherit;
-  transition: color 0.2s;
-}
-
-footer a:hover {
-  text-decoration: underline;
-  color: #3b82f6; /* blue-500 */
-}`} />
-                        </CollapsibleSection>
-                    </div>
-
-                    {/* Mode 2: HTML + JS (Reworked) */}
-                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 2: Создание интерфейса (HTML + JS)</h3>
-                        <p className="mt-2 text-base"><b>Что это?</b> Основной режим для генерации новых компонентов, блоков или целых страниц.</p>
-                        <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `generateHTMLJS`</i></p>
-                        
-                        <h4 className="font-bold text-lg mt-6 mb-4">Как это работает?</h4>
-                        <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center not-prose">
-                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.html.step1)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><PencilSquareIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>1. Анализ описания</strong><p className="text-sm text-gray-500 dark:text-slate-400">Структура и поведение</p></button>
-                            <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.html.step2)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><CodeBracketIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>2. Генерация HTML</strong><p className="text-sm text-gray-500 dark:text-slate-400">Создание разметки</p></button>
-                             <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.html.step3)} className="flex flex-col items-center w-40 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><BoltIcon className="w-10 h-10 mb-2 text-emerald-500"/><strong>3. Добавление JS</strong><p className="text-sm text-gray-500 dark:text-slate-400">Реализация интерактивности</p></button>
-                        </div>
-
-                        <h4 className="font-bold text-lg mt-8 mb-4">Лучшие практики для запросов</h4>
-                         <div className="grid md:grid-cols-2 gap-4 text-base not-prose">
-                            <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
-                                <h5 className="font-semibold flex items-center gap-2 text-green-800 dark:text-green-300"><CheckIcon className="w-5 h-5"/>Рекомендуется</h5>
-                                <ul className="list-disc list-inside mt-2 space-y-1 text-green-900 dark:text-green-200">
-                                    <li><b>Описывайте структуру:</b> "карточка с картинкой сверху..."</li>
-                                    <li><b>Описывайте интерактивность:</b> "при клике на заголовок..."</li>
-                                    <li><b>Запрашивайте стили:</b> "используй темную тему"</li>
-                                </ul>
-                            </div>
-                             <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg border border-red-200 dark:border-red-800">
-                                <h5 className="font-semibold flex items-center gap-2 text-red-800 dark:text-red-300"><NoSymbolIcon className="w-5 h-5"/>Не рекомендуется</h5>
-                                 <ul className="list-disc list-inside mt-2 space-y-1 text-red-900 dark:text-red-200">
-                                    <li><b>Запрашивать серверную логику:</b> "сохрани в базу данных"</li>
-                                    <li><b>Использовать неоднозначные термины</b></li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <InfoCard icon={<HandRaisedIcon className="w-6 h-6"/>} title="Ограничения">
-                           <p>Режим работает <strong>только на стороне клиента</strong>. Он не генерирует серверную логику (PHP, Python, Node.js). Места, где она может понадобиться, помечаются комментарием `// TODO`.</p>
-                        </InfoCard>
-
-                        <CollapsibleSection title="Пример ввода/вывода (HTML + JS)">
-                             <CodeBlockWithCopy title="Пример" code={`// ЗАПРОС:
-// "Создай вкладки (tabs) 'Профиль' и 'Настройки'. При клике на вкладку должен показываться соответствующий контент."
-
-// РЕЗУЛЬТАТ (HTML + JS):
-<div class="tabs">
-  <button class="tab-button active" data-tab="profile">Профиль</button>
-  <button class="tab-button" data-tab="settings">Настройки</button>
-</div>
-<div class="tab-content active" id="profile">...</div>
-<div class="tab-content" id="settings">...</div>
-
-<script>
-  const tabs = document.querySelectorAll('.tab-button');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => { /* ... логика переключения ... */ });
-  });
-<\/script>`} />
-                        </CollapsibleSection>
-                    </div>
-                    
-                    {/* Mode 3: JSON (Reworked) */}
-                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-0">Режим 3: Извлечение данных (JSON)</h3>
-                        <p className="mt-2 text-base"><b>Что это?</b> Используется для получения информации (системных кодов и их описаний) из внутренней базы знаний.</p>
-                        <p className="text-sm text-gray-500 dark:text-slate-500"><i>Ответственный промт: `system_code_parser`</i></p>
-
-                        <h4 className="font-bold text-lg mt-6 mb-4">Как это работает?</h4>
-                         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center not-prose">
-                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.json.step1)} className="flex flex-col items-center flex-1 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><InboxStackIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>1. Получение JSON</strong><p className="text-sm text-gray-500 dark:text-slate-400">Прием структурированного запроса</p></button>
-                            <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.json.step2)} className="flex flex-col items-center flex-1 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><CircleStackIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>2. Поиск в базе</strong><p className="text-sm text-gray-500 dark:text-slate-400">Поиск в «Корпусе контекста»</p></button>
-                             <ArrowLongRightIcon className="w-8 h-8 text-gray-300 dark:text-slate-600 hidden md:block" />
-                            <button onClick={() => setModalContent(miniDiagramModalDescriptions.json.step3)} className="flex flex-col items-center flex-1 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"><DocumentTextIcon className="w-10 h-10 mb-2 text-amber-500"/><strong>3. Возврат JSON</strong><p className="text-sm text-gray-500 dark:text-slate-400">Отправка найденных кодов</p></button>
-                        </div>
-
-                        <h4 className="font-bold text-lg mt-8 mb-4">Формат ввода</h4>
-                        <p className="text-base">Запрос должен быть в строгом <TooltipTerm definition="Текстовый формат обмена данными, основанный на JavaScript. Легко читается людьми и легко парсится машинами.">JSON-формате</TooltipTerm> и содержать следующие поля:</p>
-                        <div className="text-base my-4 not-prose">
-                            <ul className="list-disc list-inside bg-white dark:bg-slate-800 p-4 rounded-lg border dark:border-slate-700 space-y-2">
-                                <li><code>module</code> (string): Имя модуля (например, "E-commerce Store").</li>
-                                <li><code>template</code> (string): Контекст или имя шаблона (например, "Product page").</li>
-                                <li><code>question</code> (string): Уточняющий вопрос на естественном языке.</li>
-                                <li><code>filename</code> (string, опционально): Имя файла для трассировки.</li>
-                            </ul>
-                        </div>
-                        
-                        <InfoCard icon={<HandRaisedIcon className="w-6 h-6"/>} title="Ограничения">
-                           <p>Система возвращает **не более 3** наиболее релевантных системных кодов за один запрос.</p>
-                        </InfoCard>
-
-                        <CollapsibleSection title="Пример ввода/вывода (JSON)">
-                            <CodeBlockWithCopy 
-                                title="Пример"
-                                language="json"
-                                code={`// ЗАПРОС (в виде JSON):
-{
-  "module": "E-commerce Store",
-  "template": "Product page",
-  "question": "Нужны глобальные блоки"
-}
-
-// РЕЗУЛЬТАТ (в виде JSON):
-{
-  "system_codes": ["$GLOBAL_PROMOS$", "$GLOBAL_FAQS$"],
-  "descriptions": ["Глобальный промо-блок для всех товаров", "Глобальный блок с часто задаваемыми вопросами"]
-}`} />
-                        </CollapsibleSection>
-                    </div>
+                <div className="space-y-12 not-prose">
+                    <CssModeGuide />
+                    <HtmlJsModeGuide />
+                    <JsonModeGuide />
                 </div>
             </section>
             

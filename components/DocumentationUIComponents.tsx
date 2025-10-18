@@ -1,7 +1,12 @@
 import React, { useState, ReactNode, useEffect, useRef, useMemo, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { ChevronDownIcon, XMarkIcon, InformationCircleIcon, MagnifyingGlassIcon, ChartBarIcon, HandRaisedIcon, CheckCircleIcon, ShieldCheckIcon, EnvelopeOpenIcon, PaintBrushIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { 
+    ChevronDownIcon, XMarkIcon, InformationCircleIcon, MagnifyingGlassIcon, ChartBarIcon, 
+    HandRaisedIcon, CheckCircleIcon, ShieldCheckIcon, EnvelopeOpenIcon, PaintBrushIcon, CheckIcon,
+    Cog6ToothIcon, UsersIcon, UserGroupIcon, SparklesIcon 
+} from '@heroicons/react/24/outline';
 import { useModalLogic } from '../hooks/useModalLogic';
+import { GlossaryItem } from '../data/glossary';
 
 // --- Section Header ---
 interface SectionHeaderProps {
@@ -80,7 +85,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, c
 // --- Code Block with Copy Button ---
 const highlightCode = (code: string, language?: 'json') => {
     if (language !== 'json') {
-        return code.trim();
+        return <code>{code.trim()}</code>;
     }
 
     const highlighted = code.trim().replace(
@@ -155,7 +160,7 @@ export const CodeBlockWithCopy: React.FC<CodeBlockWithCopyProps> = ({ code, titl
             </button>
        </div>
       <pre className="text-slate-300 p-4 text-base overflow-x-auto mt-0 rounded-b-lg bg-transparent custom-scrollbar">
-        <code>{highlightCode(code, language)}</code>
+        {highlightCode(code, language)}
       </pre>
     </div>
   );
@@ -176,6 +181,7 @@ interface TableProps {
     headers: string[];
     data: (string | number | ReactNode)[][];
 }
+// FIX: Exported the `Table` component so it could be imported and used in other files.
 export const Table: React.FC<TableProps> = ({ headers, data }) => (
     <div className="overflow-x-auto my-4 not-prose">
         <table className="w-full text-left border-collapse">
@@ -385,23 +391,39 @@ export const ReadMore: React.FC<ReadMoreProps> = ({ children, lines }) => {
     );
 };
 
-// --- Definition List ---
-interface DefinitionListProps {
-  items: { term: string; definition: string }[];
+// --- Interactive Glossary ---
+interface InteractiveGlossaryProps {
+  items: GlossaryItem[];
 }
-export const DefinitionList: React.FC<DefinitionListProps> = ({ items }) => {
-    const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredItems = items.filter(item =>
-        item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.definition.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+const categoryConfig = {
+    'Основные понятия': { icon: Cog6ToothIcon, color: 'text-sky-500 dark:text-sky-400' },
+    'Сегментация': { icon: UsersIcon, color: 'text-indigo-500 dark:text-indigo-400' },
+    'Типы клиентов': { icon: UserGroupIcon, color: 'text-teal-500 dark:text-teal-400' },
+    'Маркетинг': { icon: SparklesIcon, color: 'text-amber-500 dark:text-amber-400' },
+};
+type Category = keyof typeof categoryConfig;
+
+export const InteractiveGlossary: React.FC<InteractiveGlossaryProps> = ({ items }) => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [activeCategory, setActiveCategory] = useState('Все');
+
+    const categories = ['Все', ...Object.keys(categoryConfig)];
+
+    const filteredItems = useMemo(() => {
+        return items.filter(item => {
+            const matchesCategory = activeCategory === 'Все' || item.category === activeCategory;
+            const matchesSearch = searchTerm === '' || 
+                                  item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                  item.definition.toLowerCase().includes(searchTerm.toLowerCase());
+            return matchesCategory && matchesSearch;
+        });
+    }, [items, activeCategory, searchTerm]);
 
     const highlightText = (text: string, highlight: string): React.ReactNode => {
         if (!highlight.trim()) {
             return text;
         }
-        // Escape special characters in the highlight string for RegExp
         const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`(${escapedHighlight})`, 'gi');
         const parts = text.split(regex);
@@ -435,7 +457,7 @@ export const DefinitionList: React.FC<DefinitionListProps> = ({ items }) => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Поиск по терминам и определениям..."
-                    className="block w-full rounded-md border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 py-2 pl-10 pr-10 text-slate-900 dark:text-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 py-2.5 pl-10 pr-10 text-slate-900 dark:text-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
                 {searchTerm && (
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -450,19 +472,42 @@ export const DefinitionList: React.FC<DefinitionListProps> = ({ items }) => {
                 )}
             </div>
 
+            <div className="mb-8 flex flex-wrap gap-3 border-b border-gray-200 dark:border-slate-700 pb-4">
+                {categories.map(category => {
+                    const isActive = activeCategory === category;
+                    const baseClasses = "px-4 py-2 text-sm font-semibold rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800";
+                    const activeClasses = "bg-indigo-600 text-white shadow";
+                    const inactiveClasses = "bg-gray-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700";
+                    
+                    return (
+                        <button key={category} onClick={() => setActiveCategory(category)} className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses}`}>
+                            {category}
+                        </button>
+                    )
+                })}
+            </div>
+
             {filteredItems.length > 0 ? (
-                <dl className="-my-4 divide-y divide-gray-200 dark:divide-slate-700">
-                    {filteredItems.map((item, index) => (
-                        <div key={index} className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-x-8 items-baseline py-4">
-                            <dt className="md:col-span-1 font-bold text-slate-900 dark:text-slate-200">
-                                {highlightText(item.term, searchTerm)}
-                            </dt>
-                            <dd className="md:col-span-3 lg:col-span-4 mt-2 md:mt-0 text-slate-700 dark:text-slate-300">
-                                {highlightText(item.definition, searchTerm)}
-                            </dd>
-                        </div>
-                    ))}
-                </dl>
+                <div className="space-y-6">
+                    {filteredItems.map((item, index) => {
+                        const { icon: Icon, color } = categoryConfig[item.category as Category];
+                        return (
+                            <div key={index} className="flex items-start gap-4">
+                                <div className={`flex-shrink-0 mt-1 w-10 h-10 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-slate-800 shadow-sm border border-gray-200 dark:border-slate-700`}>
+                                    {Icon && <Icon className={`w-6 h-6 ${color}`} />}
+                                </div>
+                                <div className="flex-grow">
+                                    <h4 className="font-bold text-slate-900 dark:text-slate-200 text-lg">
+                                        {highlightText(item.term, searchTerm)}
+                                    </h4>
+                                    <p className="mt-1 text-slate-700 dark:text-slate-300">
+                                        {highlightText(item.definition, searchTerm)}
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
             ) : (
                 <div className="text-center py-12">
                     <p className="text-slate-600 dark:text-slate-400">По вашему запросу ничего не найдено.</p>
@@ -471,6 +516,7 @@ export const DefinitionList: React.FC<DefinitionListProps> = ({ items }) => {
         </div>
     );
 };
+
 
 // --- Annotated Code Block ---
 interface AnnotatedCodeBlockProps {

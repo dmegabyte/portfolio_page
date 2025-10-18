@@ -1,28 +1,28 @@
-import React, { ErrorInfo, ReactNode } from 'react';
+// FIX: Corrected the React import to a namespace import to ensure component properties like 'props' and 'state' are correctly resolved from the base React.Component class.
+import * as React from 'react';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 interface Props {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 interface State {
   hasError: boolean;
 }
 
-// FIX: Changed to extend React.Component directly. This resolves the issue where
-// the 'props' property was not being recognized on the class, likely due to a
-// module resolution quirk in the project's TypeScript setup.
+// FIX: The class must extend React.Component to be a valid React component and have access to `props` and `state`, resolving the "property does not exist" errors.
 class ErrorBoundary extends React.Component<Props, State> {
-  // Switched to class property syntax for state initialization.
-  // This is a more modern and concise approach that avoids constructor boilerplate
-  // and resolves potential `this` context issues with some build configurations.
-  state: State = { hasError: false };
+  // FIX: Initialized state within the constructor to ensure `this.state` is available, resolving the "Property 'state' does not exist" error.
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
   static getDerivedStateFromError(_: Error): State {
     return { hasError: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
   }
 
@@ -32,6 +32,7 @@ class ErrorBoundary extends React.Component<Props, State> {
   };
 
   render() {
+    // FIX: Check `this.state.hasError`. This is now valid as `state` is properly initialized on the component instance.
     if (this.state.hasError) {
       return (
         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 sm:p-8 lg:p-12 animate-fade-in border border-red-200 dark:border-red-700 text-center">
@@ -52,6 +53,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       );
     }
 
+    // FIX: Return `this.props.children`. This is now valid as `props` are correctly passed to the component.
     return this.props.children;
   }
 }
