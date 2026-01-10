@@ -13,8 +13,8 @@
 1. [AI-маркетолог](#1-ai-маркетолог) — Гипер-персонализация рассылок
 2. [AI-генератор UI](#2-ai-генератор-ui) — Автоматическая генерация кода
 3. [GPT-ассистент с RAG](#3-gpt-ассистент-с-rag) — Умный помощник техподдержки
-4. [AI-тестировщик чат-ботов](#4-ai-тестировщик-чат-ботов) — Автоматизация тестирования
-5. [Пайплайн безопасности email](#5-пайплайн-безопасности-email) — Защита от спама и фишинга
+4. [AI-тестировщик чат-ботов](#4-ai-тестировщик-чат-ботов) — Традиционное E2E (Gherkin)
+5. [Visual AI Chatbot Tester](#5-visual-ai-chatbot-tester) — Автономное Vision-тестирование (TWINAUTOTEST)
 6. [Scenario Nexus / Victory](#6-scenario-nexus--victory) — Детерминированные AI-агенты
 
 ### 🛠️ Служебные разделы
@@ -29,10 +29,10 @@
 |------------|---------|
 | **Google Apps Script** | AI-маркетолог, GPT-ассистент |
 | **Gemini / GPT** | AI-маркетолог, GPT-ассистент, AI-тестировщик |
-| **Node.js / Express** | Пайплайн безопасности |
-| **Playwright / Selenium** | AI-тестировщик |
-| **JSON-Schema** | Scenario Nexus, AI-генератор UI |
-| **Docker** | Пайплайн безопасности |
+| **Node.js** | Visual AI Chatbot Tester, Scenario Nexus |
+| **Playwright** | AI-тестировщик, Visual AI Chatbot Tester |
+| **Claude / GPT-4v** | Visual AI Chatbot Tester, Scenario Nexus |
+| **Docker** | Visual AI Chatbot Tester |
 | **RAG** | GPT-ассистент |
 
 ---
@@ -256,49 +256,47 @@ BOT: Акция «1+1=3» работает так: при покупке трё�
 
 ---
 
-## 5. Пайплайн безопасности email {#5-пайплайн-безопасности-email}
+## 5. Visual AI Chatbot Tester {#5-visual-ai-chatbot-tester}
 
-**Slug:** `email-safety-pipeline` | **Тип:** Безопасность  
-**KEYWORDS:** Node.js, Express, SpamAssassin, Puppeteer, Google Safe Browsing, Docker  
-**Технологии:** Node.js, Express, SpamAssassin, Puppeteer, Google Safe Browsing API, Docker
+**Slug:** `visual-bot-testing` | **Тип:** QA / AI Vision  
+**KEYWORDS:** Claude Vision, Playwright, Scenario Engine, Reasoning, TWINAUTOTEST  
+**Технологии:** Node.js, Playwright, Claude Vision API (Anthropic), Docker
 
 ### Технологический стек:
-*   **Node.js + Express:** API-эндпоинт для приема HTML-шаблонов
-*   **SpamAssassin API:** Анализ спам-триггеров
-*   **Puppeteer:** Скриншоты HTML в headless Chrome (десктоп/мобайл)
-*   **Google Safe Browsing API:** Проверка URL на фишинг и вредоносное ПО
-*   **Docker:** Контейнеризация всей системы
+*   **Playwright:** Управление браузером и физическое взаимодействие с виджетом.
+*   **Claude Vision API:** "Глаза" системы для анализа скриншотов диалога.
+*   **Scenario Engine:** Генерация цепочки шагов на основе контекста бота.
+*   **Docker:** Изолированная среда для параллельного запуска тестов.
 
 ### Workflow (3 этапа):
-1.  **Анализ репутации (Reputation):** SPF/DKIM/DMARC, черные списки (Spamhaus) → Вердикт: Red/Yellow/Green
-2.  **Анализ контента (Content):** Спам-триггеры, фишинговые паттерны, проверка URL
-3.  **Финальное решение (Final Verdict):** Агрегация результатов → GO/STOP + JSON-отчет
+1.  **Генерация сценария (Scenario):** AI изучает знания о боте и создает план (цель + личность пользователя).
+2.  **Выполнение (Execution):** Система проходит по шагам, делая скриншоты и принимая решения (клик/текст) через Vision.
+3.  **Вердикт (Quality Check):** Анализ всей сессии на соответствие Tone of Voice и отсутствие логических багов.
 
-### Детальные анализаторы:
+### Анализаторы:
 
-#### Reputation:
-*   **Аутентификация отправителя:** SPF, DKIM, DMARC
-*   **Репутация домена и IP:** Проверка по Spamhaus
+#### Scenario Engine:
+*   **Анализ контекста:** Изучение Knowledge Base бота.
+*   **Профили пользователей:** Имитация разных стилей общения (агрессивный, лояльный).
 
-#### Content:
-*   **Спам-триггеры:** Поиск слов ("бесплатно", "гарантированный доход", "только сегодня")
-*   **Безопасность ссылок:** Проверка через Google Safe Browsing API
-*   **Техники маскировки:** Скрытый текст, нерелевантные анкоры
+#### AI Vision Driver:
+*   **Визуальный анализ:** Понимание элементов интерфейса по скриншотам.
+*   **Reasoning:** Принятие обоснованных решений о следующем шаге.
 
-### Пример отчета:
+### Пример отчета (JSON):
 ```json
 {
   "final_verdict": "STOP",
-  "reputation_check": {
-    "status": "green",
-    "details": "SPF, DKIM, DMARC valid. Not in blacklists."
+  "scenario_info": {
+    "goal": "Запрос на возврат денег",
+    "user_profile": "Недовольный клиент"
   },
-  "content_check": {
+  "issue_detected": {
     "status": "red",
     "flags": [
-      {"risk": "yellow", "comment": "Слова срочности ('только сегодня')"},
-      {"risk": "red", "comment": "Нереалистичные обещания ('гарантированный доход')"},
-      {"risk": "red", "comment": "Агрессивный призыв к действию"}
+      {"risk": "red", "comment": "Бот впал в цикл при упоминании юриста"},
+      {"risk": "yellow", "comment": "Стиль ответа стал слишком сухим"},
+      {"risk": "red", "comment": "Кнопка 'Оператор' не сработала"}
     ]
   }
 }

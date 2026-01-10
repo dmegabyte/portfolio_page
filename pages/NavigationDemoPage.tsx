@@ -2,9 +2,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { projects } from '../data/projects';
-import { 
-    HomeIcon, 
-    UserIcon, 
+import {
+    HomeIcon,
+    UserIcon,
     EnvelopeIcon,
     PhotoIcon,
     CommandLineIcon,
@@ -32,7 +32,7 @@ const getProjectIcon = (slug: string) => {
         case 'interface-generator': return CommandLineIcon;
         case 'gpt-assistant': return ChatBubbleLeftRightIcon;
         case 'bot-autotest': return BugAntIcon;
-        case 'email-safety-pipeline': return ShieldCheckIcon;
+        case 'visual-bot-testing': return ShieldCheckIcon;
         case 'scenario-nexus': return CubeTransparentIcon;
         default: return CodeBracketIcon;
     }
@@ -53,50 +53,50 @@ interface UniversalNavCardProps {
     secondaryLinks?: { label: string; to: string; icon?: React.ElementType }[];
 }
 
-const UniversalNavCard: React.FC<UniversalNavCardProps> = ({ 
-    to, 
-    icon: Icon, 
-    title, 
-    desc, 
-    tags = [], 
+const UniversalNavCard: React.FC<UniversalNavCardProps> = ({
+    to,
+    icon: Icon,
+    title,
+    desc,
+    tags = [],
     color = 'indigo',
     secondaryLinks = []
 }) => {
-    
+
     // Minimalist styles - Text colors only
     const colorStyles = {
-        indigo: { 
-            iconText: 'text-indigo-400 group-hover:text-indigo-300', 
+        indigo: {
+            iconText: 'text-indigo-400 group-hover:text-indigo-300',
             iconBox: 'border-indigo-500/20 group-hover:border-indigo-400/40',
             tag: 'group-hover:border-indigo-500/30 group-hover:text-indigo-300',
             link: 'hover:text-indigo-300'
         },
-        emerald: { 
-            iconText: 'text-emerald-400 group-hover:text-emerald-300', 
+        emerald: {
+            iconText: 'text-emerald-400 group-hover:text-emerald-300',
             iconBox: 'border-emerald-500/20 group-hover:border-emerald-400/40',
             tag: 'group-hover:border-emerald-500/30 group-hover:text-emerald-300',
             link: 'hover:text-emerald-300'
         },
-        sky: { 
-            iconText: 'text-sky-400 group-hover:text-sky-300', 
+        sky: {
+            iconText: 'text-sky-400 group-hover:text-sky-300',
             iconBox: 'border-sky-500/20 group-hover:border-sky-400/40',
             tag: 'group-hover:border-sky-500/30 group-hover:text-sky-300',
             link: 'hover:text-sky-300'
         },
-        pink: { 
-            iconText: 'text-pink-400 group-hover:text-pink-300', 
+        pink: {
+            iconText: 'text-pink-400 group-hover:text-pink-300',
             iconBox: 'border-pink-500/20 group-hover:border-pink-400/40',
             tag: 'group-hover:border-pink-500/30 group-hover:text-pink-300',
             link: 'hover:text-pink-300'
         },
-        violet: { 
-            iconText: 'text-violet-400 group-hover:text-violet-300', 
+        violet: {
+            iconText: 'text-violet-400 group-hover:text-violet-300',
             iconBox: 'border-violet-500/20 group-hover:border-violet-400/40',
             tag: 'group-hover:border-violet-500/30 group-hover:text-violet-300',
             link: 'hover:text-violet-300'
         },
-        amber: { 
-            iconText: 'text-amber-400 group-hover:text-amber-300', 
+        amber: {
+            iconText: 'text-amber-400 group-hover:text-amber-300',
             iconBox: 'border-amber-500/20 group-hover:border-amber-400/40',
             tag: 'group-hover:border-amber-500/30 group-hover:text-amber-300',
             link: 'hover:text-amber-300'
@@ -113,7 +113,7 @@ const UniversalNavCard: React.FC<UniversalNavCardProps> = ({
             transition-all duration-300 ease-out 
             hover:-translate-y-1
         `}>
-            
+
             {/* Clickable Area for Main Link */}
             <Link to={to} className="flex-grow flex flex-col relative z-10">
                 {/* Icon Box */}
@@ -138,8 +138,8 @@ const UniversalNavCard: React.FC<UniversalNavCardProps> = ({
                 {tags.length > 0 && (
                     <div className="mt-auto flex flex-wrap gap-2">
                         {tags.slice(0, 3).map((tag, idx) => (
-                            <span 
-                                key={idx} 
+                            <span
+                                key={idx}
                                 className={`
                                     px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 
                                     text-[10px] font-bold uppercase tracking-wider text-slate-500 
@@ -158,9 +158,9 @@ const UniversalNavCard: React.FC<UniversalNavCardProps> = ({
             {secondaryLinks.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-slate-800/50 flex gap-4 relative z-10">
                     {secondaryLinks.map((link, idx) => (
-                        <Link 
-                            key={idx} 
-                            to={link.to} 
+                        <Link
+                            key={idx}
+                            to={link.to}
                             className={`
                                 flex items-center gap-2 text-xs font-bold uppercase tracking-wider 
                                 text-slate-500 transition-colors duration-300
@@ -173,7 +173,7 @@ const UniversalNavCard: React.FC<UniversalNavCardProps> = ({
                     ))}
                 </div>
             )}
-            
+
             {/* Hover Decor - Top Right Arrow */}
             <div className={`absolute top-8 right-8 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 ${style.iconText}`}>
                 <ArrowUpRightIcon className="w-5 h-5" />
@@ -183,7 +183,7 @@ const UniversalNavCard: React.FC<UniversalNavCardProps> = ({
 };
 
 const NavigationDemoPage: React.FC = () => {
-    
+
     const mainRoutes = [
         { name: 'Главная', path: '/', icon: HomeIcon, desc: 'Обзор портфолио и ключевых кейсов', color: 'indigo' },
         { name: 'Обо мне', path: '/about', icon: UserIcon, desc: 'Компетенции, стек и биография', color: 'sky' },
@@ -207,7 +207,7 @@ const NavigationDemoPage: React.FC = () => {
         <div className="animate-fade-in py-12 md:py-24">
             {/* Header Section */}
             <div className="text-center max-w-4xl mx-auto px-4 mb-24 relative">
-                
+
                 <div className="relative z-10">
                     <div className="inline-flex items-center gap-2 mb-8 px-5 py-2.5 rounded-full bg-[#0B0F19] border border-indigo-500/20 text-indigo-300 text-[10px] font-black uppercase tracking-[0.25em] shadow-xl">
                         <MapIcon className="w-4 h-4" />
@@ -226,7 +226,7 @@ const NavigationDemoPage: React.FC = () => {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 space-y-24">
-                
+
                 {/* 1. Main Sections */}
                 <section>
                     <div className="flex items-center gap-4 mb-10 pl-2">
@@ -236,13 +236,13 @@ const NavigationDemoPage: React.FC = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {mainRoutes.map((route) => (
-                            <UniversalNavCard 
-                                key={route.path} 
-                                to={route.path} 
-                                icon={route.icon} 
-                                title={route.name} 
-                                desc={route.desc} 
-                                color={route.color as any} 
+                            <UniversalNavCard
+                                key={route.path}
+                                to={route.path}
+                                icon={route.icon}
+                                title={route.name}
+                                desc={route.desc}
+                                color={route.color as any}
                             />
                         ))}
                     </div>
@@ -286,13 +286,13 @@ const NavigationDemoPage: React.FC = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {systemRoutes.map((route) => (
-                            <UniversalNavCard 
-                                key={route.path} 
-                                to={route.path} 
-                                icon={route.icon} 
-                                title={route.name} 
-                                desc={route.desc} 
-                                color={route.color as any} 
+                            <UniversalNavCard
+                                key={route.path}
+                                to={route.path}
+                                icon={route.icon}
+                                title={route.name}
+                                desc={route.desc}
+                                color={route.color as any}
                             />
                         ))}
                     </div>

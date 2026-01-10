@@ -22,7 +22,7 @@ const InterfaceGeneratorDocumentationPage = lazy(() => import('./pages/Interface
 const GptAssistantDocumentationPage = lazy(() => import('./pages/GptAssistantDocPage'));
 const GptAssistantReportPage = lazy(() => import('./pages/GptAssistantReportPage'));
 const BotAutoTestDocumentationPage = lazy(() => import('./pages/BotAutoTestDocPage'));
-const EmailSafetyPipelineDocumentationPage = lazy(() => import('./pages/EmailSafetyPipelineDocPage'));
+const VisualBotTestingDocumentationPage = lazy(() => import('./pages/EmailSafetyPipelineDocPage'));
 const ScenarioNexusDocumentationPage = lazy(() => import('./pages/VictoryDocPage'));
 const DocUIComponentsPage = lazy(() => import('./pages/DocUIComponentsPage'));
 const TypographyGuidePage = lazy(() => import('./pages/TypographyGuidePage'));
@@ -106,7 +106,7 @@ const App: React.FC = () => {
                 <Route path="/documentation/gpt-assistant" element={<GptAssistantDocumentationPage />} />
                 <Route path="/report/gpt-assistant" element={<GptAssistantReportPage />} />
                 <Route path="/documentation/bot-autotest" element={<BotAutoTestDocumentationPage />} />
-                <Route path="/documentation/email-safety-pipeline" element={<EmailSafetyPipelineDocumentationPage />} />
+                <Route path="/documentation/visual-bot-testing" element={<VisualBotTestingDocumentationPage />} />
                 <Route path="/documentation/scenario-nexus" element={<ScenarioNexusDocumentationPage />} />
                 <Route path="/documentation/ui-components" element={<DocUIComponentsPage />} />
                 <Route path="/documentation/ui-components/typography" element={<TypographyGuidePage />} />

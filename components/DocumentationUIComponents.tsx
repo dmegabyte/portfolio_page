@@ -1,10 +1,10 @@
 
 import React, { useState, ReactNode, useEffect, useRef, useMemo, useCallback, useLayoutEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { 
-    ChevronDownIcon, XMarkIcon, InformationCircleIcon, MagnifyingGlassIcon, ChartBarIcon, 
+import {
+    ChevronDownIcon, XMarkIcon, InformationCircleIcon, MagnifyingGlassIcon, ChartBarIcon,
     HandRaisedIcon, CheckCircleIcon, ShieldCheckIcon, EnvelopeOpenIcon, PaintBrushIcon, CheckIcon,
-    Cog6ToothIcon, UsersIcon, UserGroupIcon, SparklesIcon 
+    Cog6ToothIcon, UsersIcon, UserGroupIcon, SparklesIcon, PuzzlePieceIcon, ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { useModalLogic } from '../hooks/useModalLogic';
 import { GlossaryItem } from '../data/glossary';
@@ -19,47 +19,47 @@ interface TypographyLevel {
 
 export const TypographyTable: React.FC = () => {
     const levels: TypographyLevel[] = [
-        { 
-            level: 'Hero Title', 
-            useCase: 'Главный заголовок страницы (Hero)', 
-            tailwindClasses: 'text-7xl sm:text-9xl font-black tracking-tighter', 
-            previewText: 'ИНЖЕНЕРНЫЕ' 
+        {
+            level: 'Hero Title',
+            useCase: 'Главный заголовок страницы (Hero)',
+            tailwindClasses: 'text-7xl sm:text-9xl font-black tracking-tighter',
+            previewText: 'ИНЖЕНЕРНЫЕ'
         },
-        { 
-            level: 'Section Header (H1)', 
-            useCase: 'Заголовки первого уровня в контенте', 
-            tailwindClasses: 'text-4xl sm:text-5xl font-extrabold', 
-            previewText: 'Обо мне' 
+        {
+            level: 'Section Header (H1)',
+            useCase: 'Заголовки первого уровня в контенте',
+            tailwindClasses: 'text-4xl sm:text-5xl font-extrabold',
+            previewText: 'Обо мне'
         },
-        { 
-            level: 'Subheader (H2)', 
-            useCase: 'Заголовки секций документации', 
-            tailwindClasses: 'text-3xl font-bold', 
-            previewText: '1. Концепция' 
+        {
+            level: 'Subheader (H2)',
+            useCase: 'Заголовки секций документации',
+            tailwindClasses: 'text-3xl font-bold',
+            previewText: '1. Концепция'
         },
-        { 
-            level: 'Card Title (H3)', 
-            useCase: 'Названия проектов в карточках', 
-            tailwindClasses: 'text-4xl font-black', 
-            previewText: 'AI-маркетолог' 
+        {
+            level: 'Card Title (H3)',
+            useCase: 'Названия проектов в карточках',
+            tailwindClasses: 'text-4xl font-black',
+            previewText: 'AI-маркетолог'
         },
-        { 
-            level: 'Body Lead', 
-            useCase: 'Вступительные абзацы, подзаголовки Hero', 
-            tailwindClasses: 'text-2xl sm:text-3xl font-medium', 
-            previewText: 'Автоматизация процессов и AI-интеграции.' 
+        {
+            level: 'Body Lead',
+            useCase: 'Вступительные абзацы, подзаголовки Hero',
+            tailwindClasses: 'text-2xl sm:text-3xl font-medium',
+            previewText: 'Автоматизация процессов и AI-интеграции.'
         },
-        { 
-            level: 'Body Regular', 
-            useCase: 'Основной текст документации', 
-            tailwindClasses: 'text-lg sm:text-xl font-normal leading-relaxed', 
-            previewText: 'Я создаю end-to-end AI-решения, которые решают задачи бизнеса.' 
+        {
+            level: 'Body Regular',
+            useCase: 'Основной текст документации',
+            tailwindClasses: 'text-lg sm:text-xl font-normal leading-relaxed',
+            previewText: 'Я создаю end-to-end AI-решения, которые решают задачи бизнеса.'
         },
-        { 
-            level: 'Small / Badge', 
-            useCase: 'Технологические стеки, мелкие подписи', 
-            tailwindClasses: 'text-[12px] font-black uppercase tracking-[0.15em]', 
-            previewText: 'TYPESCRIPT' 
+        {
+            level: 'Small / Badge',
+            useCase: 'Технологические стеки, мелкие подписи',
+            tailwindClasses: 'text-[12px] font-black uppercase tracking-[0.15em]',
+            previewText: 'TYPESCRIPT'
         }
     ];
 
@@ -93,9 +93,9 @@ export const TypographyTable: React.FC = () => {
 
 // --- Section Header ---
 interface SectionHeaderProps {
-  icon: ReactNode;
-  title: string;
-  subtitle: string;
+    icon: ReactNode;
+    title: string;
+    subtitle: string;
 }
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({ icon, title, subtitle }) => (
@@ -132,9 +132,9 @@ export const InfoCard: React.FC<InfoCardProps> = ({ icon, title, children }) => 
 
 // --- Collapsible Section (Accordion) ---
 interface CollapsibleSectionProps {
-  title: ReactNode;
-  children: ReactNode;
-  defaultOpen?: boolean;
+    title: ReactNode;
+    children: ReactNode;
+    defaultOpen?: boolean;
 }
 
 export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, children, defaultOpen = false }) => {
@@ -149,7 +149,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, c
                 className="w-full flex justify-between items-center p-4 text-lg text-left cursor-pointer text-slate-900 dark:text-slate-200 bg-gray-50 dark:bg-slate-900/50 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             >
                 <span className="font-semibold">{title}</span>
-                <ChevronDownIcon className={`w-6 h-6 text-gray-500 dark:text-slate-400 transition-transform duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}/>
+                <ChevronDownIcon className={`w-6 h-6 text-gray-500 dark:text-slate-400 transition-transform duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
             <div className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
                 <div className="overflow-hidden">
@@ -202,44 +202,44 @@ interface CodeBlockWithCopyProps {
     language?: 'json';
 }
 export const CodeBlockWithCopy: React.FC<CodeBlockWithCopyProps> = ({ code, title, language }) => {
-  const [copied, setCopied] = useState(false);
+    const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
-    const codeToCopy = code.trim();
-        
-    navigator.clipboard.writeText(codeToCopy).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }).catch(err => {
-      console.error('Failed to copy text: ', err);
-    });
-  };
+    const handleCopy = () => {
+        const codeToCopy = code.trim();
 
-  return (
-    <div className="relative not-prose bg-slate-900 rounded-lg border border-slate-700 shadow-lg">
-       <div className="flex justify-between items-center px-4 py-2 border-b border-slate-700">
-            <span className="text-sm font-semibold text-slate-400">{title}</span>
-            <button
-                onClick={handleCopy}
-                className="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold py-1 px-3 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-indigo-500 flex items-center gap-1.5"
-                aria-label="Копировать код"
-                aria-live="polite"
-            >
-                {copied ? (
-                    <>
-                        <CheckIcon className="w-4 h-4 text-green-400" />
-                        <span>Скопировано!</span>
-                    </>
-                ) : (
-                    'Копировать'
-                )}
-            </button>
-       </div>
-      <pre className="text-slate-300 p-4 text-base overflow-x-auto mt-0 rounded-b-lg bg-transparent custom-scrollbar">
-        {highlightCode(code, language)}
-      </pre>
-    </div>
-  );
+        navigator.clipboard.writeText(codeToCopy).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+        });
+    };
+
+    return (
+        <div className="relative not-prose bg-slate-900 rounded-lg border border-slate-700 shadow-lg">
+            <div className="flex justify-between items-center px-4 py-2 border-b border-slate-700">
+                <span className="text-sm font-semibold text-slate-400">{title}</span>
+                <button
+                    onClick={handleCopy}
+                    className="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold py-1 px-3 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-indigo-500 flex items-center gap-1.5"
+                    aria-label="Копировать код"
+                    aria-live="polite"
+                >
+                    {copied ? (
+                        <>
+                            <CheckIcon className="w-4 h-4 text-green-400" />
+                            <span>Скопировано!</span>
+                        </>
+                    ) : (
+                        'Копировать'
+                    )}
+                </button>
+            </div>
+            <pre className="text-slate-300 p-4 text-base overflow-x-auto mt-0 rounded-b-lg bg-transparent custom-scrollbar">
+                {highlightCode(code, language)}
+            </pre>
+        </div>
+    );
 };
 
 // --- Simple Code Block ---
@@ -292,7 +292,7 @@ const Portal: React.FC<{ children: React.ReactNode; targetId: string }> = ({ chi
         console.error(`Portal target #${targetId} not found in the DOM.`);
         return null;
     }
-    
+
     return ReactDOM.createPortal(children, target);
 };
 
@@ -312,12 +312,12 @@ export const TooltipTerm: React.FC<TooltipTermProps> = ({ children, definition }
 
     const handleShow = () => setIsVisible(true);
     const handleHide = () => setIsVisible(false);
-    
+
     useLayoutEffect(() => {
         if (isVisible && tooltipRef.current && triggerRef.current) {
             const tooltipEl = tooltipRef.current;
             const triggerRect = triggerRef.current.getBoundingClientRect();
-            
+
             const tooltipHeight = tooltipEl.offsetHeight;
             const tooltipWidth = tooltipEl.offsetWidth;
 
@@ -325,7 +325,7 @@ export const TooltipTerm: React.FC<TooltipTermProps> = ({ children, definition }
             const spacing = 12;
 
             const shouldFlip = triggerRect.top < tooltipHeight + spacing;
-            
+
             const newTop = shouldFlip
                 ? triggerRect.bottom + spacing
                 : triggerRect.top - spacing;
@@ -371,7 +371,7 @@ export const TooltipTerm: React.FC<TooltipTermProps> = ({ children, definition }
             <div className={`absolute left-1/2 -translate-x-1/2 w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-slate-800 dark:border-t-slate-900 ${arrowClasses}`}></div>
         </div>
     );
-    
+
     return (
         <>
             <span
@@ -454,7 +454,7 @@ export const ReadMore: React.FC<ReadMoreProps> = ({ children, lines }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [showButton, setShowButton] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
-    
+
     const dynamicStyle: React.CSSProperties = !isExpanded ? {
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -462,7 +462,7 @@ export const ReadMore: React.FC<ReadMoreProps> = ({ children, lines }) => {
         WebkitBoxOrient: 'vertical',
         WebkitLineClamp: lines,
     } : {};
-    
+
     useEffect(() => {
         const checkOverflow = () => {
             const element = contentRef.current;
@@ -471,7 +471,7 @@ export const ReadMore: React.FC<ReadMoreProps> = ({ children, lines }) => {
                 setShowButton(hasOverflow);
             }
         };
-        
+
         const timer = setTimeout(checkOverflow, 100);
         window.addEventListener('resize', checkOverflow);
 
@@ -502,7 +502,7 @@ export const ReadMore: React.FC<ReadMoreProps> = ({ children, lines }) => {
 
 // --- Interactive Glossary ---
 interface InteractiveGlossaryProps {
-  items: GlossaryItem[];
+    items: GlossaryItem[];
 }
 
 const categoryConfig = {
@@ -522,9 +522,9 @@ export const InteractiveGlossary: React.FC<InteractiveGlossaryProps> = ({ items 
     const filteredItems = useMemo(() => {
         return items.filter(item => {
             const matchesCategory = activeCategory === 'Все' || item.category === activeCategory;
-            const matchesSearch = searchTerm === '' || 
-                                  item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                  item.definition.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesSearch = searchTerm === '' ||
+                item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.definition.toLowerCase().includes(searchTerm.toLowerCase());
             return matchesCategory && matchesSearch;
         });
     }, [items, activeCategory, searchTerm]);
@@ -587,7 +587,7 @@ export const InteractiveGlossary: React.FC<InteractiveGlossaryProps> = ({ items 
                     const baseClasses = "px-4 py-2 text-sm font-semibold rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800";
                     const activeClasses = "bg-indigo-600 text-white shadow";
                     const inactiveClasses = "bg-gray-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700";
-                    
+
                     return (
                         <button key={category} onClick={() => setActiveCategory(category)} className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses}`}>
                             {category}
@@ -688,7 +688,7 @@ export const AnnotatedCodeBlock: React.FC<AnnotatedCodeBlockProps> = ({ title, a
                                 </div>
                             </div>
                         ))}
-                         {activeIndex === null && (
+                        {activeIndex === null && (
                             <div className="flex items-center justify-center h-full text-slate-500 text-sm">
                                 Кликните на строку кода, чтобы увидеть описание.
                             </div>
@@ -757,7 +757,7 @@ const ChartTooltip: React.FC<{
             if (newTop + tooltipHeight > viewportHeight - margin) {
                 newTop = viewportHeight - margin - tooltipHeight;
             }
-            
+
             setStyle({
                 top: `${newTop}px`,
                 left: `${newLeft}px`,
@@ -768,7 +768,7 @@ const ChartTooltip: React.FC<{
 
     return (
         <Portal targetId="tooltip-root">
-             <div
+            <div
                 ref={tooltipRef}
                 style={{
                     ...style,
@@ -808,7 +808,7 @@ export const LineChart: React.FC<LineChartProps> = ({ data, config, onPointClick
     } | null>(null);
     const [hoveredLegendKey, setHoveredLegendKey] = useState<string | null>(null);
     const chartRef = useRef<SVGSVGElement>(null);
-    
+
     const padding = { top: 20, right: 60, bottom: 60, left: 60 };
     const width = 800;
 
@@ -860,10 +860,10 @@ export const LineChart: React.FC<LineChartProps> = ({ data, config, onPointClick
 
     return (
         <div className="not-prose my-6 bg-[#1A202C] dark:bg-slate-900 rounded-xl p-6 border border-gray-700 dark:border-slate-700 overflow-hidden shadow-2xl">
-            <svg 
-                ref={chartRef} 
-                viewBox={`0 0 ${width} ${height}`} 
-                className="w-full h-auto text-slate-400" 
+            <svg
+                ref={chartRef}
+                viewBox={`0 0 ${width} ${height}`}
+                className="w-full h-auto text-slate-400"
                 role="graphics-document"
                 aria-label="График динамики эффективности"
             >
@@ -876,16 +876,16 @@ export const LineChart: React.FC<LineChartProps> = ({ data, config, onPointClick
                         </g>
                     ))}
                     <text transform={`rotate(-90)`} y={15} x={-(padding.top + chartHeight / 2)} textAnchor="middle" className="fill-current font-semibold text-slate-300">{yAxisLabelLeft}</text>
-                    {yAxisLabelRight && yTicksRight.map(({ value, y }) => ( <text key={`y-right-${value}`} x={width - padding.right + 12} y={y + 4} fill="currentColor">{value}</text> ))}
+                    {yAxisLabelRight && yTicksRight.map(({ value, y }) => (<text key={`y-right-${value}`} x={width - padding.right + 12} y={y + 4} fill="currentColor">{value}</text>))}
                     {yAxisLabelRight && <text transform={`rotate(90)`} y={-(width - 15)} x={(padding.top + chartHeight / 2)} textAnchor="middle" className="fill-current font-semibold text-slate-300">{yAxisLabelRight}</text>}
-                    {data.map((d, i) => ( <text key={i} x={xScale(i)} y={height - padding.bottom + 25} textAnchor="middle" fill="currentColor" className="text-slate-300">{d[xKey]}</text> ))}
+                    {data.map((d, i) => (<text key={i} x={xScale(i)} y={height - padding.bottom + 25} textAnchor="middle" fill="currentColor" className="text-slate-300">{d[xKey]}</text>))}
                 </g>
                 {/* Lines and Points */}
                 <g>
-                    {linePaths.map(({ key, path, color }) => ( <path key={key} d={path} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="transition-opacity duration-300" style={{ opacity: hoveredLegendKey && hoveredLegendKey !== key ? 0.15 : 1 }} /> ))}
+                    {linePaths.map(({ key, path, color }) => (<path key={key} d={path} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="transition-opacity duration-300" style={{ opacity: hoveredLegendKey && hoveredLegendKey !== key ? 0.15 : 1 }} />))}
                     {data.map((d, i) => yKeys.map(yKey => {
                         const yScale = yKey.axis === 'right' ? yScaleRight : yScaleLeft;
-                        return ( <circle key={`${yKey.key}-${i}`} cx={xScale(i)} cy={yScale(d[yKey.key])} r={tooltip?.index === i ? 9 : 5} fill={yKey.color} className="transition-all duration-300 ease-in-out" style={{ opacity: hoveredLegendKey && hoveredLegendKey !== yKey.key ? 0.15 : 1 }}/> );
+                        return (<circle key={`${yKey.key}-${i}`} cx={xScale(i)} cy={yScale(d[yKey.key])} r={tooltip?.index === i ? 9 : 5} fill={yKey.color} className="transition-all duration-300 ease-in-out" style={{ opacity: hoveredLegendKey && hoveredLegendKey !== yKey.key ? 0.15 : 1 }} />);
                     }))}
                 </g>
                 {/* Interaction Hover Layer */}
@@ -903,7 +903,7 @@ export const LineChart: React.FC<LineChartProps> = ({ data, config, onPointClick
                     })}
                 </g>
                 {/* Guide Line */}
-                {tooltip && ( <g pointerEvents="none" className="animate-subtle-fade-in"><line x1={xScale(tooltip.index)} y1={padding.top} x2={xScale(tooltip.index)} y2={padding.top + chartHeight} stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="4,4" /></g> )}
+                {tooltip && (<g pointerEvents="none" className="animate-subtle-fade-in"><line x1={xScale(tooltip.index)} y1={padding.top} x2={xScale(tooltip.index)} y2={padding.top + chartHeight} stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="4,4" /></g>)}
             </svg>
             {/* Legend */}
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 mt-4 text-sm" onMouseLeave={() => setHoveredLegendKey(null)}>
@@ -925,35 +925,39 @@ export const LineChart: React.FC<LineChartProps> = ({ data, config, onPointClick
 
 // --- Status Badge ---
 interface StatusBadgeProps {
-  status: 'green' | 'red' | 'yellow' | 'stop' | 'go';
-  children: React.ReactNode;
+    status: 'green' | 'red' | 'yellow' | 'stop' | 'go';
+    children: React.ReactNode;
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, children }) => {
-  const colorClasses = {
-    green: 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300',
-    go: 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300',
-    red: 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300',
-    stop: 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300',
-    yellow: 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300',
-  };
-  const statusKey = status.toLowerCase() as keyof typeof colorClasses;
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${colorClasses[statusKey]}`}>
-      {children}
-    </span>
-  );
+    const colorClasses = {
+        green: 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300',
+        go: 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300',
+        red: 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300',
+        stop: 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300',
+        yellow: 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300',
+    };
+    const statusKey = status.toLowerCase() as keyof typeof colorClasses;
+    return (
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${colorClasses[statusKey]}`}>
+            {children}
+        </span>
+    );
 };
 
 // --- JSON Report Viewer ---
 interface ReportData {
-  final_verdict: 'STOP' | 'GO';
-  reputation_check: { status: string; details: string };
-  content_check: { status: string; flags: { risk: string; comment: string }[] };
+    final_verdict: 'STOP' | 'GO';
+    // Email-specific (legacy)
+    reputation_check?: { status: string; details: string };
+    content_check?: { status: string; flags: { risk: string; comment: string }[] };
+    // Chatbot-specific
+    scenario_info?: { goal: string; user_profile: string };
+    issue_detected?: { status: string; flags: { risk: string; comment: string }[] };
 }
 
 interface JsonReportViewerProps {
-  data: ReportData;
+    data: ReportData;
 }
 
 const HighlightComment: React.FC<{ text: string }> = ({ text }) => {
@@ -977,62 +981,107 @@ const HighlightComment: React.FC<{ text: string }> = ({ text }) => {
 
 
 export const JsonReportViewer: React.FC<JsonReportViewerProps> = ({ data }) => {
-  const isStop = data.final_verdict === 'STOP';
+    const isStop = data.final_verdict === 'STOP';
 
-  const verdictIcon = isStop 
-    ? <HandRaisedIcon className="w-10 h-10" /> 
-    : <CheckCircleIcon className="w-10 h-10" />;
-  
-  const verdictBg = isStop 
-    ? 'bg-red-800/80 dark:bg-red-900/60 border-red-700/50' 
-    : 'bg-green-800/80 dark:bg-green-900/60 border-green-700/50';
-  
-  const verdictText = isStop ? 'text-red-100' : 'text-green-100';
+    const verdictIcon = isStop
+        ? <HandRaisedIcon className="w-10 h-10" />
+        : <CheckCircleIcon className="w-10 h-10" />;
 
-  return (
-    <div className="not-prose my-6 bg-slate-900 rounded-lg border border-slate-700 shadow-2xl p-6 space-y-6 font-sans">
-      
-      {/* Final Verdict */}
-      <div className={`flex items-center gap-6 p-6 rounded-lg ${verdictBg} text-white`}>
-        <div className={verdictText}>{verdictIcon}</div>
-        <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-white/70">Финальный вердикт</h3>
-          <p className="text-4xl font-extrabold">{data.final_verdict}</p>
-        </div>
-      </div>
-      
-      <div className="space-y-4">
-        {/* Reputation Check */}
-        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-          <div className="flex justify-between items-center mb-2">
-            <h4 className="font-bold text-lg text-slate-200 flex items-center gap-2">
-              <ShieldCheckIcon className="w-6 h-6 text-slate-400" />
-              Анализ репутации
-            </h4>
-            <StatusBadge status={data.reputation_check.status as any}>{data.reputation_check.status.toUpperCase()}</StatusBadge>
-          </div>
-          <p className="text-slate-400 text-sm">{data.reputation_check.details}</p>
-        </div>
+    const verdictBg = isStop
+        ? 'bg-red-800/80 dark:bg-red-900/60 border-red-700/50'
+        : 'bg-green-800/80 dark:bg-green-900/60 border-green-700/50';
 
-        {/* Content Check */}
-        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-          <div className="flex justify-between items-center mb-3">
-            <h4 className="font-bold text-lg text-slate-200 flex items-center gap-2">
-              <EnvelopeOpenIcon className="w-6 h-6 text-slate-400" />
-              Анализ контента
-            </h4>
-            <StatusBadge status={data.content_check.status as any}>{data.content_check.status.toUpperCase()}</StatusBadge>
-          </div>
-          <div className="space-y-4 border-t border-slate-700 pt-3">
-            {data.content_check.flags.map((flag, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <StatusBadge status={flag.risk as any}>{flag.risk.toUpperCase()}</StatusBadge>
-                <HighlightComment text={flag.comment} />
-              </div>
-            ))}
-          </div>
+    const verdictText = isStop ? 'text-red-100' : 'text-green-100';
+
+    return (
+        <div className="not-prose my-6 bg-slate-900 rounded-lg border border-slate-700 shadow-2xl p-6 space-y-6 font-sans">
+
+            {/* Final Verdict */}
+            <div className={`flex items-center gap-6 p-6 rounded-lg ${verdictBg} text-white`}>
+                <div className={verdictText}>{verdictIcon}</div>
+                <div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-white/70">Финальный вердикт</h3>
+                    <p className="text-4xl font-extrabold">{data.final_verdict}</p>
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                {/* Scenario Info (Chatbot) */}
+                {data.scenario_info && (
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                        <h4 className="font-bold text-lg text-slate-200 flex items-center gap-2 mb-2">
+                            <PuzzlePieceIcon className="w-6 h-6 text-slate-400" />
+                            Сценарий теста
+                        </h4>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span className="text-slate-500 block">Цель:</span>
+                                <span className="text-slate-200">{data.scenario_info.goal}</span>
+                            </div>
+                            <div>
+                                <span className="text-slate-500 block">Профиль:</span>
+                                <span className="text-slate-200">{data.scenario_info.user_profile}</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Reputation Check (Email) */}
+                {data.reputation_check && (
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                        <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-bold text-lg text-slate-200 flex items-center gap-2">
+                                <ShieldCheckIcon className="w-6 h-6 text-slate-400" />
+                                Анализ репутации
+                            </h4>
+                            <StatusBadge status={data.reputation_check.status as any}>{data.reputation_check.status.toUpperCase()}</StatusBadge>
+                        </div>
+                        <p className="text-slate-400 text-sm">{data.reputation_check.details}</p>
+                    </div>
+                )}
+
+                {/* Content Check (Email) */}
+                {data.content_check && (
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                        <div className="flex justify-between items-center mb-3">
+                            <h4 className="font-bold text-lg text-slate-200 flex items-center gap-2">
+                                <EnvelopeOpenIcon className="w-6 h-6 text-slate-400" />
+                                Анализ контента
+                            </h4>
+                            <StatusBadge status={data.content_check.status as any}>{data.content_check.status.toUpperCase()}</StatusBadge>
+                        </div>
+                        <div className="space-y-4 border-t border-slate-700 pt-3">
+                            {data.content_check.flags.map((flag, index) => (
+                                <div key={index} className="flex items-start gap-3">
+                                    <StatusBadge status={flag.risk as any}>{flag.risk.toUpperCase()}</StatusBadge>
+                                    <HighlightComment text={flag.comment} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Issue Detected (Chatbot) */}
+                {data.issue_detected && (
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                        <div className="flex justify-between items-center mb-3">
+                            <h4 className="font-bold text-lg text-slate-200 flex items-center gap-2">
+                                <ExclamationTriangleIcon className="w-6 h-6 text-slate-400" />
+                                Выявленные проблемы
+                            </h4>
+                            <StatusBadge status={data.issue_detected.status as any}>{data.issue_detected.status.toUpperCase()}</StatusBadge>
+                        </div>
+                        <div className="space-y-4 border-t border-slate-700 pt-3">
+                            {data.issue_detected.flags.map((flag, index) => (
+                                <div key={index} className="flex items-start gap-3">
+                                    <StatusBadge status={flag.risk as any}>{flag.risk.toUpperCase()}</StatusBadge>
+                                    <HighlightComment text={flag.comment} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
