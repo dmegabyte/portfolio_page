@@ -43,8 +43,8 @@ const AiConsultant: React.FC = () => {
       const deltaX = e.clientX - startPosRef.current.x;
       const deltaY = e.clientY - startPosRef.current.y;
 
-      const newWidth = Math.min(Math.max(startPosRef.current.width + deltaX, 350), 800);
-      const newHeight = Math.min(Math.max(startPosRef.current.height + deltaY, 400), 800);
+      const newWidth = Math.max(startPosRef.current.width + deltaX, 350);
+      const newHeight = Math.max(startPosRef.current.height + deltaY, 400);
 
       setWidth(newWidth);
       setHeight(newHeight);
