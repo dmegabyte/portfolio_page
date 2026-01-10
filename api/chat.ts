@@ -1,5 +1,5 @@
 /// <reference types="node" />
-export const config = { runtime: 'nodejs18.x' };
+export const config = { runtime: 'nodejs' };
 import process from 'node:process';
 import { projects } from '../data/projects';
 
