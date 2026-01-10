@@ -7,6 +7,7 @@ import ScrollToTopButton from './components/ScrollToTopButton';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useBackgroundPreloader } from './hooks/useBackgroundPreloader';
 import NeuralBackground from './components/NeuralBackground';
+import GptunnelChatWidget from './components/GptunnelChatWidget';
 
 // Lazy load all page components
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -115,6 +116,7 @@ const App: React.FC = () => {
             </Suspense>
           </ErrorBoundary>
         </main>
+        <GptunnelChatWidget />
         <Footer mainContentRef={mainContentRef} />
         <ScrollToTopButton />
       </div>

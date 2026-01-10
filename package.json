@@ -7,8 +7,9 @@
   "scripts": {
     "test:e2e": "playwright test",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
-    "build": "npm run clean && esbuild index.tsx --bundle --outdir=dist --splitting --format=esm --loader:.tsx=tsx --external:react --external:react-dom --external:react-router-dom --external:@heroicons/react/* && node -e \"const fs=require('fs'); fs.copyFileSync('index.html','dist/index.html'); fs.cpSync('assets','dist/assets',{recursive:true});\"",
-    "start": "npm run build && npx --yes serve -s dist -l 8000"
+    "build": "node scripts/build.js",
+    "start": "npm run build && npx --yes serve -s dist -l 8000",
+    "dev": "npx vercel dev --listen 8000"
   },
   "dependencies": {
     "react": "^19.2.0",

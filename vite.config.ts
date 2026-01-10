@@ -12,7 +12,10 @@ export default defineConfig(({ mode }) => {
       plugins: [react()],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'process.env.GPTUNNEL_API_KEY': JSON.stringify(env.GPTUNNEL_API_KEY),
+        'process.env.GPTUNNEL_ASSISTANT_CODE': JSON.stringify(env.GPTUNNEL_ASSISTANT_CODE),
+        'process.env.GPTUNNEL_BASE_URL': JSON.stringify(env.GPTUNNEL_BASE_URL ?? '')
       },
       resolve: {
         alias: {
