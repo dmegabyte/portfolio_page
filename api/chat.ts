@@ -1,4 +1,6 @@
 /// <reference types="node" />
+import { Buffer } from 'node:buffer';
+import process from 'node:process';
 import { projects } from '../data/projects';
 
 type ClientMessage = {
