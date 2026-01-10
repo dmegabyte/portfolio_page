@@ -137,7 +137,7 @@ export const projects: Project[] = [
     title: 'Scenario Nexus: AI-ядро',
     summary: 'Архитектура автоматической трансформации сценариев и сквозного QA-контроля.',
     description: 'Узел управления диалоговой логикой. Превращает разрозненные скрипты операторов в единую, машиночитаемую структуру, исполняемую AI-агентами с автоматической валидацией на каждом шаге.',
-    imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80&auto=format&fit=crop',
+    imageUrl: '/assets/images/Scenario Nexus AI-ядро.jpg',
     visualPrompt: 'Complex multidimensional logic graph. Glowing decision trees, interconnected nodes in a 3D dark space. Scenario engine visualization. Deep obsidian, violet and magenta accents. NO TEXT, NO NUMBERS. Cinematic depth, digital nexus, 4K.',
     technologies: ['JSON-Schema', 'Logic-Engines', 'CRM-Automation', 'QA-Validators'],
     keyFeatures: [
