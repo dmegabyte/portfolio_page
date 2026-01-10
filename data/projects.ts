@@ -92,7 +92,7 @@ export const projects: Project[] = [
     slug: 'bot-autotest',
     title: 'Visual AI Chatbot Tester',
     summary: 'Фреймворк для end-to-end тестирования диалоговых сценариев в чат-ботах.',
-    description: 'Создание системы, которая позволяет описывать тестовые сценарии в формате Gherkin (Cucumber) и автоматически запускать их, эмулируя поведение пользователя. Поддерживает тестирование ботов в Telegram, VK и на веб-сайтах. Интегрируется с CI/CD.',
+    description: 'Фреймворк для автоматического E2E-тестирования чат-ботов в Telegram, VK и веб-платформах. Заменяет часы ручных проверок 15 минутами автоматических тестов, запускаемых при каждом коммите.\n\nПозволяет описывать тестовые сценарии на языке Gherkin ("Given-When-Then") — понятном не только разработчикам, но и QA-инженерам. Система эмулирует реальные действия пользователя: нажатия на кнопки, отправку сообщений, проверку визуальных элементов. Встроенная поддержка скриншот-тестирования выявляет даже мелкие визуальные регрессии.\n\nИнтеграция с CI/CD превращает каждый pull request в автоматическую проверку качества диалоговой логики на всех платформах параллельно.',
     imageUrl: '/assets/images/QA.jpg',
     visualPrompt: 'Cybernetic bug-fix visualization. Hexagonal digital grid, glowing node verification paths, matrix-like flow. Blue and white neon on dark background. NO TEXT, NO CHARACTERS. Minimalist tech testing environment, sharp focus, 4K.',
     technologies: ['JavaScript', 'Playwright', 'Jest', 'Cucumber.js', 'CI/CD'],
