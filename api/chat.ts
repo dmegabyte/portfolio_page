@@ -292,10 +292,11 @@ export default async function handler(req: any, res: any) {
   }
 
   if (!result.response.ok) {
+    const errorData = result.json as any;
     const message =
-      result.json?.error?.message ||
-      result.json?.error ||
-      result.json?.message ||
+      errorData?.error?.message ||
+      errorData?.error ||
+      errorData?.message ||
       `Upstream error: ${result.response.status}`;
     res.status(502).json({ error: message });
     return;

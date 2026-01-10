@@ -16,26 +16,10 @@ type SendAssistantMessageOptions = {
 const CHAT_ID_STORAGE_KEY = 'gptunnel_chat_id';
 
 const safeGetEnv = (key: string): string | undefined => {
+  // Server-side only: read from process.env
   try {
     if (typeof process !== 'undefined' && process.env && process.env[key]) {
       return process.env[key];
-    }
-  } catch (_) {
-    /* ignore */
-  }
-
-  try {
-    const metaEnv = (import.meta as any)?.env;
-    if (metaEnv && metaEnv[key]) {
-      return metaEnv[key];
-    }
-  } catch (_) {
-    /* ignore */
-  }
-
-  try {
-    if (typeof window !== 'undefined' && (window as any)[key]) {
-      return (window as any)[key];
     }
   } catch (_) {
     /* ignore */
@@ -80,41 +64,16 @@ const hashToken = async (token: string): Promise<string> => {
 };
 
 export const resolveChatId = async (sessionToken?: string): Promise<string> => {
-  let stored: string | null = null;
-  try {
-    stored = typeof localStorage !== 'undefined' ? localStorage.getItem(CHAT_ID_STORAGE_KEY) : null;
-  } catch (_) {
-    stored = null;
-  }
-
+  // Server-side: no localStorage, use sessionToken or generate random
   if (sessionToken && sessionToken.trim()) {
     const base = sessionToken.length >= 24 && sessionToken.length <= 36
       ? sessionToken
       : await hashToken(sessionToken);
-    const normalized = base.slice(0, 36);
-    try {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(CHAT_ID_STORAGE_KEY, normalized);
-      }
-    } catch (_) {
-      /* ignore */
-    }
-    return normalized;
+    return base.slice(0, 36);
   }
 
-  if (stored && stored.trim()) {
-    return stored;
-  }
-
-  const fresh = randomId();
-  try {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(CHAT_ID_STORAGE_KEY, fresh);
-    }
-  } catch (_) {
-    /* ignore */
-  }
-  return fresh;
+  // Generate fresh random ID
+  return randomId();
 };
 
 export const sendAssistantMessage = async ({
@@ -126,7 +85,7 @@ export const sendAssistantMessage = async ({
   stream,
   useProxy,
 }: SendAssistantMessageOptions): Promise<string> => {
-  const isBrowser = typeof window !== 'undefined';
+  // Always use direct API unless useProxy is explicitly true or proxyPref is set
   const proxyEndpoint = safeGetEnv('GPTUNNEL_PROXY_URL') || '/api/assistant-chat';
   const proxyPref = String(safeGetEnv('GPTUNNEL_USE_PROXY') || '').toLowerCase() === 'true';
 
@@ -137,11 +96,7 @@ export const sendAssistantMessage = async ({
   const shouldUseProxy =
     typeof useProxy === 'boolean'
       ? useProxy
-      : proxyPref
-        ? true
-        : isBrowser
-          ? !hasDirectCreds
-          : false;
+      : proxyPref;
 
   const endpoint = shouldUseProxy ? proxyEndpoint : `${baseUrl}/v1/assistant/chat`;
 
