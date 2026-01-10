@@ -11,13 +11,59 @@ const AiConsultant: React.FC = () => {
     { role: 'model', text: 'Привет! Я AI-ассистент этого портфолио. Могу рассказать подробнее о любом проекте или стеке технологий. О чем хочешь узнать?' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [width, setWidth] = useState(384); // Default: w-96 = 384px
+  const [height, setHeight] = useState(550); // Default height
+  const [isResizing, setIsResizing] = useState(false);
+
   const scrollRef = useRef<HTMLDivElement>(null);
+  const startPosRef = useRef({ x: 0, y: 0, width: 0, height: 0 });
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Resize handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+    startPosRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      width,
+      height
+    };
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+
+      const deltaX = e.clientX - startPosRef.current.x;
+      const deltaY = e.clientY - startPosRef.current.y;
+
+      const newWidth = Math.min(Math.max(startPosRef.current.width + deltaX, 350), 800);
+      const newHeight = Math.min(Math.max(startPosRef.current.height + deltaY, 400), 800);
+
+      setWidth(newWidth);
+      setHeight(newHeight);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -30,7 +76,7 @@ const AiConsultant: React.FC = () => {
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const context = projects.map(p => `${p.title}: ${p.summary}`).join('\n');
-      
+
       const chat = ai.chats.create({
         model: 'gemini-3-flash-preview',
         config: {
@@ -53,12 +99,18 @@ const AiConsultant: React.FC = () => {
   return (
     <div className="fixed bottom-6 right-6 z-[70] flex flex-col items-end">
       {isOpen && (
-        <div className={`
-          fixed bottom-0 left-0 right-0 top-0 md:relative md:top-auto md:left-auto md:right-auto
-          md:w-96 md:h-[550px] bg-slate-950/95 md:bg-slate-900/90 backdrop-blur-2xl 
-          md:border border-indigo-500/30 md:rounded-[32px] shadow-3xl 
-          md:mb-4 flex flex-col overflow-hidden animate-fade-in
-        `}>
+        <div
+          className={`
+            fixed bottom-0 left-0 right-0 top-0 md:relative md:top-auto md:left-auto md:right-auto
+            bg-slate-950/95 md:bg-slate-900/90 backdrop-blur-2xl 
+            md:border border-indigo-500/30 md:rounded-[32px] shadow-3xl 
+            md:mb-4 flex flex-col overflow-hidden animate-fade-in relative
+          `}
+          style={{
+            width: window.innerWidth >= 768 ? `${width}px` : undefined,
+            height: window.innerWidth >= 768 ? `${height}px` : undefined
+          }}
+        >
           <div className="p-5 border-b border-slate-800 flex justify-between items-center bg-indigo-500/10 shrink-0">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-indigo-500/20 border border-indigo-500/30">
@@ -69,9 +121,9 @@ const AiConsultant: React.FC = () => {
                 <span className="text-indigo-400 text-[10px] font-bold tracking-wide block leading-none">Online & Thinking</span>
               </div>
             </div>
-            <button 
-                onClick={() => setIsOpen(false)} 
-                className="p-2 rounded-xl bg-slate-800/50 text-slate-400 hover:text-white transition-all active:scale-90"
+            <button
+              onClick={() => setIsOpen(false)}
+              className="p-2 rounded-xl bg-slate-800/50 text-slate-400 hover:text-white transition-all active:scale-90"
             >
               <XMarkIcon className="w-6 h-6" />
             </button>
@@ -80,11 +132,10 @@ const AiConsultant: React.FC = () => {
           <div ref={scrollRef} className="flex-grow overflow-y-auto p-6 space-y-6 custom-scrollbar">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-                <div className={`max-w-[85%] p-4 rounded-[20px] text-sm leading-relaxed shadow-lg ${
-                  m.role === 'user' 
-                    ? 'bg-indigo-600 text-white rounded-tr-none' 
-                    : 'bg-slate-800 text-slate-200 rounded-tl-none border border-slate-700/50'
-                }`}>
+                <div className={`max-w-[85%] p-4 rounded-[20px] text-sm leading-relaxed shadow-lg ${m.role === 'user'
+                  ? 'bg-indigo-600 text-white rounded-tr-none'
+                  : 'bg-slate-800 text-slate-200 rounded-tl-none border border-slate-700/50'
+                  }`}>
                   {m.text}
                 </div>
               </div>
@@ -108,7 +159,7 @@ const AiConsultant: React.FC = () => {
                 placeholder="Спросите об AI-маркетологе..."
                 className="w-full bg-slate-900/50 border border-slate-700 rounded-2xl py-4 pl-5 pr-14 text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600"
               />
-              <button 
+              <button
                 onClick={handleSend}
                 disabled={isLoading}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 active:scale-95 disabled:opacity-50 transition-all shadow-lg"
@@ -117,6 +168,18 @@ const AiConsultant: React.FC = () => {
               </button>
             </div>
             <p className="text-[9px] text-center mt-4 text-slate-600 font-bold uppercase tracking-widest">Powered by Gemini 3.0 Flash Preview</p>
+          </div>
+
+          {/* Resize Handle - Desktop only */}
+          <div
+            onMouseDown={handleMouseDown}
+            className="hidden md:block absolute bottom-2 right-2 w-5 h-5 cursor-nwse-resize group"
+          >
+            <div className="absolute bottom-0 right-0 w-full h-full">
+              <svg viewBox="0 0 20 20" className="w-full h-full text-slate-700 group-hover:text-indigo-500 transition-colors">
+                <path d="M14 16L16 14M16 18L18 16M12 18L18 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </div>
           </div>
         </div>
       )}
