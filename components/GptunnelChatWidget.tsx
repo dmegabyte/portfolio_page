@@ -24,7 +24,7 @@ const GptunnelChatWidget: React.FC<Props> = ({ sessionToken, maxContext = 10 }) 
     {
       id: 'welcome',
       role: 'assistant',
-      text: 'Привет! Я ассистент GPTunnel. Задай вопрос — отвечу и сохраню контекст по chatId.',
+      text: 'Привет! Я ассистент этого сайта — помогу быстро разобраться в проектах Дениса: что сделано, как устроено и где посмотреть. С чего начнём: RAG, автотесты, Apps Script или конкретный проект?',
     },
   ]);
   const [isSending, setIsSending] = useState(false);
@@ -114,7 +114,7 @@ const GptunnelChatWidget: React.FC<Props> = ({ sessionToken, maxContext = 10 }) 
                   GPTunnel Assistant
                 </span>
                 <span className="text-indigo-400 text-[10px] font-bold tracking-wide block leading-none">
-                  ChatId сохраняет контекст
+                  Онлайн — отвечаю по проектам
                 </span>
               </div>
             </div>
@@ -173,9 +173,9 @@ const GptunnelChatWidget: React.FC<Props> = ({ sessionToken, maxContext = 10 }) 
               </button>
             </div>
             {error && <p className="text-[11px] text-rose-400 font-semibold">Ошибка: {error}</p>}
-            {!error && chatId && (
-              <p className="text-[10px] text-slate-500 font-semibold truncate">
-                chatId: {chatId}
+            {!error && (
+              <p className="text-[10px] text-slate-500 font-semibold">
+                Могу подсказать по любому проекту — спросите коротко, я отвечу по делу.
               </p>
             )}
           </div>
