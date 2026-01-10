@@ -115,7 +115,7 @@ export const projects: Project[] = [
     title: 'Пайплайн безопасности email',
     summary: 'Сервис анализа email-шаблонов на спам-триггеры, фишинг и проблемы с рендерингом.',
     description: 'Автоматизированный пайплайн, который принимает на вход HTML-шаблон письма, проверяет его через SpamAssassin, анализирует все ссылки на безопасность с помощью Google Safe Browsing API, и делает скриншоты рендеринга в разных почтовых клиентах.',
-    imageUrl: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&q=80&auto=format&fit=crop',
+    imageUrl: '/assets/images/email.jpg',
     visualPrompt: 'Abstract cybersecurity pipeline. Digital shield composed of data packets, flowing through protective light rings. Obsidian glass surface, red and gold defensive glows. ABSOLUTELY NO TEXT. Geometric flow, security tech vibe, 8K.',
     technologies: ['Node.js', 'Express', 'Puppeteer', 'SpamAssassin API', 'Docker'],
     keyFeatures: [
