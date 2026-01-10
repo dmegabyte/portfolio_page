@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { projects } from '../data/projects';
 
 type ClientMessage = {
@@ -322,4 +323,3 @@ export default async function handler(req: any, res: any) {
     detectedProjectSlugs: selectedProjects.map((p: any) => p.slug),
   });
 }
-
