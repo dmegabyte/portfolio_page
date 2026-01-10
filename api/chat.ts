@@ -1,6 +1,5 @@
 /// <reference types="node" />
 export const config = { runtime: 'nodejs18.x' };
-import { Buffer } from 'node:buffer';
 import process from 'node:process';
 import { projects } from '../data/projects';
 
@@ -51,20 +50,7 @@ const safeJson = async (req: any): Promise<any> => {
       return null;
     }
   }
-
-  // Fallback: read raw stream (should rarely happen on Vercel)
-  const chunks: Buffer[] = [];
-  await new Promise<void>((resolve) => {
-    req.on('data', (chunk: Buffer) => chunks.push(chunk));
-    req.on('end', () => resolve());
-    req.on('error', () => resolve());
-  });
-  if (chunks.length === 0) return null;
-  try {
-    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
-  } catch {
-    return null;
-  }
+  return null;
 };
 
 const normalizeText = (text: string): string =>

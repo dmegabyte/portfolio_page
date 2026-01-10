@@ -1,5 +1,4 @@
 export const config = { runtime: 'nodejs18.x' };
-import { Buffer } from 'node:buffer';
 import process from 'node:process';
 
 type AnyReq = any;
@@ -14,19 +13,7 @@ const safeJson = async (req: AnyReq): Promise<any> => {
       return null;
     }
   }
-
-  const chunks: Buffer[] = [];
-  await new Promise<void>((resolve) => {
-    req.on('data', (chunk: Buffer) => chunks.push(chunk));
-    req.on('end', () => resolve());
-    req.on('error', () => resolve());
-  });
-  if (chunks.length === 0) return null;
-  try {
-    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
-  } catch {
-    return null;
-  }
+  return null;
 };
 
 const normalizeAuthHeader = (raw: string): string => {
