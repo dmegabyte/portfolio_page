@@ -7,7 +7,7 @@ import ScrollToTopButton from './components/ScrollToTopButton';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useBackgroundPreloader } from './hooks/useBackgroundPreloader';
 import NeuralBackground from './components/NeuralBackground';
-import GptunnelChatWidget from './components/GptunnelChatWidget';
+
 
 // Lazy load all page components
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -56,12 +56,12 @@ const ScrollToTop = () => {
 };
 
 const LoadingFallback: React.FC = () => (
-    <div className="flex flex-col justify-center items-center h-[70vh] animate-fade-in">
-        <div className="relative mb-8">
-            <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-indigo-500"></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-indigo-400 font-black text-2xl">P</div>
-        </div>
+  <div className="flex flex-col justify-center items-center h-[70vh] animate-fade-in">
+    <div className="relative mb-8">
+      <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-indigo-500"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-indigo-400 font-black text-2xl">P</div>
     </div>
+  </div>
 );
 
 const App: React.FC = () => {
@@ -84,11 +84,11 @@ const App: React.FC = () => {
                 <Route path="/playground" element={<PlaygroundPage />} />
                 <Route path="/gallery" element={<GalleryPage />} />
                 <Route path="/project/:slug" element={<ProjectPage />} />
-                
+
                 {/* Smooth Demo Routes */}
                 <Route path="/smooth-demo" element={<SmoothLobby />} />
                 <Route path="/smooth-demo/deep" element={<SmoothDeep />} />
-                
+
                 {/* Demo Navigation Pages */}
                 <Route path="/demo/vision" element={<VisionPage />} />
                 <Route path="/demo/tech" element={<TechPage />} />
@@ -98,7 +98,7 @@ const App: React.FC = () => {
                 <Route path="/test-site" element={<TestHome />} />
                 <Route path="/test-site/services" element={<TestServices />} />
                 <Route path="/test-site/contact" element={<TestContact />} />
-                
+
                 {/* Documentation Routes */}
                 <Route path="/documentation/client-segmentation" element={<ClientSegmentationDocumentationPage />} />
                 <Route path="/report/client-segmentation" element={<ClientSegmentationReportPage />} />
@@ -116,7 +116,7 @@ const App: React.FC = () => {
             </Suspense>
           </ErrorBoundary>
         </main>
-        <GptunnelChatWidget />
+
         <Footer mainContentRef={mainContentRef} />
         <ScrollToTopButton />
       </div>
