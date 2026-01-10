@@ -10,12 +10,12 @@ const Breadcrumbs: React.FC = () => {
   if (pathnames.length === 0) return null;
 
   const getBreadcrumbName = (part: string, index: number) => {
-    if (part === 'project') return 'Проекты';
-    if (part === 'documentation') return 'Документация';
-    if (part === 'report') return 'Отчёт';
-    if (part === 'about') return 'Обо мне';
-    if (part === 'contact') return 'Контакты';
-    if (part === 'gallery') return 'Галерея';
+    if (part === 'project') return 'РџСЂРѕРµРєС‚С‹';
+    if (part === 'documentation') return 'Р”РѕРєСѓРјРµРЅС‚Р°С†РёСЏ';
+    if (part === 'report') return 'РћС‚С‡С‘С‚';
+    if (part === 'about') return 'РћР±Рѕ РјРЅРµ';
+    if (part === 'contact') return 'РљРѕРЅС‚Р°РєС‚С‹';
+    if (part === 'gallery') return 'Р“Р°Р»РµСЂРµСЏ';
     if (part === 'playground') return 'Playground';
 
     const project = projects.find((p) => p.slug === part);
@@ -32,7 +32,7 @@ const Breadcrumbs: React.FC = () => {
         <li>
           <Link to="/" className="flex items-center hover:text-indigo-400 transition-colors">
             <HomeIcon className="w-3.5 h-3.5 mr-1" />
-            Главная
+            Р“Р»Р°РІРЅР°СЏ
           </Link>
         </li>
         {pathnames.map((value, index) => {
