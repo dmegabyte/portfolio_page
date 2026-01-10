@@ -1,6 +1,6 @@
 
 import React, { Suspense, lazy } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { projects } from '../data/projects';
 import { 
     CheckBadgeIcon, 
@@ -31,8 +31,16 @@ const renderFeatureWithLinks = (feature: string) => {
     });
 };
 
+// Keep anchors pointing at hash-friendly URLs so documentation links survive page reloads.
+const toHashRoute = (path?: string) => {
+    if (!path) return undefined;
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    return `/#${normalized}`;
+};
+
 const ProjectPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const projectIndex = projects.findIndex((p) => p.slug === slug);
   const project = projects[projectIndex];
   
@@ -46,6 +54,15 @@ const ProjectPage: React.FC = () => {
       />
     );
   }
+
+  const documentationPath = project.documentationPage;
+  const documentationHref = toHashRoute(documentationPath);
+  const handleDocumentationClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    if (documentationPath) {
+      navigate(documentationPath);
+    }
+  };
 
   const prevProject = projects[projectIndex - 1] || projects[projects.length - 1];
   const nextProject = projects[projectIndex + 1] || projects[0];
@@ -133,14 +150,15 @@ const ProjectPage: React.FC = () => {
             )}
 
             <div className="pt-12 border-t border-slate-800 flex flex-wrap gap-4">
-              {project.documentationPage && (
-                <Link
-                  to={project.documentationPage}
+              {documentationHref && (
+                <a
+                  href={documentationHref}
+                  onClick={handleDocumentationClick}
                   className={`${baseBtnClasses} bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-500/20`}
                 >
                   <BookOpenIcon className="w-5 h-5" />
                   Документация
-                </Link>
+                </a>
               )}
               
               {project.reportPage && (

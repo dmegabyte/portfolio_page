@@ -125,7 +125,7 @@ const App: React.FC = () => {
           </ErrorBoundary>
         </main>
 
-        <Footer mainContentRef={mainContentRef} />
+        <Footer />
         <ScrollToTopButton />
       </div>
     </Router>
