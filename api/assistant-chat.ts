@@ -1,3 +1,7 @@
+export const config = { runtime: 'nodejs18.x' };
+import { Buffer } from 'node:buffer';
+import process from 'node:process';
+
 type AnyReq = any;
 type AnyRes = any;
 
@@ -112,4 +116,3 @@ export default async function handler(req: AnyReq, res: AnyRes) {
 
   res.status(200).send(result.text);
 }
-

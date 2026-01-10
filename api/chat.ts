@@ -1,4 +1,5 @@
 /// <reference types="node" />
+export const config = { runtime: 'nodejs18.x' };
 import { Buffer } from 'node:buffer';
 import process from 'node:process';
 import { projects } from '../data/projects';
