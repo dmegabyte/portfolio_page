@@ -90,7 +90,7 @@ export const projects: Project[] = [
   {
     id: 4,
     slug: 'bot-autotest',
-    title: 'AI-тестировщик чат-ботов',
+    title: 'Visual AI Chatbot Tester',
     summary: 'Фреймворк для end-to-end тестирования диалоговых сценариев в чат-ботах.',
     description: 'Создание системы, которая позволяет описывать тестовые сценарии в формате Gherkin (Cucumber) и автоматически запускать их, эмулируя поведение пользователя. Поддерживает тестирование ботов в Telegram, VK и на веб-сайтах. Интегрируется с CI/CD.',
     imageUrl: '/assets/images/QA.jpg',
@@ -111,25 +111,25 @@ export const projects: Project[] = [
   },
   {
     id: 5,
-    slug: 'visual-bot-testing',
-    title: 'Visual AI Chatbot Tester',
-    summary: 'Автономный QA-агент на базе Claude Vision для визуального тестирования чат-ботов.',
-    description: 'Система сквозного тестирования, которая "видит" интерфейс чата как человек. Она самостоятельно генерирует сценарии, проходит их в браузере через Playwright и анализирует ответы бота с помощью Claude API, выявляя логические ошибки и нарушения визуального стиля.',
+    slug: 'email-safety-pipeline',
+    title: 'Пайплайн безопасности email',
+    summary: 'Сервис анализа email-шаблонов на спам-триггеры, фишинг и проблемы с рендерингом.',
+    description: 'Автоматизированный пайплайн, который принимает на вход HTML-шаблон письма, проверяет его через SpamAssassin, анализирует все ссылки на безопасность с помощью Google Safe Browsing API, и делает скриншоты рендеринга в разных почтовых клиентах.',
     imageUrl: '/assets/images/email.jpg',
-    visualPrompt: 'Futuristic robotic eye analyzing a holographic chat interface. Digital brush strokes, neural connections, high-tech diagnostic display. Deep blue and violet tones, cinematic glow. ABSOLUTELY NO TEXT. Sleek, precise, 8K.',
-    technologies: ['Node.js', 'Playwright', 'Claude Vision API', 'Docker', 'TypeScript'],
+    visualPrompt: 'Abstract cybersecurity pipeline. Digital shield composed of data packets, flowing through protective light rings. Obsidian glass surface, red and gold defensive glows. ABSOLUTELY NO TEXT. Geometric flow, security tech vibe, 8K.',
+    technologies: ['Node.js', 'Express', 'Puppeteer', 'SpamAssassin API', 'Docker'],
     keyFeatures: [
-      'Автономное выполнение сценариев через визуальный анализ (Vision).',
-      'Интеллектуальная генерация негативных и граничных тест-кейсов.',
-      'Эмуляция различных личностей пользователей для проверки Tone of Voice.',
-      'Автоматическое обнаружение "галлюцинаций" и логических тупиков бота.'
+      'Автоматизированный конвейер для комплексного анализа email-шаблонов.',
+      'Проверка на спам-триггеры с использованием SpamAssassin.',
+      'Анализ безопасности всех ссылок через Google Safe Browsing API.',
+      'Создание скриншотов рендеринга в разных почтовых клиентах.'
     ],
     keyTakeaways: [
-      'Снижение затрат на ручное QA-тестирование чат-ботов на 80%.',
-      'Обнаружение визуальных багов верстки виджета на разных разрешениях.',
-      '100% покрытие сложных диалоговых ветвей без написания кода тестов.'
+      'Нулевой риск попадания в черные списки из-за фишинговых ссылок.',
+      'Автоматическая валидация верстки под мобильные устройства.',
+      'Интеграция с маркетинговыми CRM для преданализа кампаний.'
     ],
-    documentationPage: '/documentation/visual-bot-testing',
+    documentationPage: '/documentation/email-safety-pipeline',
   },
   {
     id: 6,

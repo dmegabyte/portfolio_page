@@ -48,7 +48,12 @@ const Breadcrumbs: React.FC = () => {
                   {name}
                 </span>
               ) : (
-                <Link to={to} className="hover:text-indigo-400 transition-colors">
+                // Если это промежуточный сегмент без реального маршрута (project, documentation, report),
+                // направляем на главную страницу вместо несуществующего пути
+                <Link
+                  to={['project', 'documentation', 'report'].includes(value) ? '/' : to}
+                  className="hover:text-indigo-400 transition-colors"
+                >
                   {name}
                 </Link>
               )}

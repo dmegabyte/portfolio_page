@@ -42,6 +42,10 @@ const TestContact = lazy(() => import('./pages/test-site/TestContact'));
 const SmoothLobby = lazy(() => import('./pages/demo/SmoothLobby'));
 const SmoothDeep = lazy(() => import('./pages/demo/SmoothDeep'));
 
+// Simple Demo Pages
+const SimpleDemoLanding = lazy(() => import('./pages/SimpleDemoLanding'));
+const SimpleDemoSubpage = lazy(() => import('./pages/SimpleDemoSubpage'));
+
 const GALLERY_ASSETS = [
   'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1200',
   'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?auto=format&fit=crop&q=80&w=1200',
@@ -88,6 +92,10 @@ const App: React.FC = () => {
                 {/* Smooth Demo Routes */}
                 <Route path="/smooth-demo" element={<SmoothLobby />} />
                 <Route path="/smooth-demo/deep" element={<SmoothDeep />} />
+
+                {/* Simple Demo Routes */}
+                <Route path="/demo-simple" element={<SimpleDemoLanding />} />
+                <Route path="/demo-simple/subpage" element={<SimpleDemoSubpage />} />
 
                 {/* Demo Navigation Pages */}
                 <Route path="/demo/vision" element={<VisionPage />} />
