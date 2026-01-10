@@ -132,8 +132,10 @@ const ProjectPage: React.FC = () => {
               </InfoCard>
             </div>
 
-            <div className="prose prose-invert prose-lg max-w-none text-slate-300 font-medium leading-relaxed">
-              <p>{project.description}</p>
+            <div className="prose prose-invert prose-lg max-w-none text-slate-300 font-medium leading-relaxed space-y-6">
+              {project.description.split('\n\n').map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
             </div>
 
             {project.keyFeatures && project.keyFeatures.length > 0 && (
